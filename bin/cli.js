@@ -30,11 +30,11 @@ function showBanner() {
   console.log(`
   ${c('cyan', '╔═══════════════════════════════════════════════╗')}
   ${c('cyan', '║')}                                               ${c('cyan', '║')}
-  ${c('cyan', '║')}   ${c('bold', 'A E G I S')}   v${EZRA_VERSION}                        ${c('cyan', '║')}
-  ${c('cyan', '║')}   Automated Epistemic Governance              ${c('cyan', '║')}
-  ${c('cyan', '║')}   & Intelligence System                       ${c('cyan', '║')}
+  ${c('cyan', '║')}   ${c('bold', 'E Z R A  (עזרא)')}   v${EZRA_VERSION}                 ${c('cyan', '║')}
+  ${c('cyan', '║')}   The Scribe Who Restores                     ${c('cyan', '║')}
+  ${c('cyan', '║')}   and Enforces Standards                      ${c('cyan', '║')}
   ${c('cyan', '║')}                                               ${c('cyan', '║')}
-  ${c('cyan', '║')}   The divine shield for codebases.            ${c('cyan', '║')}
+  ${c('cyan', '║')}   Enforce. Zero-drift. Restore. Audit.        ${c('cyan', '║')}
   ${c('cyan', '║')}                                               ${c('cyan', '║')}
   ${c('cyan', '╚═══════════════════════════════════════════════╝')}
   `);

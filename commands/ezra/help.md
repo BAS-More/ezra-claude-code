@@ -6,8 +6,9 @@ description: Show all EZRA commands, agents, and current configuration.
 Display the following help text:
 
 ```
-EZRA — Automated Epistemic Governance & Intelligence System
+EZRA (עזרא) — The Scribe Who Restores and Enforces Standards
 ═══════════════════════════════════════════════════════════════
+Enforce. Zero-drift. Restore. Audit.
 
 COMMANDS
   /ezra:init          Initialize EZRA for this project
@@ -54,9 +55,10 @@ TYPICAL WORKFLOW
   8. /ezra:status            → Ongoing health check
 
 PHILOSOPHY
-  The complexity is in the system, not in your workflow.
+  Ezra didn't suggest. He governed.
   EZRA handles multi-phase analysis, decision tracking,
-  and integrity enforcement. You focus on building.
+  document lifecycle, and integrity enforcement.
+  You focus on building.
 ```
 
 Then check if `.ezra/` exists and append current state:

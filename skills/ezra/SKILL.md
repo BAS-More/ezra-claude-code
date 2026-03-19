@@ -1,11 +1,11 @@
 ---
 name: ezra
-description: "EZRA — Automated Epistemic Governance & Intelligence System. A multi-agent codebase governance framework that enforces architectural decisions, detects drift, reviews code quality and security, and reconciles plans against implementation. Use when the user asks about architecture, governance, decisions, code review, or plan tracking. Trigger on: /ezra, architecture review, decision record, governance check, plan reconciliation, codebase analysis, drift detection, protected paths."
+description: "EZRA (עזרא) — The Scribe Who Restores and Enforces Standards. A multi-agent codebase governance framework that enforces architectural decisions, detects drift, reviews code quality and security, and reconciles plans against implementation. Use when the user asks about architecture, governance, decisions, code review, or plan tracking. Trigger on: /ezra, architecture review, decision record, governance check, plan reconciliation, codebase analysis, drift detection, protected paths."
 ---
 
-# EZRA — Automated Epistemic Governance & Intelligence System
+# EZRA (עזרא) — The Scribe Who Restores and Enforces Standards
 
-EZRA is a codebase shield. It provides multi-agent, multi-phase analysis with no manual orchestration.
+EZRA is a codebase governance framework. It provides multi-agent, multi-phase analysis with no manual orchestration.
 
 ## What EZRA Does
 

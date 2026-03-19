@@ -1,7 +1,7 @@
 {
   "name": "ezra-claude-code",
   "version": "4.0.0",
-  "description": "EZRA — Automated Epistemic Governance & Intelligence System. Multi-agent codebase governance for Claude Code.",
+  "description": "EZRA (עזרא) — The Scribe Who Restores and Enforces Standards. Multi-agent codebase governance for Claude Code.",
   "bin": {
     "ezra-claude-code": "bin/cli.js",
     "ezra": "bin/cli.js"
