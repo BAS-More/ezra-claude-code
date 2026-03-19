@@ -38,6 +38,17 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:review` — Multi-agent code review
 - `/ezra:status` — Governance health dashboard
 - `/ezra:help` — Show all commands
+- `/ezra:doc` — Generate, manage, and track SDLC documentation (55 document types)
+- `/ezra:dash` — Real-time governance dashboard with metrics across all pillars
+- `/ezra:doc-check` — Verify documentation completeness and currency against project lifecycle
+- `/ezra:doc-sync` — Synchronize documentation with current codebase state
+- `/ezra:doc-approve` — Document review and approval workflow with sign-off tracking
+- `/ezra:version` — Version control for all EZRA state with immutable changelog
+- `/ezra:health` — 5-pillar health assessment (architecture, security, quality, documentation, governance)
+- `/ezra:advisor` — Lifecycle-aware guidance, best practices, and forward-looking recommendations
+- `/ezra:process` — Create, run, edit, and save reusable step-by-step workflows
+- `/ezra:auto` — Autonomous process execution with guard rails and approval gates
+- `/ezra:multi` — Multi-project portfolio orchestration across multiple codebases
 
 ## Agents
 

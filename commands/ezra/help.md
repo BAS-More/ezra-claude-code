@@ -10,14 +10,25 @@ EZRA — Automated Epistemic Governance & Intelligence System
 ═══════════════════════════════════════════════════════════════
 
 COMMANDS
-  /ezra:init        Initialize EZRA for this project
-  /ezra:scan        Full multi-agent codebase analysis
-  /ezra:guard       Check changes against governance rules
-  /ezra:reconcile   Compare plan vs implementation
-  /ezra:decide      Record an architectural decision
-  /ezra:review      Multi-agent code review
-  /ezra:status      Governance health dashboard
-  /ezra:help        This help text
+  /ezra:init          Initialize EZRA for this project
+  /ezra:scan          Full multi-agent codebase analysis
+  /ezra:guard         Check changes against governance rules
+  /ezra:reconcile     Compare plan vs implementation
+  /ezra:decide        Record an architectural decision
+  /ezra:review        Multi-agent code review
+  /ezra:status        Governance health dashboard
+  /ezra:doc           Generate and manage SDLC documentation
+  /ezra:dash          Real-time governance dashboard
+  /ezra:doc-check     Verify documentation completeness
+  /ezra:doc-sync      Synchronize docs with codebase state
+  /ezra:doc-approve   Document review and approval workflow
+  /ezra:version       Version control for EZRA state
+  /ezra:health        5-pillar health assessment
+  /ezra:advisor       Lifecycle-aware guidance and recommendations
+  /ezra:process       Create and run reusable workflows
+  /ezra:auto          Autonomous execution with guard rails
+  /ezra:multi         Multi-project portfolio orchestration
+  /ezra:help          This help text
 
 AGENTS (dispatched automatically by commands)
   ezra-architect    Architecture analysis, layer mapping, dependency tracing

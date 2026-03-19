@@ -15,7 +15,32 @@
 
 const fs = require('fs');
 const path = require('path');
-const yaml = require('yaml'); // Falls back to JSON parsing if yaml not available
+// YAML parser — optional dependency, falls back to simple parser
+let yaml;
+try { yaml = require('yaml'); } catch (_) { yaml = null; }
+
+function parseYaml(text) {
+  if (yaml) return yaml.parse(text);
+  // Simple fallback: parse YAML-like key: value pairs
+  const result = {};
+  const lines = text.split('\n');
+  let currentKey = null;
+  let currentList = null;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const kvMatch = trimmed.match(/^(\w+):\s*(.*)$/);
+    if (kvMatch) {
+      currentKey = kvMatch[1];
+      const val = kvMatch[2].trim();
+      if (val) { result[currentKey] = val; currentList = null; }
+      else { result[currentKey] = []; currentList = currentKey; }
+    } else if (trimmed.startsWith('- ') && currentList) {
+      result[currentList].push(trimmed.slice(2).trim());
+    }
+  }
+  return result;
+}
 
 let input = '';
 process.stdin.setEncoding('utf8');
@@ -44,7 +69,7 @@ process.stdin.on('end', () => {
     const govContent = fs.readFileSync(govPath, 'utf8');
     try {
       // Try YAML parse
-      governance = yaml.parse(govContent);
+      governance = parseYaml(govContent);
     } catch {
       // Fallback: try as JSON
       try {
