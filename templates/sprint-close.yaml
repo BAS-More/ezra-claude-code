@@ -1,0 +1,39 @@
+name: sprint-close
+description: End-of-sprint checklist — tests, scan, doc sync, reconcile, snapshot.
+version: 1
+author: EZRA
+
+guard_rails:
+  require_clean_git: false
+  block_on_failure: false
+
+steps:
+  - id: 1
+    name: Run Tests
+    type: command
+    command: npm test
+    on_failure: ask
+
+  - id: 2
+    name: Code Scan
+    type: ezra
+    ezra_command: scan
+    on_failure: skip
+
+  - id: 3
+    name: Doc Sync
+    type: ezra
+    ezra_command: doc-sync
+    on_failure: skip
+
+  - id: 4
+    name: Plan Reconcile
+    type: ezra
+    ezra_command: reconcile
+    on_failure: skip
+
+  - id: 5
+    name: Sprint Snapshot
+    type: ezra
+    ezra_command: version snapshot sprint-end
+    on_failure: skip

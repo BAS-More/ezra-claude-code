@@ -1,0 +1,45 @@
+name: onboarding
+description: New project onboarding — initialize EZRA, scan codebase, check docs, get advisor guidance.
+version: 1
+author: EZRA
+
+guard_rails:
+  require_clean_git: false
+  block_on_failure: false
+
+steps:
+  - id: 1
+    name: Initialize EZRA
+    type: ezra
+    ezra_command: init
+    on_failure: stop
+
+  - id: 2
+    name: Full Codebase Scan
+    type: ezra
+    ezra_command: scan
+    on_failure: ask
+
+  - id: 3
+    name: Document Inventory
+    type: ezra
+    ezra_command: doc-check
+    on_failure: skip
+
+  - id: 4
+    name: Health Assessment
+    type: ezra
+    ezra_command: health
+    on_failure: skip
+
+  - id: 5
+    name: Advisor Guidance
+    type: ezra
+    ezra_command: advisor
+    on_failure: skip
+
+  - id: 6
+    name: Onboarding Report
+    type: report
+    report_type: summary
+    report_sources: [2, 3, 4, 5]
