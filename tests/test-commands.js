@@ -36,7 +36,7 @@ const EXPECTED_COMMANDS = [
   'init', 'scan', 'guard', 'reconcile', 'decide', 'review',
   'status', 'health', 'advisor', 'dash', 'doc', 'doc-check',
   'doc-sync', 'doc-approve', 'process', 'auto', 'multi',
-  'version', 'help',
+  'version', 'help', 'sync', 'claude-md', 'bootstrap',
 ];
 
 const EXPECTED_AGENTS = [
@@ -114,7 +114,7 @@ test('SKILL.md has frontmatter', () => {
 
 test('SKILL.md references all commands', () => {
   const content = fs.readFileSync(SKILL_FILE, 'utf8');
-  const critical = ['init', 'scan', 'health', 'dash', 'doc', 'process', 'auto', 'multi', 'version'];
+  const critical = ['init', 'scan', 'health', 'dash', 'doc', 'process', 'auto', 'multi', 'version', 'sync', 'claude-md', 'bootstrap'];
   for (const cmd of critical) {
     assert(content.includes(`/ezra:${cmd}`), `SKILL.md missing reference to /ezra:${cmd}`);
   }
@@ -122,9 +122,9 @@ test('SKILL.md references all commands', () => {
 
 // ─── Cross-references ────────────────────────────────────────────
 
-test('Help command lists all 19 commands', () => {
+test('Help command lists all 22 commands', () => {
   const content = fs.readFileSync(path.join(CMD_DIR, 'help.md'), 'utf8');
-  const critical = ['init', 'scan', 'guard', 'health', 'advisor', 'dash', 'doc', 'process', 'auto', 'multi', 'version'];
+  const critical = ['init', 'scan', 'guard', 'health', 'advisor', 'dash', 'doc', 'process', 'auto', 'multi', 'version', 'sync', 'claude-md', 'bootstrap'];
   for (const cmd of critical) {
     assert(content.includes(`/ezra:${cmd}`), `help.md missing /ezra:${cmd}`);
   }

@@ -49,6 +49,9 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:process` — Create, run, edit, and save reusable step-by-step workflows
 - `/ezra:auto` — Autonomous process execution with guard rails and approval gates
 - `/ezra:multi` — Multi-project portfolio orchestration across multiple codebases
+- `/ezra:sync` — Sync EZRA governance state with avios-context MCP server
+- `/ezra:claude-md` — Generate or update CLAUDE.md from EZRA governance state
+- `/ezra:bootstrap` — One-command project onboarding (init + configure + health + CLAUDE.md)
 
 ## Agents
 

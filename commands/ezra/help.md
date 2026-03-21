@@ -29,6 +29,9 @@ COMMANDS
   /ezra:process       Create and run reusable workflows
   /ezra:auto          Autonomous execution with guard rails
   /ezra:multi         Multi-project portfolio orchestration
+  /ezra:sync          Sync governance state with avios-context
+  /ezra:claude-md     Generate CLAUDE.md from EZRA state
+  /ezra:bootstrap     One-command project onboarding
   /ezra:help          This help text
 
 AGENTS (dispatched automatically by commands)
