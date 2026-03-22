@@ -1,6 +1,6 @@
 ---
 name: ezra:review
-description: Multi-agent code review dispatching architecture, security, and quality agents in parallel. Reviews staged changes, a specific file, or recent commits.
+description: "Dynamic multi-agent code review. Recommends optimal agents from 100 roles for reviewing staged changes, files, or commits. Usage: /ezra:review [scope] [--agents N] [--preset name] [--classic]."
 ---
 
 You are running an EZRA multi-agent code review.
@@ -12,7 +12,7 @@ If `.ezra/` does not exist, tell the user to run `/ezra:init` first and stop.
 If $ARGUMENTS contains a file path → review that file
 If $ARGUMENTS contains "staged" or "changes" → review staged git changes
 If $ARGUMENTS contains a commit hash → review that commit
-If $ARGUMENTS is empty → review staged changes, or if none, the last commit
+If no scope specified → review staged changes, or if none, the last commit
 
 ```bash
 # Determine what to review
@@ -20,7 +20,82 @@ git diff --cached --name-only  # staged
 git diff HEAD~1 --name-only    # last commit
 ```
 
-## Dispatch Three Review Agents in Parallel
+## Agent Selection
+
+Read the agent registry from `agents/registry.yaml` (or `~/.claude/agents/registry.yaml`).
+
+Parse modifiers from $ARGUMENTS:
+- `--classic` → Use original 3-agent review (architecture + security + quality)
+- `--preset <name>` → Use a registry preset
+- `--agents <count>` → Deploy N agents (auto-recommend based on changed files)
+- `--roles <id1,id2,...>` → Deploy specific roles
+- (no modifier) → **Smart selection** (below)
+
+### Smart Agent Selection (default)
+
+Analyze the files being reviewed to auto-recommend agents:
+
+1. **Detect file types** in the diff:
+   - `.ts/.tsx/.jsx` frontend files → recommend `fe-react`, `a11y-wcag`
+   - `.ts` service/controller files → recommend `arch-general`, `sec-api`
+   - `.prisma` or migration files → recommend `data-schema`, `data-migration`
+   - `Dockerfile`, `terraform`, CI configs → recommend `devops-docker`, `devops-cicd`
+   - `.test.ts`, `.spec.ts` → recommend `test-unit`, `test-coverage`
+   - Auth-related files → recommend `sec-auth`, `sec-crypto`
+
+2. **Count files changed**:
+   - 1-3 files → 3 agents (quick review)
+   - 4-10 files → 4-6 agents
+   - 10+ files → 6-8 agents
+
+3. **Present recommendation**:
+
+```
+EZRA REVIEW — AGENT SELECTION
+═══════════════════════════════════════════════════════
+Reviewing: <N> files (<scope description>)
+
+Detected: <file type analysis summary>
+
+📊 Recommended: <N> agents
+
+  #  Agent                    Domain        Why
+  ── ──────────────────────── ──────────── ──────────────────────────────
+  1  <role-name>              <domain>      <reason based on file analysis>
+  2  <role-name>              <domain>      <reason>
+  3  <role-name>              <domain>      <reason>
+  ...
+
+Proceed with these agents? [Y/n/customize]
+═══════════════════════════════════════════════════════
+```
+
+If user says "customize", show full domain/role list for selection.
+
+### Dynamic Agent Dispatch
+
+For each selected role:
+1. Look up `base_agent` in registry
+2. Construct brief:
+
+   "You are operating as the EZRA {role.name} ({role.id}).
+   Your specialty: {role.specialty}
+   
+   Review these changed files: <list of files with diff content>
+   
+   Focus your review on: {role.best_for}
+   The review team includes: {all role names}
+   Do not duplicate findings from other reviewers.
+   
+   Rate each finding: CRITICAL / HIGH / MEDIUM / LOW with confidence score (0-100).
+   Output structured YAML."
+
+3. Dispatch using the base_agent engine
+4. Collect results
+
+---
+
+## Classic Review (with --classic flag)
 
 ### Agent 1: Architecture Review (ezra-architect)
 

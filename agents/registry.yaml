@@ -1,0 +1,895 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# EZRA Agent Registry — 100 Specialized Roles Across 12 Domains
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Each role maps to one of 4 core agent engines (ezra-architect, ezra-reviewer,
+# ezra-guardian, ezra-reconciler) and adds a specialized focus brief.
+#
+# The /ezra:agents command reads this registry to recommend optimal agents
+# for any task. scan/review commands use it for dynamic dispatch.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+version: 1
+updated: 2025-07-17
+total_roles: 100
+
+core_agents:
+  - id: ezra-architect
+    description: Architecture analysis engine — layer mapping, dependency tracing, pattern detection
+    file: agents/ezra-architect.md
+  - id: ezra-reviewer
+    description: Security + quality review engine — OWASP checks, code quality, confidence scoring
+    file: agents/ezra-reviewer.md
+  - id: ezra-guardian
+    description: Governance enforcement engine — decision compliance, protected paths, standards
+    file: agents/ezra-guardian.md
+  - id: ezra-reconciler
+    description: Plan reconciliation engine — plan vs implementation, gap detection, constraints
+    file: agents/ezra-reconciler.md
+
+domains:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 1: ARCHITECTURE (10 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  architecture:
+    description: Architecture analysis and design review
+    icon: "\U0001F3D7"
+    roles:
+      - id: arch-general
+        name: Architecture Analyst
+        base_agent: ezra-architect
+        specialty: Full-stack architecture analysis — layers, patterns, coupling, cohesion
+        best_for: [architecture review, codebase analysis, system design review]
+        tags: [architecture, layers, patterns, dependencies, coupling]
+
+      - id: arch-microservices
+        name: Microservices Specialist
+        base_agent: ezra-architect
+        specialty: Microservices patterns — service boundaries, inter-service communication, data ownership
+        best_for: [microservices review, service decomposition, distributed systems]
+        tags: [microservices, distributed, service-mesh, saga, event-bus]
+
+      - id: arch-monolith
+        name: Modular Monolith Specialist
+        base_agent: ezra-architect
+        specialty: Monolith and modular monolith patterns — module boundaries, internal APIs, migration readiness
+        best_for: [monolith review, modularization, monolith-to-microservices planning]
+        tags: [monolith, modular, bounded-context, module-boundary]
+
+      - id: arch-api
+        name: API Design Specialist
+        base_agent: ezra-architect
+        specialty: API architecture — REST maturity, GraphQL schema design, gRPC service definitions, versioning
+        best_for: [API design review, endpoint audit, contract review, API versioning]
+        tags: [api, rest, graphql, grpc, openapi, swagger, versioning]
+
+      - id: arch-database
+        name: Database Architecture Specialist
+        base_agent: ezra-architect
+        specialty: Database design — schema normalization, indexing strategy, query patterns, read/write separation
+        best_for: [database design review, schema audit, query optimization planning]
+        tags: [database, schema, indexing, normalization, postgresql, mongodb]
+
+      - id: arch-frontend
+        name: Frontend Architecture Specialist
+        base_agent: ezra-architect
+        specialty: Frontend architecture — component hierarchy, state management, rendering patterns, code splitting
+        best_for: [frontend architecture review, component structure audit, state management review]
+        tags: [frontend, react, vue, angular, components, state-management, rendering]
+
+      - id: arch-event-driven
+        name: Event-Driven Architecture Specialist
+        base_agent: ezra-architect
+        specialty: Event-driven patterns — CQRS, event sourcing, message queues, pub/sub, saga orchestration
+        best_for: [event-driven review, CQRS audit, message queue design, saga pattern review]
+        tags: [events, cqrs, event-sourcing, message-queue, pub-sub, saga, kafka, rabbitmq]
+
+      - id: arch-ddd
+        name: Domain-Driven Design Specialist
+        base_agent: ezra-architect
+        specialty: DDD patterns — bounded contexts, aggregates, value objects, domain services, ubiquitous language
+        best_for: [DDD review, domain modeling, bounded context mapping, aggregate design]
+        tags: [ddd, domain, bounded-context, aggregate, value-object, entity, repository-pattern]
+
+      - id: arch-cloud
+        name: Cloud-Native Architecture Specialist
+        base_agent: ezra-architect
+        specialty: Cloud-native patterns — 12-factor, containerization readiness, serverless, managed services
+        best_for: [cloud migration review, cloud-native audit, serverless architecture review]
+        tags: [cloud, azure, aws, gcp, serverless, containers, 12-factor, cloud-native]
+
+      - id: arch-performance
+        name: Performance Architecture Specialist
+        base_agent: ezra-architect
+        specialty: Performance-oriented architecture — caching layers, CDN, async processing, connection pooling
+        best_for: [performance architecture review, scalability audit, caching strategy review]
+        tags: [performance, caching, cdn, async, pooling, scalability, throughput]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 2: SECURITY (12 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  security:
+    description: Security analysis and vulnerability detection
+    icon: "\U0001F6E1"
+    roles:
+      - id: sec-general
+        name: Security Analyst
+        base_agent: ezra-reviewer
+        specialty: Full OWASP Top 10 security review with confidence-scored findings
+        best_for: [security review, vulnerability scan, security audit]
+        tags: [security, owasp, vulnerabilities, audit]
+
+      - id: sec-owasp
+        name: OWASP Top 10 Specialist
+        base_agent: ezra-reviewer
+        specialty: Deep OWASP Top 10 2025 analysis — all 10 categories with exploitation scenarios
+        best_for: [OWASP compliance, penetration test prep, security certification]
+        tags: [owasp, top-10, injection, xss, broken-auth, ssrf]
+
+      - id: sec-auth
+        name: Authentication & Authorization Specialist
+        base_agent: ezra-reviewer
+        specialty: Auth system review — JWT, OAuth2, RBAC, MFA, session management, token lifecycle
+        best_for: [auth review, login flow audit, permission model review, MFA implementation]
+        tags: [auth, jwt, oauth, rbac, mfa, session, tokens, authorization]
+
+      - id: sec-crypto
+        name: Cryptography Specialist
+        base_agent: ezra-reviewer
+        specialty: Cryptographic implementation review — hashing, encryption, key management, TLS, certificates
+        best_for: [crypto review, encryption audit, key management review, TLS configuration]
+        tags: [crypto, encryption, hashing, bcrypt, aes, rsa, tls, certificates, key-management]
+
+      - id: sec-api
+        name: API Security Specialist
+        base_agent: ezra-reviewer
+        specialty: API security — rate limiting, input validation, CORS, CSRF, API keys, request signing
+        best_for: [API security audit, endpoint hardening, rate limiting review]
+        tags: [api-security, rate-limiting, cors, csrf, input-validation, api-keys]
+
+      - id: sec-injection
+        name: Injection Attack Specialist
+        base_agent: ezra-reviewer
+        specialty: Injection vector analysis — SQL, NoSQL, command, LDAP, XPath, template, header injection
+        best_for: [injection audit, parameterized query review, input sanitization review]
+        tags: [injection, sql-injection, nosql-injection, command-injection, ldap, xpath]
+
+      - id: sec-supply-chain
+        name: Supply Chain Security Specialist
+        base_agent: ezra-reviewer
+        specialty: Dependency and supply chain security — CVE scanning, license risks, typosquatting, lockfile integrity
+        best_for: [dependency audit, npm audit, supply chain review, license compliance]
+        tags: [supply-chain, dependencies, cve, npm, license, lockfile, sbom]
+
+      - id: sec-infrastructure
+        name: Infrastructure Security Specialist
+        base_agent: ezra-reviewer
+        specialty: Infrastructure security — Docker hardening, Kubernetes RBAC, cloud IAM, network policies
+        best_for: [infrastructure security audit, Docker review, Kubernetes security, cloud IAM review]
+        tags: [infrastructure, docker, kubernetes, iam, network-policy, cloud-security]
+
+      - id: sec-data-privacy
+        name: Data Privacy Specialist
+        base_agent: ezra-reviewer
+        specialty: Data privacy — PII detection, GDPR compliance, data classification, consent management, retention
+        best_for: [privacy audit, GDPR review, PII scan, data classification, retention policy review]
+        tags: [privacy, gdpr, pii, data-classification, consent, retention, anonymization]
+
+      - id: sec-secrets
+        name: Secrets Management Specialist
+        base_agent: ezra-reviewer
+        specialty: Secrets handling — hardcoded credentials, env var management, vault integration, gitignore coverage
+        best_for: [secrets scan, credential audit, environment variable review, vault setup review]
+        tags: [secrets, credentials, env-vars, vault, gitignore, key-rotation]
+
+      - id: sec-xss
+        name: XSS & Frontend Security Specialist
+        base_agent: ezra-reviewer
+        specialty: Frontend security — stored/reflected/DOM XSS, CSP, sanitization, safe rendering patterns
+        best_for: [XSS audit, CSP review, frontend sanitization review, output encoding review]
+        tags: [xss, csp, sanitization, encoding, dom-xss, stored-xss, reflected-xss]
+
+      - id: sec-network
+        name: Network Security Specialist
+        base_agent: ezra-reviewer
+        specialty: Network-level security — SSRF, open redirects, DNS rebinding, CORS policy, TLS configuration
+        best_for: [network security audit, SSRF review, CORS audit, TLS review]
+        tags: [network, ssrf, cors, tls, dns, open-redirect, proxy]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 3: CODE QUALITY (10 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  quality:
+    description: Code quality analysis and improvement
+    icon: "\U00002728"
+    roles:
+      - id: qual-types
+        name: Type Safety Specialist
+        base_agent: ezra-reviewer
+        specialty: TypeScript/type safety — strict mode, no any, generic usage, type narrowing, inference
+        best_for: [type safety audit, TypeScript strict mode review, type coverage analysis]
+        tags: [types, typescript, strict, generics, type-safety, inference]
+
+      - id: qual-errors
+        name: Error Handling Specialist
+        base_agent: ezra-reviewer
+        specialty: Error handling patterns — try/catch, promise rejection, error boundaries, custom errors, logging
+        best_for: [error handling review, exception audit, error boundary review]
+        tags: [errors, error-handling, try-catch, promises, error-boundary, exceptions]
+
+      - id: qual-naming
+        name: Naming Conventions Specialist
+        base_agent: ezra-reviewer
+        specialty: Naming analysis — variable/function naming quality, consistency, domain language alignment
+        best_for: [naming review, convention audit, readability improvement]
+        tags: [naming, conventions, readability, camelCase, PascalCase, domain-language]
+
+      - id: qual-complexity
+        name: Code Complexity Analyst
+        base_agent: ezra-reviewer
+        specialty: Complexity metrics — cyclomatic complexity, cognitive complexity, nesting depth, function length
+        best_for: [complexity audit, refactoring priority, maintainability review]
+        tags: [complexity, cyclomatic, cognitive, nesting, function-length, maintainability]
+
+      - id: qual-dry
+        name: DRY Principle Analyst
+        base_agent: ezra-reviewer
+        specialty: Duplication detection — copy-paste code, missed abstractions, shared logic opportunities
+        best_for: [duplication scan, abstraction opportunity review, code consolidation]
+        tags: [dry, duplication, abstraction, consolidation, shared-logic]
+
+      - id: qual-dead-code
+        name: Dead Code Detector
+        base_agent: ezra-reviewer
+        specialty: Dead code analysis — unused exports, unreachable branches, orphan files, stale dependencies
+        best_for: [dead code scan, unused code cleanup, dependency cleanup]
+        tags: [dead-code, unused, orphan, stale, unreachable, tree-shaking]
+
+      - id: qual-clean-code
+        name: Clean Code Enforcer
+        base_agent: ezra-reviewer
+        specialty: Clean Code principles — SRP in functions, clear intent, minimal parameters, no side effects
+        best_for: [clean code review, readability audit, code smell detection]
+        tags: [clean-code, readability, code-smells, single-responsibility, intent]
+
+      - id: qual-solid
+        name: SOLID Principles Specialist
+        base_agent: ezra-reviewer
+        specialty: SOLID compliance — SRP, OCP, LSP, ISP, DIP in classes and modules
+        best_for: [SOLID review, OOP design review, class design audit]
+        tags: [solid, srp, ocp, lsp, isp, dip, oop, class-design]
+
+      - id: qual-refactor
+        name: Refactoring Opportunity Identifier
+        base_agent: ezra-reviewer
+        specialty: Refactoring analysis — extract method, move field, replace conditional, introduce parameter object
+        best_for: [refactoring planning, technical debt assessment, code improvement roadmap]
+        tags: [refactoring, technical-debt, extract, inline, move, replace]
+
+      - id: qual-patterns
+        name: Design Pattern Specialist
+        base_agent: ezra-reviewer
+        specialty: Design pattern analysis — correct pattern usage, anti-patterns, pattern opportunities
+        best_for: [pattern review, anti-pattern detection, design improvement]
+        tags: [patterns, anti-patterns, factory, strategy, observer, singleton, repository]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 4: TESTING (8 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  testing:
+    description: Test strategy and coverage analysis
+    icon: "\U0001F9EA"
+    roles:
+      - id: test-unit
+        name: Unit Test Specialist
+        base_agent: ezra-reviewer
+        specialty: Unit test quality — test isolation, assertion quality, edge case coverage, mock usage
+        best_for: [unit test review, test quality audit, assertion analysis]
+        tags: [unit-test, jest, mocha, assertions, isolation, mocking]
+
+      - id: test-integration
+        name: Integration Test Specialist
+        base_agent: ezra-reviewer
+        specialty: Integration test strategy — service integration, database testing, API contract testing
+        best_for: [integration test review, service test audit, contract testing review]
+        tags: [integration-test, contract-test, database-test, service-test]
+
+      - id: test-e2e
+        name: E2E Test Specialist
+        base_agent: ezra-reviewer
+        specialty: End-to-end test quality — user flow coverage, flaky test detection, test stability
+        best_for: [E2E test review, Playwright/Cypress audit, test stability analysis]
+        tags: [e2e, playwright, cypress, user-flow, flaky-tests, stability]
+
+      - id: test-coverage
+        name: Test Coverage Analyst
+        base_agent: ezra-reviewer
+        specialty: Coverage analysis — uncovered branches, missing edge cases, coverage gaps by module
+        best_for: [coverage audit, gap analysis, coverage improvement planning]
+        tags: [coverage, branches, edge-cases, gaps, istanbul, nyc]
+
+      - id: test-tdd
+        name: TDD Methodology Specialist
+        base_agent: ezra-reviewer
+        specialty: TDD compliance — red-green-refactor cycle, test-first evidence, behavior-driven specs
+        best_for: [TDD audit, test-first review, BDD review]
+        tags: [tdd, bdd, test-first, red-green-refactor, specification]
+
+      - id: test-mocking
+        name: Mock Strategy Specialist
+        base_agent: ezra-reviewer
+        specialty: Mock/stub strategy — over-mocking detection, test doubles quality, fake vs stub vs mock
+        best_for: [mock strategy review, test doubles audit, dependency isolation review]
+        tags: [mocking, stubs, fakes, spies, test-doubles, dependency-injection]
+
+      - id: test-performance
+        name: Performance Test Specialist
+        base_agent: ezra-reviewer
+        specialty: Performance testing strategy — load testing, stress testing, benchmark analysis, k6/NBomber
+        best_for: [performance test review, load test planning, benchmark analysis]
+        tags: [performance-test, load-test, stress-test, benchmark, k6, nbomber]
+
+      - id: test-api
+        name: API Test Specialist
+        base_agent: ezra-reviewer
+        specialty: API testing — endpoint coverage, request/response validation, error scenario testing, auth flows
+        best_for: [API test review, endpoint coverage audit, error scenario analysis]
+        tags: [api-test, endpoint, request-response, supertest, http-testing]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 5: GOVERNANCE (8 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  governance:
+    description: Governance enforcement and compliance
+    icon: "\U0001F3DB"
+    roles:
+      - id: gov-general
+        name: Governance Enforcer
+        base_agent: ezra-guardian
+        specialty: Full governance compliance — decisions, protected paths, standards, drift
+        best_for: [governance audit, compliance check, standards enforcement]
+        tags: [governance, compliance, standards, enforcement]
+
+      - id: gov-compliance
+        name: Regulatory Compliance Specialist
+        base_agent: ezra-guardian
+        specialty: Regulatory compliance — SOC2, ISO 27001, HIPAA, PCI-DSS code-level requirements
+        best_for: [regulatory audit, SOC2 review, ISO compliance, HIPAA review]
+        tags: [compliance, soc2, iso-27001, hipaa, pci-dss, regulatory]
+
+      - id: gov-standards
+        name: Coding Standards Enforcer
+        base_agent: ezra-guardian
+        specialty: Coding standards — ESLint rules, Prettier, naming conventions, file organization, import order
+        best_for: [standards audit, lint review, code format review, convention enforcement]
+        tags: [standards, eslint, prettier, conventions, formatting, linting]
+
+      - id: gov-adr
+        name: ADR Management Specialist
+        base_agent: ezra-guardian
+        specialty: ADR management — decision record completeness, decision compliance, superseded tracking
+        best_for: [ADR audit, decision compliance review, architectural decision tracking]
+        tags: [adr, decisions, architectural-decisions, compliance, tracking]
+
+      - id: gov-licensing
+        name: License Compliance Specialist
+        base_agent: ezra-guardian
+        specialty: License compliance — OSS license compatibility, license obligations, SBOM generation
+        best_for: [license audit, OSS compliance, license compatibility review]
+        tags: [license, oss, gpl, mit, apache, sbom, compliance]
+
+      - id: gov-audit
+        name: Audit Trail Specialist
+        base_agent: ezra-guardian
+        specialty: Audit trail analysis — change tracking, approval workflows, traceability, evidence collection
+        best_for: [audit trail review, change tracking audit, traceability analysis]
+        tags: [audit-trail, change-tracking, traceability, approval, evidence]
+
+      - id: gov-policy
+        name: Policy Enforcement Specialist
+        base_agent: ezra-guardian
+        specialty: Policy enforcement — branch policies, merge requirements, deployment gates, code owners
+        best_for: [policy review, branch protection audit, deployment gate review]
+        tags: [policy, branch-protection, merge-requirements, code-owners, deployment-gates]
+
+      - id: gov-drift
+        name: Drift Detection Specialist
+        base_agent: ezra-guardian
+        specialty: Drift detection — configuration drift, infrastructure drift, schema drift, dependency drift
+        best_for: [drift detection, configuration audit, infrastructure drift review]
+        tags: [drift, configuration, infrastructure, schema, dependency, state]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 6: DEVOPS (10 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  devops:
+    description: DevOps practices and infrastructure
+    icon: "\U0001F680"
+    roles:
+      - id: devops-cicd
+        name: CI/CD Pipeline Specialist
+        base_agent: ezra-architect
+        specialty: CI/CD pipeline analysis — build steps, test stages, deployment automation, pipeline efficiency
+        best_for: [CI/CD review, pipeline optimization, build process audit]
+        tags: [cicd, pipeline, build, deploy, github-actions, azure-devops, jenkins]
+
+      - id: devops-docker
+        name: Docker & Container Specialist
+        base_agent: ezra-architect
+        specialty: Container analysis — Dockerfile best practices, image optimization, multi-stage builds, security
+        best_for: [Docker review, container audit, image optimization, Dockerfile review]
+        tags: [docker, container, dockerfile, multi-stage, image, registry]
+
+      - id: devops-k8s
+        name: Kubernetes Specialist
+        base_agent: ezra-architect
+        specialty: Kubernetes configuration — manifests, helm charts, resource limits, health probes, RBAC
+        best_for: [Kubernetes review, helm chart audit, resource configuration review]
+        tags: [kubernetes, k8s, helm, manifests, pods, services, ingress]
+
+      - id: devops-terraform
+        name: Infrastructure-as-Code Specialist
+        base_agent: ezra-architect
+        specialty: IaC analysis — Terraform modules, state management, resource dependencies, drift detection
+        best_for: [Terraform review, IaC audit, infrastructure planning, state management review]
+        tags: [terraform, iac, infrastructure, bicep, pulumi, cloudformation]
+
+      - id: devops-monitoring
+        name: Monitoring & Observability Specialist
+        base_agent: ezra-architect
+        specialty: Observability — metrics, alerting, dashboards, SLOs/SLIs, distributed tracing, health checks
+        best_for: [monitoring review, observability audit, alerting strategy review, SLO review]
+        tags: [monitoring, observability, metrics, alerting, slo, sli, tracing, health-checks]
+
+      - id: devops-logging
+        name: Logging Strategy Specialist
+        base_agent: ezra-architect
+        specialty: Logging analysis — structured logging, log levels, correlation IDs, log aggregation, retention
+        best_for: [logging review, log strategy audit, structured logging review]
+        tags: [logging, structured-logging, log-levels, correlation-id, aggregation]
+
+      - id: devops-deployment
+        name: Deployment Strategy Specialist
+        base_agent: ezra-architect
+        specialty: Deployment patterns — blue-green, canary, rolling, feature flags, rollback procedures
+        best_for: [deployment strategy review, rollback planning, feature flag audit]
+        tags: [deployment, blue-green, canary, rolling, feature-flags, rollback]
+
+      - id: devops-git
+        name: Git Workflow Specialist
+        base_agent: ezra-architect
+        specialty: Git workflow — branching strategy, commit conventions, merge/rebase policy, hook configuration
+        best_for: [git workflow review, branching strategy audit, commit convention review]
+        tags: [git, branching, merge, rebase, commits, hooks, gitflow, trunk-based]
+
+      - id: devops-azure
+        name: Azure Platform Specialist
+        base_agent: ezra-architect
+        specialty: Azure services — App Service, Container Apps, Functions, CosmosDB, Key Vault, Azure DevOps
+        best_for: [Azure architecture review, Azure service audit, Azure cost optimization]
+        tags: [azure, app-service, container-apps, functions, cosmos-db, key-vault]
+
+      - id: devops-aws
+        name: AWS Platform Specialist
+        base_agent: ezra-architect
+        specialty: AWS services — Lambda, ECS, RDS, S3, CloudFront, IAM policies, CDK
+        best_for: [AWS architecture review, AWS service audit, AWS cost optimization]
+        tags: [aws, lambda, ecs, rds, s3, cloudfront, iam, cdk]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 7: DOCUMENTATION (8 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  documentation:
+    description: Documentation quality and completeness
+    icon: "\U0001F4DD"
+    roles:
+      - id: doc-api
+        name: API Documentation Specialist
+        base_agent: ezra-reviewer
+        specialty: API docs — OpenAPI/Swagger completeness, endpoint documentation, request/response examples
+        best_for: [API documentation audit, OpenAPI review, endpoint documentation review]
+        tags: [api-docs, openapi, swagger, endpoint-docs, examples]
+
+      - id: doc-readme
+        name: README & Project Docs Specialist
+        base_agent: ezra-reviewer
+        specialty: Project docs — README completeness, setup instructions, contribution guides, badges
+        best_for: [README review, project documentation audit, onboarding docs review]
+        tags: [readme, project-docs, setup, contributing, onboarding]
+
+      - id: doc-code
+        name: Code Documentation Specialist
+        base_agent: ezra-reviewer
+        specialty: Code docs — JSDoc/TSDoc completeness, inline comment quality, documentation coverage
+        best_for: [code documentation audit, JSDoc review, comment quality review]
+        tags: [jsdoc, tsdoc, inline-comments, documentation-coverage, code-docs]
+
+      - id: doc-architecture
+        name: Architecture Documentation Specialist
+        base_agent: ezra-reviewer
+        specialty: Architecture docs — C4 diagrams, system context, component diagrams, data flow documentation
+        best_for: [architecture documentation review, diagram audit, system context review]
+        tags: [architecture-docs, c4, diagrams, system-context, data-flow]
+
+      - id: doc-user
+        name: User Documentation Specialist
+        base_agent: ezra-reviewer
+        specialty: User docs — guides, tutorials, FAQ, troubleshooting, user-facing content quality
+        best_for: [user documentation review, guide quality audit, FAQ review]
+        tags: [user-docs, guides, tutorials, faq, troubleshooting, help]
+
+      - id: doc-changelog
+        name: Changelog & Versioning Specialist
+        base_agent: ezra-reviewer
+        specialty: Changelog — semantic versioning compliance, changelog completeness, release notes quality
+        best_for: [changelog review, versioning audit, release notes review]
+        tags: [changelog, semver, versioning, release-notes, keep-a-changelog]
+
+      - id: doc-runbook
+        name: Runbook & Operations Specialist
+        base_agent: ezra-reviewer
+        specialty: Ops docs — runbooks, incident response, disaster recovery, operational procedures
+        best_for: [runbook review, incident response planning, DR documentation review]
+        tags: [runbook, incident-response, disaster-recovery, operations, procedures]
+
+      - id: doc-sdlc
+        name: SDLC Documentation Specialist
+        base_agent: ezra-reviewer
+        specialty: SDLC docs — requirements traceability, test plans, design documents, review records
+        best_for: [SDLC documentation audit, traceability review, test plan review]
+        tags: [sdlc, requirements, traceability, test-plan, design-doc, review-records]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 8: PERFORMANCE (8 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  performance:
+    description: Performance analysis and optimization
+    icon: "\U000026A1"
+    roles:
+      - id: perf-backend
+        name: Backend Performance Analyst
+        base_agent: ezra-reviewer
+        specialty: Backend performance — N+1 queries, connection pooling, async patterns, response times
+        best_for: [backend performance review, query optimization, async pattern review]
+        tags: [backend-performance, n+1, connection-pool, async, response-time]
+
+      - id: perf-frontend
+        name: Frontend Performance Analyst
+        base_agent: ezra-reviewer
+        specialty: Frontend performance — Core Web Vitals, bundle size, rendering, lazy loading, hydration
+        best_for: [frontend performance review, Core Web Vitals audit, bundle analysis]
+        tags: [frontend-performance, core-web-vitals, bundle-size, lazy-loading, hydration]
+
+      - id: perf-database
+        name: Database Performance Specialist
+        base_agent: ezra-reviewer
+        specialty: Database performance — query optimization, index analysis, explain plans, connection pooling
+        best_for: [database performance audit, query optimization, index review]
+        tags: [database-performance, query-optimization, indexes, explain-plan, pooling]
+
+      - id: perf-api
+        name: API Latency Specialist
+        base_agent: ezra-reviewer
+        specialty: API performance — endpoint latency, payload optimization, pagination, caching headers
+        best_for: [API performance review, latency audit, payload optimization]
+        tags: [api-performance, latency, payload, pagination, caching-headers]
+
+      - id: perf-memory
+        name: Memory Leak Detector
+        base_agent: ezra-reviewer
+        specialty: Memory analysis — leak detection, closure retention, event listener cleanup, garbage collection
+        best_for: [memory leak detection, memory profiling review, resource leak audit]
+        tags: [memory, leaks, closures, event-listeners, garbage-collection, resources]
+
+      - id: perf-bundle
+        name: Bundle Size Analyst
+        base_agent: ezra-reviewer
+        specialty: Bundle analysis — tree-shaking effectiveness, code splitting, dynamic imports, unused dependencies
+        best_for: [bundle size audit, tree-shaking review, code splitting analysis]
+        tags: [bundle, tree-shaking, code-splitting, dynamic-import, webpack, vite, rollup]
+
+      - id: perf-caching
+        name: Caching Strategy Specialist
+        base_agent: ezra-reviewer
+        specialty: Caching analysis — Redis usage, HTTP caching, CDN caching, application-level cache, invalidation
+        best_for: [caching strategy review, Redis audit, cache invalidation review]
+        tags: [caching, redis, http-cache, cdn, invalidation, memoization, etag]
+
+      - id: perf-scalability
+        name: Scalability Analyst
+        base_agent: ezra-architect
+        specialty: Scalability analysis — horizontal/vertical scaling, bottleneck identification, capacity planning
+        best_for: [scalability review, capacity planning, bottleneck analysis]
+        tags: [scalability, horizontal-scaling, vertical-scaling, bottleneck, capacity]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 9: ACCESSIBILITY (6 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  accessibility:
+    description: Accessibility compliance and best practices
+    icon: "\U0000267F"
+    roles:
+      - id: a11y-wcag
+        name: WCAG Compliance Specialist
+        base_agent: ezra-reviewer
+        specialty: WCAG 2.1 AA compliance — perceivable, operable, understandable, robust principles
+        best_for: [WCAG audit, accessibility compliance review, a11y certification prep]
+        tags: [wcag, accessibility, a11y, perceivable, operable, understandable, robust]
+
+      - id: a11y-aria
+        name: ARIA Implementation Specialist
+        base_agent: ezra-reviewer
+        specialty: ARIA implementation — roles, states, properties, live regions, landmark usage
+        best_for: [ARIA review, role audit, live region review, landmark analysis]
+        tags: [aria, roles, states, properties, live-regions, landmarks]
+
+      - id: a11y-keyboard
+        name: Keyboard Navigation Specialist
+        base_agent: ezra-reviewer
+        specialty: Keyboard accessibility — focus management, tab order, keyboard traps, skip links, shortcuts
+        best_for: [keyboard navigation review, focus management audit, tab order analysis]
+        tags: [keyboard, focus, tab-order, keyboard-trap, skip-link, shortcuts]
+
+      - id: a11y-screen-reader
+        name: Screen Reader Compatibility Specialist
+        base_agent: ezra-reviewer
+        specialty: Screen reader compatibility — announcements, reading order, semantic HTML, alt text
+        best_for: [screen reader review, semantic HTML audit, alt text review]
+        tags: [screen-reader, announcements, semantic-html, alt-text, reading-order]
+
+      - id: a11y-contrast
+        name: Color & Contrast Specialist
+        base_agent: ezra-reviewer
+        specialty: Visual accessibility — color contrast ratios (4.5:1 text, 3:1 UI), color independence, focus indicators
+        best_for: [contrast audit, color accessibility review, visual indicator review]
+        tags: [contrast, color, visual, focus-indicators, high-contrast, color-blind]
+
+      - id: a11y-semantic
+        name: Semantic HTML Specialist
+        base_agent: ezra-reviewer
+        specialty: Semantic markup — heading hierarchy, form labels, table structure, list usage, landmark elements
+        best_for: [semantic HTML review, heading hierarchy audit, form accessibility review]
+        tags: [semantic, headings, forms, tables, lists, landmarks, html-structure]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 10: DATA (6 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  data:
+    description: Data architecture and management
+    icon: "\U0001F5C4"
+    roles:
+      - id: data-schema
+        name: Database Schema Specialist
+        base_agent: ezra-architect
+        specialty: Schema design — normalization, relationships, constraints, indices, partitioning
+        best_for: [schema review, database design audit, normalization analysis]
+        tags: [schema, normalization, relationships, constraints, indices, partitioning]
+
+      - id: data-migration
+        name: Data Migration Specialist
+        base_agent: ezra-architect
+        specialty: Migration analysis — migration safety, rollback plans, data transformation, zero-downtime migrations
+        best_for: [migration review, rollback planning, data transformation audit]
+        tags: [migration, rollback, transformation, zero-downtime, prisma-migrate, flyway]
+
+      - id: data-validation
+        name: Data Validation Specialist
+        base_agent: ezra-reviewer
+        specialty: Data validation — input validation, schema validation, type coercion, boundary checks, sanitization
+        best_for: [validation review, input sanitization audit, schema validation review]
+        tags: [validation, input, sanitization, schema-validation, zod, joi, class-validator]
+
+      - id: data-modeling
+        name: Data Modeling Specialist
+        base_agent: ezra-architect
+        specialty: Data modeling — entity relationships, ORM mapping, query patterns, denormalization decisions
+        best_for: [data model review, ORM audit, entity relationship analysis]
+        tags: [data-modeling, orm, prisma, typeorm, entity, relationship, denormalization]
+
+      - id: data-api
+        name: Data API Design Specialist
+        base_agent: ezra-architect
+        specialty: Data API patterns — pagination, filtering, sorting, field selection, batch operations
+        best_for: [data API review, pagination design, filtering pattern review]
+        tags: [data-api, pagination, filtering, sorting, field-selection, batch]
+
+      - id: data-integrity
+        name: Data Integrity Specialist
+        base_agent: ezra-guardian
+        specialty: Data integrity — referential integrity, transaction boundaries, consistency, backup strategy
+        best_for: [data integrity audit, transaction review, consistency analysis]
+        tags: [integrity, transactions, referential, consistency, backup, acid]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 11: FRONTEND (8 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  frontend:
+    description: Frontend development patterns and practices
+    icon: "\U0001F3A8"
+    roles:
+      - id: fe-react
+        name: React Specialist
+        base_agent: ezra-reviewer
+        specialty: React patterns — hooks usage, component lifecycle, rendering optimization, React 19 features
+        best_for: [React review, hooks audit, component pattern review, React 19 migration]
+        tags: [react, hooks, components, jsx, rendering, react-19, suspense]
+
+      - id: fe-state
+        name: State Management Specialist
+        base_agent: ezra-reviewer
+        specialty: State management — Redux, Zustand, Context, server state, state normalization, selectors
+        best_for: [state management review, Redux audit, state architecture review]
+        tags: [state, redux, zustand, context, react-query, tanstack, selectors]
+
+      - id: fe-css
+        name: CSS & Styling Specialist
+        base_agent: ezra-reviewer
+        specialty: CSS analysis — specificity, performance, responsiveness, Tailwind usage, CSS-in-JS patterns
+        best_for: [CSS review, styling audit, responsive design review, Tailwind review]
+        tags: [css, tailwind, styled-components, sass, specificity, responsive, css-in-js]
+
+      - id: fe-components
+        name: Component Design Specialist
+        base_agent: ezra-architect
+        specialty: Component architecture — composition patterns, prop design, reusability, atomic design
+        best_for: [component design review, composition audit, reusability analysis]
+        tags: [components, composition, props, atomic-design, reusability, design-system]
+
+      - id: fe-routing
+        name: Routing Specialist
+        base_agent: ezra-reviewer
+        specialty: Client-side routing — route protection, code splitting, navigation guards, deep linking
+        best_for: [routing review, route protection audit, navigation flow review]
+        tags: [routing, react-router, navigation, guards, code-splitting, deep-linking]
+
+      - id: fe-forms
+        name: Form Handling Specialist
+        base_agent: ezra-reviewer
+        specialty: Form patterns — validation, error display, multi-step forms, file uploads, accessibility
+        best_for: [form handling review, validation pattern review, form accessibility audit]
+        tags: [forms, validation, react-hook-form, formik, multi-step, file-upload]
+
+      - id: fe-hooks
+        name: React Hooks Specialist
+        base_agent: ezra-reviewer
+        specialty: Custom hooks — hook composition, dependency arrays, memoization, hook testing patterns
+        best_for: [hooks review, custom hook audit, memoization review, dependency array check]
+        tags: [hooks, useEffect, useMemo, useCallback, custom-hooks, dependency-array]
+
+      - id: fe-ux
+        name: UX Patterns Specialist
+        base_agent: ezra-reviewer
+        specialty: UX patterns — loading states, error states, empty states, optimistic updates, animations
+        best_for: [UX pattern review, loading state audit, error handling UX review]
+        tags: [ux, loading, error-states, empty-states, optimistic-updates, skeleton, toast]
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # DOMAIN 12: RECONCILIATION (6 roles)
+  # ─────────────────────────────────────────────────────────────────────────────
+  reconciliation:
+    description: Plan vs implementation tracking and reconciliation
+    icon: "\U0001F4CB"
+    roles:
+      - id: recon-general
+        name: Plan Reconciler
+        base_agent: ezra-reconciler
+        specialty: Plan vs implementation — completion tracking, gap detection, unplanned changes, constraints
+        best_for: [plan reconciliation, implementation tracking, gap analysis]
+        tags: [reconciliation, plan, implementation, gaps, tracking]
+
+      - id: recon-sprint
+        name: Sprint Reconciler
+        base_agent: ezra-reconciler
+        specialty: Sprint/milestone tracking — sprint goal completion, velocity analysis, carryover items
+        best_for: [sprint review, milestone tracking, velocity analysis]
+        tags: [sprint, milestone, velocity, carryover, agile, scrum]
+
+      - id: recon-requirements
+        name: Requirements Traceability Specialist
+        base_agent: ezra-reconciler
+        specialty: Requirements tracing — requirement to code mapping, coverage gaps, acceptance criteria verification
+        best_for: [requirements traceability, acceptance criteria review, coverage gap analysis]
+        tags: [requirements, traceability, acceptance-criteria, coverage, mapping]
+
+      - id: recon-budget
+        name: Budget & Effort Tracker
+        base_agent: ezra-reconciler
+        specialty: Effort tracking — estimated vs actual effort, scope vs budget, resource utilization
+        best_for: [effort tracking, budget review, resource utilization analysis]
+        tags: [budget, effort, estimation, resource, cost, utilization]
+
+      - id: recon-scope
+        name: Scope Creep Detector
+        base_agent: ezra-reconciler
+        specialty: Scope analysis — unplanned additions, feature creep, gold plating, scope vs original requirements
+        best_for: [scope creep detection, feature creep analysis, scope control review]
+        tags: [scope, creep, unplanned, gold-plating, feature-creep, requirements]
+
+      - id: recon-timeline
+        name: Timeline Reconciler
+        base_agent: ezra-reconciler
+        specialty: Timeline tracking — milestone dates, critical path, blockers, dependency delays
+        best_for: [timeline review, milestone tracking, critical path analysis]
+        tags: [timeline, milestones, critical-path, blockers, delays, dependencies]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RECOMMENDATION PRESETS
+# ═══════════════════════════════════════════════════════════════════════════════
+# Pre-configured agent combinations for common tasks. Used by /ezra:agents recommend.
+
+presets:
+  quick-review:
+    description: Fast code review — architecture + security + quality (3 agents)
+    agents: [arch-general, sec-general, qual-clean-code]
+    recommended_for: [quick review, PR review, small change review]
+
+  full-scan:
+    description: Comprehensive codebase scan — matches original /ezra:scan (4 agents)
+    agents: [arch-general, sec-general, gov-general, recon-general]
+    recommended_for: [full scan, health check, periodic audit]
+
+  security-deep:
+    description: Deep security audit (6 agents)
+    agents: [sec-owasp, sec-auth, sec-injection, sec-supply-chain, sec-secrets, sec-data-privacy]
+    recommended_for: [security audit, penetration prep, compliance review]
+
+  quality-deep:
+    description: Deep quality analysis (6 agents)
+    agents: [qual-types, qual-complexity, qual-dry, qual-dead-code, qual-solid, qual-patterns]
+    recommended_for: [quality audit, tech debt assessment, refactoring planning]
+
+  frontend-review:
+    description: Frontend-focused review (6 agents)
+    agents: [arch-frontend, fe-react, fe-state, fe-components, perf-frontend, a11y-wcag]
+    recommended_for: [frontend review, React audit, UI code review]
+
+  backend-review:
+    description: Backend-focused review (6 agents)
+    agents: [arch-api, sec-api, perf-backend, perf-database, data-schema, test-integration]
+    recommended_for: [backend review, API audit, service layer review]
+
+  devops-audit:
+    description: DevOps and infrastructure review (6 agents)
+    agents: [devops-cicd, devops-docker, devops-terraform, devops-monitoring, sec-infrastructure, devops-deployment]
+    recommended_for: [DevOps audit, infrastructure review, deployment review]
+
+  pre-release:
+    description: Pre-release validation (8 agents)
+    agents: [sec-general, qual-types, test-coverage, perf-backend, perf-frontend, doc-readme, gov-compliance, recon-general]
+    recommended_for: [pre-release check, production readiness, release validation]
+
+  new-project:
+    description: New project setup review (5 agents)
+    agents: [arch-general, devops-cicd, devops-docker, doc-readme, gov-standards]
+    recommended_for: [new project review, project setup audit, scaffolding review]
+
+  api-focused:
+    description: API-focused review (6 agents)
+    agents: [arch-api, sec-api, perf-api, test-api, doc-api, data-api]
+    recommended_for: [API review, endpoint audit, API design review]
+
+  database-focused:
+    description: Database-focused review (5 agents)
+    agents: [arch-database, perf-database, data-schema, data-migration, data-integrity]
+    recommended_for: [database review, schema audit, migration review]
+
+  testing-deep:
+    description: Testing strategy review (6 agents)
+    agents: [test-unit, test-integration, test-e2e, test-coverage, test-mocking, test-api]
+    recommended_for: [test strategy review, coverage improvement, testing audit]
+
+  accessibility-full:
+    description: Full accessibility audit (6 agents)
+    agents: [a11y-wcag, a11y-aria, a11y-keyboard, a11y-screen-reader, a11y-contrast, a11y-semantic]
+    recommended_for: [accessibility audit, WCAG compliance, a11y review]
+
+  documentation-full:
+    description: Documentation completeness review (6 agents)
+    agents: [doc-api, doc-readme, doc-code, doc-architecture, doc-changelog, doc-sdlc]
+    recommended_for: [documentation audit, docs completeness, documentation quality]
+
+  maximum-coverage:
+    description: Maximum coverage — all domains represented (12 agents)
+    agents: [arch-general, sec-owasp, qual-solid, test-coverage, gov-general, devops-cicd, doc-readme, perf-backend, a11y-wcag, data-schema, fe-react, recon-general]
+    recommended_for: [full audit, maximum coverage, comprehensive review]

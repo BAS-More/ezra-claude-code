@@ -1,6 +1,6 @@
 ---
 name: ezra:scan
-description: Full multi-agent codebase analysis. Dispatches architect, reviewer, and guardian agents to analyze architecture, code quality, security, and governance compliance. Results saved to .ezra/scans/.
+description: "Dynamic multi-agent codebase scan. Recommends optimal agents from 100 roles, or use presets. Usage: /ezra:scan (interactive), /ezra:scan --preset <name>, /ezra:scan --agents <count>, /ezra:scan --classic (original 4-agent scan). Results saved to .ezra/scans/."
 ---
 
 You are running an EZRA deep scan. This is a multi-phase, multi-agent analysis of the codebase.
@@ -9,7 +9,87 @@ First, read `.ezra/knowledge.yaml` and `.ezra/governance.yaml` to understand cur
 
 If `.ezra/` does not exist, tell the user to run `/ezra:init` first and stop.
 
-## Phase 1: Architecture Scan (Agent: ezra-architect)
+## Pre-Scan: Agent Selection
+
+Read the agent registry from `agents/registry.yaml` (or `~/.claude/agents/registry.yaml` if installed globally).
+
+Parse `$ARGUMENTS` to determine scan mode:
+
+- `/ezra:scan --classic` → Use original 4-agent scan (Phase 1-4 below)
+- `/ezra:scan --preset <name>` → Use a preset from the registry (e.g., `full-scan`, `security-deep`, `pre-release`)
+- `/ezra:scan --agents <count>` → Recommend and deploy N agents
+- `/ezra:scan --roles <id1,id2,...>` → Deploy specific roles by ID
+- `/ezra:scan` (no args) → **Interactive agent selection** (below)
+
+### Interactive Agent Selection (default)
+
+When no arguments provided, present:
+
+```
+EZRA SCAN — AGENT SELECTION
+═══════════════════════════════════════════════════════
+EZRA has 100 specialized agents across 12 domains.
+
+How many agents should I deploy for this scan?
+
+  Presets:
+  [1] Quick Review     — 3 agents  (architecture + security + quality)
+  [2] Full Scan        — 4 agents  (classic: architect, reviewer, guardian, reconciler)
+  [3] Security Deep    — 6 agents  (OWASP, auth, injection, supply chain, secrets, privacy)
+  [4] Quality Deep     — 6 agents  (types, complexity, DRY, dead code, SOLID, patterns)
+  [5] Pre-Release      — 8 agents  (security, quality, testing, performance, docs, governance)
+  [6] Maximum Coverage — 12 agents (all 12 domains represented)
+  [7] Custom           — Choose your own agents
+
+  Or enter a number (2-20) and I'll recommend the best team.
+  Or describe what you want to focus on.
+
+═══════════════════════════════════════════════════════
+```
+
+Based on user response:
+- Number 1-6 → Use the corresponding preset
+- Number 7 → Show domain list, let user pick roles
+- A plain number (2-20) → Recommend top N agents for a general codebase scan
+- Text description → Match against registry tags/specialties, recommend optimal team
+
+After selection, confirm the team:
+
+```
+DEPLOYING <N> AGENTS:
+  1. <role-name> (<domain>) — <specialty summary>
+  2. <role-name> (<domain>) — <specialty summary>
+  ...
+
+Proceed? [Y/n]
+```
+
+### Dynamic Phase Dispatch
+
+For each selected agent role, construct and dispatch a phase:
+
+1. Look up the role in the registry
+2. Get the `base_agent` (one of: ezra-architect, ezra-reviewer, ezra-guardian, ezra-reconciler)
+3. Construct the brief using the role's `specialty` and `best_for`:
+
+   "You are operating as the EZRA {role.name} ({role.id}).
+   Your specialty: {role.specialty}
+   Focus your analysis on: {role.best_for}
+   Apply your core capabilities as {role.base_agent} but NARROW your focus to your specialty area.
+   The full team includes: {all role names}
+   Do not duplicate findings from other team members.
+   Output as structured YAML with severity ratings."
+
+4. Dispatch the subagent using the `base_agent` engine
+5. Collect structured YAML output
+
+Dispatch agents sharing different base engines in parallel. Dispatch sequentially when multiple roles share the same base engine.
+
+---
+
+## Classic Phases (used with --classic flag or preset "full-scan")
+
+### Phase 1: Architecture Scan (Agent: ezra-architect)
 
 Dispatch the `ezra-architect` subagent with this brief:
 
@@ -23,7 +103,7 @@ Dispatch the `ezra-architect` subagent with this brief:
 
 Output as structured YAML."
 
-## Phase 2: Quality & Security Scan (Agent: ezra-reviewer)
+### Phase 2: Quality & Security Scan (Agent: ezra-reviewer)
 
 Dispatch the `ezra-reviewer` subagent with this brief:
 
@@ -37,7 +117,7 @@ Dispatch the `ezra-reviewer` subagent with this brief:
 
 Output as structured YAML with severity ratings (CRITICAL/HIGH/MEDIUM/LOW)."
 
-## Phase 3: Governance Compliance (Agent: ezra-guardian)
+### Phase 3: Governance Compliance (Agent: ezra-guardian)
 
 Dispatch the `ezra-guardian` subagent with this brief:
 
@@ -49,7 +129,7 @@ Dispatch the `ezra-guardian` subagent with this brief:
 
 Output as structured YAML with violation details."
 
-## Phase 4: Reconciliation Check (Agent: ezra-reconciler)
+### Phase 4: Reconciliation Check (Agent: ezra-reconciler)
 
 If any files exist in `.ezra/plans/`, dispatch the `ezra-reconciler` subagent:
 

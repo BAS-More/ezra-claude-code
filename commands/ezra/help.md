@@ -12,11 +12,12 @@ Enforce. Zero-drift. Restore. Audit.
 
 COMMANDS
   /ezra:init          Initialize EZRA for this project
-  /ezra:scan          Full multi-agent codebase analysis
+  /ezra:scan          Dynamic multi-agent codebase scan (100 agents, presets, classic)
   /ezra:guard         Check changes against governance rules
   /ezra:reconcile     Compare plan vs implementation
   /ezra:decide        Record an architectural decision
-  /ezra:review        Multi-agent code review
+  /ezra:review        Dynamic multi-agent code review (smart agent selection)
+  /ezra:agents        Agent management — list, recommend, deploy, search (100 roles)
   /ezra:status        Governance health dashboard
   /ezra:doc           Generate and manage SDLC documentation
   /ezra:dash          Real-time governance dashboard
@@ -29,13 +30,31 @@ COMMANDS
   /ezra:process       Create and run reusable workflows
   /ezra:auto          Autonomous execution with guard rails
   /ezra:multi         Multi-project portfolio orchestration
+  /ezra:sync          Sync EZRA state with avios-context MCP
+  /ezra:claude-md     Generate or update CLAUDE.md from .ezra/ state
+  /ezra:bootstrap     One-command project onboarding
   /ezra:help          This help text
 
-AGENTS (dispatched automatically by commands)
-  ezra-architect    Architecture analysis, layer mapping, dependency tracing
-  ezra-reviewer     Security + quality review with severity scoring
-  ezra-guardian     Decision enforcement, protected path integrity
-  ezra-reconciler   Plan vs implementation comparison
+AGENT SYSTEM (100 roles × 12 domains × 4 core engines)
+  Core Engines:
+    ezra-architect    Architecture analysis, layer mapping, dependency tracing
+    ezra-reviewer     Security + quality review with severity scoring
+    ezra-guardian     Decision enforcement, protected path integrity
+    ezra-reconciler   Plan vs implementation comparison
+
+  Domains (100 specialized roles):
+    architecture(10) security(12) quality(10) testing(8)
+    governance(8)    devops(10)   documentation(8) performance(8)
+    accessibility(6) data(6)     frontend(8)  reconciliation(6)
+
+  Presets: quick-review(3) full-scan(4) security-deep(6) quality-deep(6)
+           frontend-review(6) backend-review(6) pre-release(8) maximum-coverage(12)
+
+  Quick Start:
+    /ezra:agents                  → Interactive agent menu
+    /ezra:agents recommend <task> → Get recommendation for any task
+    /ezra:scan --preset <name>    → Scan with preset team
+    /ezra:review --agents 6       → Review with 6 smart-selected agents
 
 STATE DIRECTORY: .ezra/
   decisions/         Architectural Decision Records (YAML)

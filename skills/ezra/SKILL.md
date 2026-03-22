@@ -31,11 +31,12 @@ EZRA persists state in `.ezra/` at the project root:
 ## Commands
 
 - `/ezra:init` — Initialize EZRA, scan codebase, create state directory
-- `/ezra:scan` — Full multi-agent analysis (architecture + security + quality + governance)
+- `/ezra:scan` — Dynamic multi-agent codebase scan (interactive agent selection from 100 roles, presets, or classic 4-agent mode)
 - `/ezra:guard` — Check staged/recent changes against rules
 - `/ezra:reconcile` — Compare plan vs implementation
 - `/ezra:decide <decision>` — Record an architectural decision
-- `/ezra:review` — Multi-agent code review
+- `/ezra:review` — Dynamic multi-agent code review (smart agent selection based on changed files)
+- `/ezra:agents` — Agent management: list 100 roles, recommend agents for tasks, deploy preset teams, search by domain
 - `/ezra:status` — Governance health dashboard
 - `/ezra:help` — Show all commands
 - `/ezra:doc` — Generate, manage, and track SDLC documentation (55 document types)
@@ -49,15 +50,88 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:process` — Create, run, edit, and save reusable step-by-step workflows
 - `/ezra:auto` — Autonomous process execution with guard rails and approval gates
 - `/ezra:multi` — Multi-project portfolio orchestration across multiple codebases
+- `/ezra:sync` — Sync EZRA governance state with avios-context MCP server
+- `/ezra:claude-md` — Generate or update CLAUDE.md from `.ezra/` state
+- `/ezra:bootstrap` — One-command project onboarding (init + configure + ADR + health + CLAUDE.md)
 
-## Agents
+## Agent System
 
-EZRA dispatches these subagents (defined in `.claude/agents/`):
+EZRA uses a **scalable agent registry** with 100 specialized roles across 12 domains, powered by 4 core agent engines.
+
+### Core Engines (4)
 
 - `ezra-architect` — Architecture analysis, layer mapping, dependency tracing, pattern detection
 - `ezra-reviewer` — OWASP-aligned security review + code quality analysis with confidence scores
 - `ezra-guardian` — Decision enforcement, protected path integrity, standards compliance
 - `ezra-reconciler` — Plan vs implementation comparison, gap detection, constraint verification
+
+### Domains (12) — 100 Specialized Roles
+
+| Domain | Roles | Core Engine | Focus |
+|---|---|---|---|
+| Architecture | 10 | ezra-architect | Layers, patterns, API design, DDD, cloud-native |
+| Security | 12 | ezra-reviewer | OWASP, auth, crypto, injection, supply chain, privacy |
+| Quality | 10 | ezra-reviewer | Types, complexity, SOLID, clean code, refactoring |
+| Testing | 8 | ezra-reviewer | Unit, integration, E2E, coverage, mocking, TDD |
+| Governance | 8 | ezra-guardian | Compliance, standards, ADR, licensing, drift |
+| DevOps | 10 | ezra-architect | CI/CD, Docker, Kubernetes, Terraform, monitoring |
+| Documentation | 8 | ezra-reviewer | API docs, README, code docs, runbooks, SDLC |
+| Performance | 8 | ezra-reviewer | Backend, frontend, database, caching, scalability |
+| Accessibility | 6 | ezra-reviewer | WCAG, ARIA, keyboard, screen reader, contrast |
+| Data | 6 | mixed | Schema, migration, validation, modeling, integrity |
+| Frontend | 8 | mixed | React, state, CSS, components, routing, UX |
+| Reconciliation | 6 | ezra-reconciler | Sprint, requirements, scope, timeline, budget |
+
+### Agent Registry
+
+All 100 roles are defined in `agents/registry.yaml` with:
+- Role ID, name, domain, and base engine mapping
+- Specialty description and best-for task matching
+- Tags for search and recommendation algorithm
+
+### Presets (14 pre-configured teams)
+
+| Preset | Agents | Use Case |
+|---|---|---|
+| quick-review | 3 | Fast PR review |
+| full-scan | 4 | Classic comprehensive scan |
+| security-deep | 6 | Deep security audit |
+| quality-deep | 6 | Quality & tech debt analysis |
+| frontend-review | 6 | Frontend-focused review |
+| backend-review | 6 | Backend-focused review |
+| devops-audit | 6 | Infrastructure & DevOps review |
+| pre-release | 8 | Pre-release validation |
+| new-project | 5 | New project setup review |
+| api-focused | 6 | API design & security review |
+| database-focused | 5 | Database & schema review |
+| testing-deep | 6 | Testing strategy review |
+| accessibility-full | 6 | WCAG accessibility audit |
+| documentation-full | 6 | Documentation completeness |
+| maximum-coverage | 12 | All domains represented |
+
+### Usage
+
+```
+/ezra:agents                          — Interactive agent menu
+/ezra:agents list                     — All 100 roles by domain
+/ezra:agents recommend <task>         — Get agent recommendation for a task
+/ezra:agents deploy <preset>          — Deploy a preset team
+/ezra:agents deploy <count> <task>    — Deploy N agents for a task
+/ezra:agents info <role-id>           — Role details
+/ezra:agents domains                  — Domain overview
+/ezra:agents presets                  — List all presets
+/ezra:agents search <keyword>         — Search by tag/specialty
+
+/ezra:scan                            — Interactive scan with agent selection
+/ezra:scan --preset security-deep     — Scan with preset team
+/ezra:scan --agents 8                 — Scan with 8 recommended agents
+/ezra:scan --classic                  — Original 4-agent scan
+
+/ezra:review                          — Smart review (auto-detects from changed files)
+/ezra:review --preset frontend-review — Review with preset team
+/ezra:review --agents 6               — Review with 6 recommended agents
+/ezra:review --classic                — Original 3-agent review
+```
 
 ## Workflow
 

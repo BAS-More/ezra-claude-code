@@ -7,7 +7,7 @@ const path = require('path');
 const os = require('os');
 const readline = require('readline');
 
-const EZRA_VERSION = '4.0.0';
+const EZRA_VERSION = '5.0.0';
 const PACKAGE_DIR = path.resolve(__dirname, '..');
 const IS_WIN = process.platform === 'win32';
 const IS_MAC = process.platform === 'darwin';
@@ -190,7 +190,7 @@ function showInfo() {
   console.log(`  ${c('bold', 'Contents:')}`);
   console.log(`  ${c('cyan', `${MANIFEST.commands.length}`)} slash commands (/ezra:init, /ezra:dash, /ezra:health, ...)`);
   console.log(`  ${c('cyan', `${MANIFEST.agents.length}`)} subagents (architect, reviewer, guardian, reconciler)`);
-  console.log(`  ${c('cyan', `${MANIFEST.hooks.length}`)} hooks (guard, dash, drift, version)`);
+  console.log(`  ${c('cyan', `${MANIFEST.hooks.length}`)} hooks (guard, dash, drift, version, avios-bridge)`);
   console.log(`  ${c('cyan', `${MANIFEST.skills.length}`)} skill definition`);
   console.log(`  ${c('cyan', `${MANIFEST.templates.length}`)} process templates`);
   console.log('');
@@ -235,6 +235,7 @@ function generateHooksConfig(targetDir) {
   const dashPath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-dash-hook.js'));
   const driftPath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-drift-hook.js'));
   const versionPath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-version-hook.js'));
+  const bridgePath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-avios-bridge.js'));
 
   return {
     hooks: {
@@ -259,6 +260,7 @@ function generateHooksConfig(targetDir) {
         hooks: [
           { type: 'command', command: `node "${driftPath}"`, timeout: 3 },
           { type: 'command', command: `node "${versionPath}"`, timeout: 3 },
+          { type: 'command', command: `node "${bridgePath}"`, timeout: 5 },
         ],
       }],
     },
@@ -344,7 +346,7 @@ async function main() {
   console.log(`  ${c('bold', 'Next steps:')}`);
   console.log('');
   console.log(`  ${c('cyan', '1.')} Restart Claude Code`);
-  console.log(`  ${c('cyan', '2.')} Run ${c('bold', '/ezra:help')} to see all 19 commands`);
+  console.log(`  ${c('cyan', '2.')} Run ${c('bold', '/ezra:help')} to see all ${MANIFEST.commands.length} commands`);
   console.log(`  ${c('cyan', '3.')} Run ${c('bold', '/ezra:init')} to initialize your project`);
   console.log('');
 

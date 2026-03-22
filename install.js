@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-const EZRA_VERSION = '1.0.0';
+const EZRA_VERSION = '5.0.0';
 
 // What we install
 const MANIFEST = {
@@ -44,12 +44,14 @@ const MANIFEST = {
     'commands/ezra/sync.md',
     'commands/ezra/claude-md.md',
     'commands/ezra/bootstrap.md',
+    'commands/ezra/agents.md',
   ],
   agents: [
     'agents/ezra-architect.md',
     'agents/ezra-reviewer.md',
     'agents/ezra-guardian.md',
     'agents/ezra-reconciler.md',
+    'agents/registry.yaml',
   ],
   skills: [
     'skills/ezra/SKILL.md',
@@ -75,9 +77,9 @@ async function main() {
   console.log(`
   ╔═══════════════════════════════════════════════╗
   ║                                               ║
-  ║     A E G I S                                 ║
-  ║     Automated Epistemic Governance            ║
-  ║     & Intelligence System                     ║
+  ║     E Z R A  (עזרא)                           ║
+  ║     The Scribe Who Restores                   ║
+  ║     & Enforces Standards                      ║
   ║                                               ║
   ║     v${EZRA_VERSION}                                    ║
   ║                                               ║

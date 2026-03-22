@@ -122,7 +122,7 @@ test('SKILL.md references all commands', () => {
 
 // ─── Cross-references ────────────────────────────────────────────
 
-test('Help command lists all 19 commands', () => {
+test('Help command lists all 22 commands', () => {
   const content = fs.readFileSync(path.join(CMD_DIR, 'help.md'), 'utf8');
   const critical = ['init', 'scan', 'guard', 'health', 'advisor', 'dash', 'doc', 'process', 'auto', 'multi', 'version'];
   for (const cmd of critical) {
