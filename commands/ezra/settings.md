@@ -100,6 +100,18 @@ Add a custom rule to standards or security:
 5. Append to the appropriate custom_rules array in settings.yaml
 6. Confirm addition
 
+### remove-rule
+
+Remove a custom rule from standards or security by index:
+
+1. Specify the section (standards or security)
+2. Specify the rule index to remove
+3. The rule is removed from custom_rules array
+4. Settings are written back to settings.yaml
+5. Confirm removal
+
+Example: `/ezra:settings remove-rule standards 0` removes the first custom rule from standards.
+
 ### reset
 
 Reset settings to defaults:
@@ -107,6 +119,16 @@ Reset settings to defaults:
 1. Confirm with user
 2. Write default settings to `.ezra/settings.yaml`
 3. Confirm reset
+
+### reset-all
+
+Reset ALL settings to defaults:
+
+1. Confirm with user (this is destructive)
+2. Write complete default settings to `.ezra/settings.yaml`
+3. Confirm reset
+
+This restores every section to factory defaults.
 
 ### export
 
