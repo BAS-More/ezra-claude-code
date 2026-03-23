@@ -38,6 +38,7 @@ COMMANDS
 REAL-TIME OVERSIGHT
   /ezra:oversight     View oversight status, violations, and intervention level
   /ezra:settings      Unified settings management (.ezra/settings.yaml)
+  /ezra:compliance    Compliance profiles (ISO 25010, OWASP, SOC2, HIPAA, PCI-DSS, GDPR, WCAG)
   /ezra:learn         Self-learning intelligence and recommendations
   /ezra:pm             Project management with milestones and deliverables
   /ezra:progress       Track and report project milestone progress

@@ -54,7 +54,8 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:claude-md` — Generate or update CLAUDE.md from `.ezra/` state
 - `/ezra:bootstrap` — One-command project onboarding (init + configure + ADR + health + CLAUDE.md)
 - `/ezra:oversight` — Real-time agent oversight — view status, set intervention level, review violations
-- `/ezra:settings`
+- `/ezra:settings` — Unified settings management — view, set, init, add-rule, reset, export, diff
+- `/ezra:compliance` — Compliance profiles: activate ISO 25010, OWASP, SOC2, HIPAA, PCI-DSS, GDPR, WCAG
 - `/ezra:learn` — Self-learning intelligence: agent profiles, violation patterns, cost optimisation, recommendations — Unified settings management — view, set, init, add-rule, reset, export, diff
 - `/ezra:pm` — Project management with milestones, deliverables, and tracking
 - `/ezra:progress` — Track milestone progress and generate reports
