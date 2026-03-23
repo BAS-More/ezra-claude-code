@@ -37,7 +37,9 @@ COMMANDS
 
 REAL-TIME OVERSIGHT
   /ezra:oversight     View oversight status, violations, and intervention level
-  /ezra:settings      View and manage unified EZRA settings (.ezra/settings.yaml)
+  /ezra:settings      Unified settings management (.ezra/settings.yaml)
+  /ezra:learn         Self-learning intelligence and recommendations
+View and manage unified EZRA settings (.ezra/settings.yaml)
 
 AGENT SYSTEM (100 roles × 12 domains × 4 core engines)
   Core Engines:

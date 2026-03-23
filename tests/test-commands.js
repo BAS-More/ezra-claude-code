@@ -37,7 +37,7 @@ const EXPECTED_COMMANDS = [
   'status', 'health', 'advisor', 'dash', 'doc', 'doc-check',
   'doc-sync', 'doc-approve', 'process', 'auto', 'multi',
   'version', 'help', 'sync', 'claude-md', 'bootstrap', 'agents',
-  'oversight', 'settings',
+  'oversight', 'settings', 'learn',
 ];
 
 const EXPECTED_AGENTS = [

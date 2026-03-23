@@ -58,6 +58,28 @@ const DEFAULTS = {
     auto_run: false,
     approval_gates: true,
   },
+  self_learning: {
+    enabled: true,
+    analysis_frequency: 'weekly',
+    min_data_points: 10,
+    confidence_threshold: 0.75,
+    auto_apply: false,
+    report_on_scan: true,
+    report_on_dash: true,
+    domains: {
+      standards_effectiveness: true,
+      agent_profiles: true,
+      violation_patterns: true,
+      health_trajectories: true,
+      decision_impact: true,
+      workflow_optimisation: true,
+      cost_optimisation: true,
+    },
+    cross_project: {
+      enabled: false,
+      shared_domains: [],
+    },
+  },
 };
 
 // ─── YAML Parser (simple, no deps) ──────────────────────────────
@@ -251,6 +273,10 @@ function getWorkflows(projectDir) {
   return loadSettings(projectDir).workflows;
 }
 
+function getSelfLearning(projectDir) {
+  return loadSettings(projectDir).self_learning;
+}
+
 // ─── Exports (for require()) ─────────────────────────────────────
 
 module.exports = {
@@ -260,6 +286,7 @@ module.exports = {
   getOversight,
   getBestPractices,
   getWorkflows,
+  getSelfLearning,
   parseYamlSimple,
   parseValue,
   deepMerge,
