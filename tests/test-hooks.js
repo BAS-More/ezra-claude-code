@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync, spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -121,7 +122,7 @@ test('ezra-drift-hook.js exits 0 when no .ezra/', () => {
 test('ezra-dash-hook.js outputs message when no .ezra/', () => {
   const hookPath = path.join(HOOKS_DIR, 'ezra-dash-hook.js');
   try {
-    const result = execSync(`cd /tmp && node "${hookPath}"`, { encoding: 'utf8', timeout: 5000 });
+    const result = execSync(`node "${hookPath}"`, { encoding: 'utf8', timeout: 5000, cwd: os.tmpdir() });
     assert(result.includes('Not initialized') || result.includes('EZRA'), 'Should output initialization message');
   } catch (err) {
     // Exit 0 is fine even on error
