@@ -56,6 +56,9 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:oversight` — Real-time agent oversight — view status, set intervention level, review violations
 - `/ezra:settings`
 - `/ezra:learn` — Self-learning intelligence: agent profiles, violation patterns, cost optimisation, recommendations — Unified settings management — view, set, init, add-rule, reset, export, diff
+- `/ezra:pm` — Project management with milestones, deliverables, and tracking
+- `/ezra:progress` — Track milestone progress and generate reports
+- `/ezra:compliance` — Manage compliance profiles (ISO-25010, OWASP-2025, SOC2, HIPAA, PCI-DSS, GDPR, WCAG-AA)
 
 ## Agent System
 
