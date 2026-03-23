@@ -7,3 +7,6 @@ Thumbs.db
 .env
 coverage/
 dist/
+
+# Prevent worktree submodule references from breaking CI
+.claude/worktrees/
