@@ -77,6 +77,94 @@ function readYamlFile(filePath) {
   }
 }
 
+/**
+ * Enhanced YAML reader for progress files that need arrays of objects.
+ * Handles: top-level keys, arrays of objects (- key: val\n  key: val), nested sections.
+ */
+function readDeepYaml(filePath) {
+  if (!fs.existsSync(filePath)) return {};
+  try {
+    const text = fs.readFileSync(filePath, 'utf8');
+    const result = {};
+    const lines = text.split(/\r?\n/);
+    let currentKey = null;
+    let currentArray = null;
+    let currentObj = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^\s*$/.test(line) || /^\s*#/.test(line)) continue;
+      const indent = (line.match(/^(\s*)/)[1] || '').length;
+
+      // Top-level key (no indent)
+      if (indent === 0) {
+        if (currentObj && currentArray) { currentArray.push(currentObj); currentObj = null; }
+        if (currentArray && currentKey) { result[currentKey] = currentArray; }
+        const m = line.match(/^(\w[\w_-]*):\s*(.*)?$/);
+        if (!m) continue;
+        const key = m[1];
+        const val = (m[2] || '').trim();
+        if (val === '') {
+          currentKey = key;
+          currentArray = null;
+          currentObj = null;
+        } else {
+          currentKey = null;
+          currentArray = null;
+          currentObj = null;
+          result[key] = parsePrimitive(val);
+        }
+        continue;
+      }
+
+      const trimmed = line.trim();
+
+      // Array item start
+      if (trimmed.startsWith('- ')) {
+        if (currentObj && currentArray) { currentArray.push(currentObj); }
+        if (!currentArray) currentArray = [];
+        const rest = trimmed.slice(2).trim();
+        const m = rest.match(/^(\w[\w_-]*):\s*(.*)?$/);
+        if (m) {
+          currentObj = {};
+          currentObj[m[1]] = parsePrimitive((m[2] || '').trim());
+        } else {
+          currentObj = null;
+          currentArray.push(parsePrimitive(rest));
+        }
+        continue;
+      }
+
+      // Continuation of array object item
+      if (currentObj) {
+        const m = trimmed.match(/^(\w[\w_-]*):\s*(.*)?$/);
+        if (m) {
+          currentObj[m[1]] = parsePrimitive((m[2] || '').trim());
+          continue;
+        }
+      }
+
+      // Plain nested key:value (not in array)
+      if (currentKey && !currentArray) {
+        const m = trimmed.match(/^(\w[\w_-]*):\s*(.*)?$/);
+        if (m) {
+          if (typeof result[currentKey] !== 'object' || Array.isArray(result[currentKey])) {
+            result[currentKey] = {};
+          }
+          result[currentKey][m[1]] = parsePrimitive((m[2] || '').trim());
+        }
+      }
+    }
+
+    // Flush last item
+    if (currentObj && currentArray) { currentArray.push(currentObj); }
+    if (currentArray && currentKey) { result[currentKey] = currentArray; }
+
+    return result;
+  } catch { return {}; }
+}
+
+
 function parseSimple(text) {
   const result = {};
   const lines = text.split(/\r?\n/);
@@ -121,6 +209,12 @@ function parsePrimitive(val) {
   if (val === 'true') return true;
   if (val === 'false') return false;
   if (val === 'null' || val === '~' || val === '') return null;
+  // Inline array: [a, b, c]
+  if (val.startsWith('[') && val.endsWith(']')) {
+    const inner = val.slice(1, -1).trim();
+    if (inner === '') return [];
+    return inner.split(',').map(s => parsePrimitive(s.trim()));
+  }
   if (/^-?\d+$/.test(val)) return parseInt(val, 10);
   if (/^-?\d+\.\d+$/.test(val)) return parseFloat(val);
   if ((val.startsWith('"') && val.endsWith('"')) ||
@@ -230,7 +324,7 @@ function loadProjectState(projectDir) {
 
   // Read tasks
   const tasksPath = path.join(ezraDir, 'progress', 'tasks.yaml');
-  const tasksData = readYamlFile(tasksPath);
+  const tasksData = readDeepYaml(tasksPath);
   if (tasksData.tasks && Array.isArray(tasksData.tasks)) {
     state.tasks.total = tasksData.tasks.length;
     for (const t of tasksData.tasks) {
@@ -244,7 +338,7 @@ function loadProjectState(projectDir) {
 
   // Read milestones
   const milestonesPath = path.join(ezraDir, 'progress', 'milestones.yaml');
-  const msData = readYamlFile(milestonesPath);
+  const msData = readDeepYaml(milestonesPath);
   if (msData.milestones && Array.isArray(msData.milestones)) {
     state.milestones.total = msData.milestones.length;
     for (const ms of msData.milestones) {
@@ -263,7 +357,7 @@ function loadProjectState(projectDir) {
 function checkMilestones(projectDir) {
   const ezraDir = path.join(projectDir, '.ezra');
   const milestonesPath = path.join(ezraDir, 'progress', 'milestones.yaml');
-  const msData = readYamlFile(milestonesPath);
+  const msData = readDeepYaml(milestonesPath);
 
   if (!msData.milestones || !Array.isArray(msData.milestones)) {
     return { milestones: [], summary: 'No milestones defined' };
@@ -271,7 +365,7 @@ function checkMilestones(projectDir) {
 
   const state = loadProjectState(projectDir);
   const tasksPath = path.join(ezraDir, 'progress', 'tasks.yaml');
-  const tasksData = readYamlFile(tasksPath);
+  const tasksData = readDeepYaml(tasksPath);
   const tasks = (tasksData.tasks && Array.isArray(tasksData.tasks)) ? tasksData.tasks : [];
 
   const results = [];
@@ -350,61 +444,45 @@ function checkMilestones(projectDir) {
  * Checks the most recently updated task in tasks.yaml.
  */
 function detectStalls(projectDir, thresholdMinutes) {
-  const settings = loadPMSettings(projectDir);
-  const threshold = thresholdMinutes || settings.stall_detection || 30;
   const ezraDir = path.join(projectDir, '.ezra');
+  const pmSettings = loadPMSettings(projectDir);
+  const threshold = thresholdMinutes || pmSettings.stall_detection || 30;
   const tasksPath = path.join(ezraDir, 'progress', 'tasks.yaml');
-  const tasksData = readYamlFile(tasksPath);
+  const tasksData = readDeepYaml(tasksPath);
+  const tasks = Array.isArray(tasksData.tasks) ? tasksData.tasks : [];
 
-  if (!tasksData.tasks || !Array.isArray(tasksData.tasks) || tasksData.tasks.length === 0) {
-    return {
-      stalled: false,
-      lastActivity: null,
-      minutesSinceActivity: 0,
-      stalledTask: null,
-      message: 'No tasks tracked',
-    };
+  if (tasks.length === 0) {
+    return { stalled: false, lastActivity: null, minutesSinceActivity: 0, message: 'No tasks tracked' };
   }
 
-  // Find most recently updated task
-  let latestTime = null;
+  // Find most recent update
+  let latest = null;
   let latestTask = null;
-  for (const t of tasksData.tasks) {
-    const updated = t.updated || t.created || null;
-    if (updated) {
-      const d = new Date(updated);
-      if (!isNaN(d.getTime())) {
-        if (!latestTime || d > latestTime) {
-          latestTime = d;
-          latestTask = t;
-        }
+  for (const t of tasks) {
+    const ts = t.updated || t.created;
+    if (ts) {
+      const d = new Date(ts);
+      if (!latest || d > latest) {
+        latest = d;
+        latestTask = t;
       }
     }
   }
 
-  if (!latestTime) {
-    return {
-      stalled: false,
-      lastActivity: null,
-      minutesSinceActivity: 0,
-      stalledTask: null,
-      message: 'No timestamps on tasks',
-    };
+  if (!latest) {
+    return { stalled: false, lastActivity: null, minutesSinceActivity: 0, message: 'No timestamps on tasks' };
   }
 
   const now = new Date();
-  const diffMs = now.getTime() - latestTime.getTime();
-  const diffMinutes = Math.round(diffMs / 60000);
-  const stalled = diffMinutes > threshold;
+  const minutes = (now - latest) / 60000;
+  const stalled = minutes > threshold;
 
   return {
     stalled,
-    lastActivity: latestTime.toISOString(),
-    minutesSinceActivity: diffMinutes,
-    stalledTask: stalled ? (latestTask.description || latestTask.name || latestTask.id || null) : null,
-    message: stalled
-      ? `Stalled: ${diffMinutes}min since last activity (threshold: ${threshold}min)`
-      : `Active: Last activity ${diffMinutes}min ago`,
+    lastActivity: latest.toISOString(),
+    minutesSinceActivity: Math.round(minutes),
+    stalledTask: latestTask ? (latestTask.description || latestTask.id) : null,
+    message: stalled ? 'Stalled: ' + Math.round(minutes) + ' minutes since last activity' : 'Active',
   };
 }
 
@@ -483,24 +561,22 @@ function calculateHealthTrend(projectDir, lastN) {
 /**
  * Check if escalation is needed based on consecutive failures.
  */
-function checkEscalation(projectDir, failures) {
-  const settings = loadPMSettings(projectDir);
-  const threshold = settings.escalation_threshold || 3;
-  const ezraDir = path.join(projectDir, '.ezra');
-  const escPath = path.join(ezraDir, 'progress', 'escalations.yaml');
-  const escData = readYamlFile(escPath);
+function checkEscalation(projectDir, consecutiveFailures) {
+  const pmSettings = loadPMSettings(projectDir);
+  const threshold = pmSettings.escalation_threshold || 3;
+  const failures = consecutiveFailures || 0;
 
-  const consecutiveFailures = failures || 0;
-  const escalate = consecutiveFailures >= threshold;
+  // Also check escalation log
+  const escPath = path.join(projectDir, '.ezra', 'progress', 'escalations.yaml');
+  const escData = readDeepYaml(escPath);
+  const history = Array.isArray(escData.escalations) ? escData.escalations : [];
 
   return {
-    escalate,
-    count: consecutiveFailures,
+    escalate: failures >= threshold,
+    reason: failures >= threshold ? failures + ' consecutive failures (threshold: ' + threshold + ')' : null,
+    count: failures,
     threshold,
-    reason: escalate
-      ? `${consecutiveFailures} consecutive failures (threshold: ${threshold})`
-      : null,
-    history: escData.escalations || [],
+    history,
   };
 }
 
@@ -529,7 +605,7 @@ function generateDailyReport(projectDir) {
 
   // Count tasks done today
   const tasksPath = path.join(projectDir, '.ezra', 'progress', 'tasks.yaml');
-  const tasksData = readYamlFile(tasksPath);
+  const tasksData = readDeepYaml(tasksPath);
   if (tasksData.tasks && Array.isArray(tasksData.tasks)) {
     daily.tasks_done_today = tasksData.tasks.filter(t =>
       t.status === 'done' && t.updated && t.updated.startsWith(date)
@@ -552,57 +628,36 @@ function updateProgress(projectDir, task, status) {
   const ezraDir = path.join(projectDir, '.ezra');
   const progressDir = path.join(ezraDir, 'progress');
   ensureDir(progressDir);
-
   const tasksPath = path.join(progressDir, 'tasks.yaml');
-  const tasksData = readYamlFile(tasksPath);
+  const tasksData = readDeepYaml(tasksPath);
+  let tasks = Array.isArray(tasksData.tasks) ? tasksData.tasks : [];
 
-  if (!tasksData.tasks || !Array.isArray(tasksData.tasks)) {
-    tasksData.tasks = [];
-  }
+  const now = new Date().toISOString();
+  const existing = tasks.find(t => t.id === task || t.description === task);
 
-  const now = isoTimestamp();
-  const statusStr = status || 'pending';
-
-  // Find existing task by description/name match
-  const existing = tasksData.tasks.find(t =>
-    t.description === task || t.name === task || t.id === task
-  );
-
+  let action;
   if (existing) {
-    existing.status = statusStr;
+    existing.status = status || existing.status;
     existing.updated = now;
+    action = 'updated';
   } else {
-    const id = `task-${tasksData.tasks.length + 1}`;
-    tasksData.tasks.push({
-      id,
-      description: task,
-      status: statusStr,
-      priority: 'p2',
-      created: now,
-      updated: now,
-    });
+    const id = 'task-' + (tasks.length + 1);
+    tasks.push({ id, description: task, status: status || 'pending', created: now, updated: now });
+    action = 'created';
   }
 
-  // Write back — use a simple serializer for the tasks array
-  const lines = ['tasks:'];
-  for (const t of tasksData.tasks) {
-    lines.push(`  - id: ${t.id}`);
-    lines.push(`    description: ${t.description || ''}`);
-    lines.push(`    status: ${t.status || 'pending'}`);
-    lines.push(`    priority: ${t.priority || 'p2'}`);
-    lines.push(`    created: ${t.created || now}`);
-    lines.push(`    updated: ${t.updated || now}`);
-    if (t.name) lines.push(`    name: ${t.name}`);
+  // Serialize tasks back to YAML
+  let yaml = 'tasks:\n';
+  for (const t of tasks) {
+    yaml += '  - id: ' + (t.id || '') + '\n';
+    if (t.description) yaml += '    description: ' + t.description + '\n';
+    yaml += '    status: ' + (t.status || 'pending') + '\n';
+    if (t.created) yaml += '    created: ' + t.created + '\n';
+    if (t.updated) yaml += '    updated: ' + t.updated + '\n';
   }
-  fs.writeFileSync(tasksPath, lines.join('\n') + '\n', 'utf8');
-
-  return {
-    task: existing ? existing.id : `task-${tasksData.tasks.length}`,
-    description: task,
-    status: statusStr,
-    updated: now,
-    action: existing ? 'updated' : 'created',
-  };
+  fs.writeFileSync(tasksPath, yaml, 'utf8');
+  const resultTask = existing || tasks[tasks.length - 1];
+  return { action, id: resultTask.id, description: resultTask.description, status: resultTask.status };
 }
 
 // ─── Exports ─────────────────────────────────────────────────────
