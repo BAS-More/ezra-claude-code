@@ -121,12 +121,19 @@ test('ezra-drift-hook.js exits 0 when no .ezra/', () => {
 
 test('ezra-dash-hook.js outputs message when no .ezra/', () => {
   const hookPath = path.join(HOOKS_DIR, 'ezra-dash-hook.js');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ezra-dash-'));
   try {
-    const result = execSync(`node "${hookPath}"`, { encoding: 'utf8', timeout: 5000, cwd: os.tmpdir() });
+    const result = execSync(`node "${hookPath}"`, {
+      encoding: 'utf8',
+      timeout: 5000,
+      cwd: tmpDir,
+      input: '{}',
+    });
     assert(result.includes('Not initialized') || result.includes('EZRA'), 'Should output initialization message');
   } catch (err) {
-    // Exit 0 is fine even on error
     assert(err.status === 0 || err.status === null, `Unexpected exit code: ${err.status}`);
+  } finally {
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
   }
 });
 
