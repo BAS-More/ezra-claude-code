@@ -102,6 +102,17 @@ const DEFAULTS = {
     alert_on_new_cve: true,
     categories_monitored: ['all'],
   },
+  agents: {
+    providers: [],
+    budget_ceiling_daily: 10.00,
+    budget_ceiling_monthly: 200.00,
+    budget_ceiling_currency: 'USD',
+    assignment_strategy: 'auto',
+    max_concurrent: 3,
+    fallback_order: ['claude', 'codex', 'cursor'],
+    task_routing: 'none',
+  },
+
 };
 
 // ─── YAML Parser (simple, no deps) ──────────────────────────────
@@ -303,6 +314,9 @@ function getProjectManager(projectDir) {
   return loadSettings(projectDir).project_manager;
 }
 
+function getAgents(projectDir) {
+  return loadSettings(projectDir).agents;
+}
 
 function getLibrary(projectDir) {
   return loadSettings(projectDir).library;
@@ -318,6 +332,7 @@ module.exports = {
   getWorkflows,
   getSelfLearning,
   getProjectManager,
+  getAgents,
   getLibrary,
   parseYamlSimple,
   parseValue,

@@ -56,12 +56,12 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:oversight` — Real-time agent oversight — view status, set intervention level, review violations
 - `/ezra:settings` — Unified settings management — view, set, init, add-rule, reset, export, diff
 - `/ezra:compliance` — Compliance profiles: activate ISO 25010, OWASP, SOC2, HIPAA, PCI-DSS, GDPR, WCAG
-- `/ezra:learn` — Self-learning intelligence: agent profiles, violation patterns, cost optimisation, recommendations — Unified settings management — view, set, init, add-rule, reset, export, diff
+- `/ezra:learn` — Self-learning intelligence: agent profiles, violation patterns, cost optimisation, recommendations
 - `/ezra:pm` — Project management with milestones, deliverables, and tracking
 - `/ezra:progress` — Track milestone progress and generate reports
-- `/ezra:compliance` — Manage compliance profiles (ISO-25010, OWASP-2025, SOC2, HIPAA, PCI-DSS, GDPR, WCAG-AA)
 - `/ezra:library` — Best practice library: browse, search, add, export across 14 categories
-- `/ezra:research` — Research agent control: configure automated best practice discovery (ISO-25010, OWASP-2025, SOC2, HIPAA, PCI-DSS, GDPR, WCAG-AA)
+- `/ezra:research` — Research agent control: configure automated best practice discovery
+- `/ezra:cost` — Cost tracking and budget management for AI agent usage
 
 ## Agent System
 

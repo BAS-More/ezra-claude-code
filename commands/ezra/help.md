@@ -40,10 +40,11 @@ REAL-TIME OVERSIGHT
   /ezra:settings      Unified settings management (.ezra/settings.yaml)
   /ezra:compliance    Compliance profiles (ISO 25010, OWASP, SOC2, HIPAA, PCI-DSS, GDPR, WCAG)
   /ezra:learn         Self-learning intelligence and recommendations
-  /ezra:pm             Project management with milestones and deliverables
-  /ezra:progress       Track and report project milestone progress
-  /ezra:compliance     Manage compliance profiles (ISO, OWASP, SOC2, HIPAA, etc.)
-View and manage unified EZRA settings (.ezra/settings.yaml)
+  /ezra:pm            Project management with milestones and deliverables
+  /ezra:progress      Track and report project milestone progress
+  /ezra:library       Best practice library — browse, search, add across 14 categories
+  /ezra:research      Research agent control — automated best practice discovery
+  /ezra:cost          Cost tracking and budget management for AI agent usage
 
 AGENT SYSTEM (100 roles × 12 domains × 4 core engines)
   Core Engines:

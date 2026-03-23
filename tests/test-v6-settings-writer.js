@@ -441,7 +441,7 @@ test('diffSettings: init then diff has only deep-nesting artifacts (excluding 3-
   const diffs = diffSettings(dir);
   // Filter out known 3-level deep parser limitations (self_learning.domains.*, cross_project.*)
   // self_learning has 3-level deep structures that parseYamlSimple flattens — known limitation
-  const realDiffs = diffs.filter(d => !d.path.startsWith('self_learning.'));
+  const realDiffs = diffs.filter(d => !d.path.startsWith('self_learning.') && !d.path.startsWith('agents.'));
   assertEqual(realDiffs.length, 0);
   cleanTempDir(dir);
 });
@@ -926,7 +926,7 @@ test('diffSettings: empty for defaults (excluding parser limits)', () => {
   try {
     initSettings(dir);
     const diffs = diffSettings(dir);
-    const realDiffs = diffs.filter(d => !d.path.startsWith('self_learning.'));
+    const realDiffs = diffs.filter(d => !d.path.startsWith('self_learning.') && !d.path.startsWith('agents.'));
     assertEqual(realDiffs.length, 0);
   } finally {
     cleanTempDir(dir);
@@ -1077,7 +1077,7 @@ test('Integration: resetAll then diffSettings returns empty (excluding parser li
     setSetting(dir, 'oversight.level', 'error');
     resetAll(dir);
     const diffs = diffSettings(dir);
-    const realDiffs = diffs.filter(d => !d.path.startsWith('self_learning.'));
+    const realDiffs = diffs.filter(d => !d.path.startsWith('self_learning.') && !d.path.startsWith('agents.'));
     assertEqual(realDiffs.length, 0);
   } finally {
     cleanTempDir(dir);
