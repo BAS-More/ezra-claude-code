@@ -118,6 +118,13 @@ const DEFAULTS = {
     export_format: 'yaml',
     refresh_interval: 'manual',
   },
+  memory: {
+    auto_capture: true,
+    max_entries: 500,
+    dedup_threshold: 0.8,
+    capture_sources: 'all',
+    archive_after_days: 90,
+  },
   cloud_sync: {
     enabled: false,
     provider: 'local',
@@ -314,6 +321,10 @@ function getBestPractices(projectDir) {
   return loadSettings(projectDir).best_practices;
 }
 
+function getMemory(projectDir) {
+  return loadSettings(projectDir).memory;
+}
+
 function getWorkflows(projectDir) {
   return loadSettings(projectDir).workflows;
 }
@@ -349,6 +360,7 @@ module.exports = {
   getSecurity,
   getOversight,
   getBestPractices,
+  getMemory,
   getWorkflows,
   getSelfLearning,
   getProjectManager,

@@ -391,12 +391,12 @@ test('ezra-library.js uses strict mode', () => {
 
 test('12 hook files exist', () => {
   const files = fs.readdirSync(path.join(ROOT, 'hooks')).filter(f => f.endsWith('.js'));
-  assert(files.length === 15, 'Expected 15 hooks, found ' + files.length + ': ' + files.join(', '));
+  assert(files.length === 17, 'Expected 17 hooks, found ' + files.length + ': ' + files.join(', '));
 });
 
 test('32 command files exist', () => {
   const files = fs.readdirSync(path.join(ROOT, 'commands', 'ezra')).filter(f => f.endsWith('.md'));
-  assert(files.length === 35, 'Expected 35, found ' + files.length);
+  assert(files.length === 36, 'Expected 36, found ' + files.length);
 });
 
 test('Round-trip preserves entries', () => {

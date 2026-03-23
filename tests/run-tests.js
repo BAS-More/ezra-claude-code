@@ -24,6 +24,7 @@ const SUITES = [
   { name: 'V6-Agents', script: 'test-v6-agents.js' },
   { name: 'V6-Dashboard', script: 'test-v6-dashboard-data.js' },
   { name: 'V6-Workflows', script: 'test-v6-workflows.js' },
+  { name: 'V6-Memory', script: 'test-v6-memory.js' },
 ];
 
 const testsDir = __dirname;
