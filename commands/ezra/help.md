@@ -39,6 +39,9 @@ REAL-TIME OVERSIGHT
   /ezra:oversight     View oversight status, violations, and intervention level
   /ezra:settings      Unified settings management (.ezra/settings.yaml)
   /ezra:learn         Self-learning intelligence and recommendations
+  /ezra:pm             Project management with milestones and deliverables
+  /ezra:progress       Track and report project milestone progress
+  /ezra:compliance     Manage compliance profiles (ISO, OWASP, SOC2, HIPAA, etc.)
 View and manage unified EZRA settings (.ezra/settings.yaml)
 
 AGENT SYSTEM (100 roles × 12 domains × 4 core engines)

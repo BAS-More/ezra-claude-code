@@ -19,6 +19,7 @@ const SUITES = [
   { name: 'AVI-OS Bridge', script: 'test-avios-bridge.js' },
   { name: 'V6-Oversight', script: 'test-v6-oversight.js' },
   { name: 'V6-PM', script: 'test-v6-pm.js' },
+  { name: 'V6-Settings-Writer', script: 'test-v6-settings-writer.js' },
 ];
 
 const testsDir = __dirname;

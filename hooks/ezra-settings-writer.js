@@ -152,6 +152,9 @@ function addRule(projectDir, section, rule) {
   if (!Array.isArray(current[section].custom_rules)) {
     current[section].custom_rules = [];
   }
+  if (current[section].custom_rules.includes(rule)) {
+    return { success: false, error: 'Rule already exists: ' + rule };
+  }
   current[section].custom_rules.push(rule);
   ensureEzraDir(projectDir);
   fs.writeFileSync(settingsPath(projectDir), serializeYaml(current), 'utf8');
