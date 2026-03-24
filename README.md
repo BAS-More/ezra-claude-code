@@ -226,6 +226,21 @@ The installer prints the exact JSON configuration after install.
 npx ezra-claude-code --uninstall
 ```
 
+## Cursor Support
+
+EZRA is fully compatible with [Cursor](https://cursor.sh), the AI-first VS Code fork.
+
+- **VS Code extension** installs via VSIX in Cursor's extension panel
+- **Claude Code hooks** work when Claude Code runs in Cursor's terminal
+- **`.cursorrules` template** enforces EZRA governance through Cursor's AI agent
+
+```bash
+# Copy the .cursorrules template to your project:
+cp node_modules/ezra-claude-code/templates/cursorrules-template .cursorrules
+```
+
+See [docs/CURSOR-COMPATIBILITY.md](docs/CURSOR-COMPATIBILITY.md) for the full installation guide, compatibility matrix, and FAQ.
+
 ## Requirements
 
 - **Node.js** >= 16.7.0
