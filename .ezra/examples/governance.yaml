@@ -1,0 +1,27 @@
+# EZRA Governance Configuration
+# This file defines the project's governance rules.
+# Place in: .ezra/governance.yaml
+
+# Project identity
+project: my-project
+version: 1.0.0
+phase: development
+
+# Standards enforcement
+standards:
+  naming: kebab-case
+  max_file_length: 500
+  require_tests: true
+  require_docs: true
+  allowed_languages: [javascript, typescript]
+
+# Review requirements
+review:
+  require_before_merge: true
+  auto_scan_on_pr: true
+  min_health_score: 70
+
+# Decision tracking
+decisions:
+  auto_log: true
+  categories: [architecture, business, technical, security]

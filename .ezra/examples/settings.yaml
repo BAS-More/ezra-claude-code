@@ -1,0 +1,123 @@
+# EZRA v6 Settings
+# Complete example with all 14 sections.
+# Place in: .ezra/settings.yaml
+
+standards:
+  naming_convention: kebab-case
+  max_file_length: 500
+  require_tests: true
+  require_jsdoc: false
+  allowed_patterns: [module, factory, singleton]
+  forbidden_patterns: [god-object, circular-dependency]
+  custom_rules: []
+
+security:
+  scan_on_commit: true
+  block_on_critical: true
+  allowed_licenses: [MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC]
+  require_https: true
+  max_dependency_age_days: 365
+  audit_frequency: weekly
+
+oversight:
+  enabled: true
+  level: warn
+  log_all_tool_use: true
+  intervention_threshold: 3
+  auto_revert_on_critical: false
+  report_frequency: every_10_tasks
+  excluded_paths: [node_modules, .git, dist]
+
+best_practices:
+  enforce: true
+  categories: [naming, security, testing, documentation]
+  severity: warn
+  auto_fix: false
+
+workflows:
+  active_templates: [all]
+  custom_templates_dir: .ezra/workflows/custom/
+  auto_run:
+    on_commit: [anti-drift-enforcement]
+    on_pr: [security-audit]
+    on_deploy: [post-deployment-testing]
+    weekly: [deep-gap-analysis]
+
+self_learning:
+  enabled: true
+  analysis_frequency: weekly
+  min_data_points: 10
+  confidence_threshold: 0.75
+  auto_apply: false
+  report_on_scan: true
+  report_on_dash: true
+  domains:
+    standards_effectiveness: true
+    agent_profiles: true
+    violation_patterns: true
+    health_trajectories: true
+    decision_impact: true
+    workflow_optimisation: true
+    cost_optimisation: true
+  cross_project:
+    enabled: false
+    shared_domains: []
+
+project_manager:
+  enabled: true
+  mode: hybrid
+  routine_checks: rule-based
+  complex_decisions: ai
+  ai_provider: claude
+  check_interval: every_5_tasks
+  escalation_threshold: 3
+  stall_detection: 30
+  daily_report: true
+  weekly_report: true
+  milestones: []
+
+library:
+  enabled: true
+  categories: [naming, security, testing, documentation, architecture, performance, accessibility, api-design, error-handling, logging, monitoring, deployment, database, authentication]
+  auto_suggest: true
+  max_suggestions: 3
+  min_relevance: 0.5
+  seed_on_init: true
+  custom_practices_dir: .ezra/library/custom/
+
+agents:
+  enabled: true
+  max_concurrent: 3
+  daily_budget_usd: 10
+  monthly_budget_usd: 200
+  default_provider: anthropic
+
+dashboard:
+  enabled: true
+  export_format: json
+  auto_export: true
+  export_interval: every_scan
+
+memory:
+  enabled: true
+  max_key_facts: 100
+  briefing_regeneration: on_state_change
+  session_history_depth: 20
+  red_lines_locked: true
+
+planning:
+  enabled: true
+  max_tasks_before_gap_check: 5
+  checkpoint_on_milestone: true
+  auto_assign: true
+
+licensing:
+  tier: core
+  license_key: null
+  offline_cache_days: 30
+
+cloud_sync:
+  enabled: false
+  endpoint: null
+  sync_interval: 300
+  auto_push: false

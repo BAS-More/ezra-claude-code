@@ -1,0 +1,46 @@
+# EZRA Knowledge Graph
+# Maps relationships between files, features, decisions, tests, and documentation.
+# Auto-updated by scans. Place in: .ezra/knowledge.yaml
+
+files:
+  src/auth/login.js:
+    feature: authentication
+    decisions: [AD-001, AD-003]
+    tests: [tests/auth/login.test.js]
+    docs: [docs/auth.md]
+    dependencies: [src/auth/session.js, src/db/users.js]
+    last_modified: 2026-03-24
+    health: green
+
+  src/api/routes.js:
+    feature: api
+    decisions: [AD-002]
+    tests: [tests/api/routes.test.js]
+    docs: [docs/api.md]
+    dependencies: [src/auth/middleware.js]
+    last_modified: 2026-03-20
+    health: yellow
+
+features:
+  authentication:
+    owner: team-backend
+    status: stable
+    files: [src/auth/login.js, src/auth/session.js, src/auth/middleware.js]
+    coverage: 92
+
+  api:
+    owner: team-backend
+    status: active-development
+    files: [src/api/routes.js, src/api/handlers.js]
+    coverage: 78
+
+decisions:
+  AD-001:
+    text: Use JWT for session management
+    status: locked
+    affects: [src/auth/login.js, src/auth/session.js]
+
+  AD-002:
+    text: REST API with OpenAPI 3.1 specification
+    status: locked
+    affects: [src/api/routes.js]
