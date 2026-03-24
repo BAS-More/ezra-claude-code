@@ -224,7 +224,48 @@ function showHelp() {
     Requires Claude Code installed and working.
 
   ${c('bold', 'AFTER INSTALL:')}
-    Restart Claude Code, then run /ezra:help
+        Restart Claude Code, then run /ezra:help
+
+  ${c('bold', 'COMMANDS (39):')}
+    /ezra:init          Initialize EZRA governance in a project
+    /ezra:scan          Run health scan and generate report
+    /ezra:guard         Check file against governance rules
+    /ezra:oversight     Real-time agent oversight controls
+    /ezra:settings      View and manage EZRA settings
+    /ezra:compliance    Run compliance checks against profiles
+    /ezra:pm            Project manager — tasks, milestones, stalls
+    /ezra:progress      Quick progress dashboard
+    /ezra:library       Browse best practice library
+    /ezra:agents        Multi-agent orchestration controls
+    /ezra:cost          View agent cost tracking
+    /ezra:memory        Agent memory — key facts, red lines, briefings
+    /ezra:plan          Holistic planning engine
+    /ezra:workflow      Run, create, and manage workflow templates
+    /ezra:license       License management and tier status
+    /ezra:install       Install EZRA into a project
+    /ezra:dash          Dashboard data export
+    /ezra:health        Detailed health report
+    /ezra:status        Quick status summary
+    /ezra:decide        Record architectural decisions
+    /ezra:review        Code review against standards
+    /ezra:reconcile     Reconcile drift between expected and actual
+    /ezra:learn         Self-learning analysis and recommendations
+    /ezra:research      Search best practices and advisories
+    /ezra:portfolio     Multi-project portfolio overview
+    /ezra:handoff       Generate session handoff briefing
+    /ezra:doc           Generate documentation
+    /ezra:doc-check     Check documentation completeness
+    /ezra:doc-sync      Sync docs with codebase
+    /ezra:doc-approve   Approve documentation changes
+    /ezra:advisor       AI-powered governance advisor
+    /ezra:auto          Autonomous governance mode
+    /ezra:multi         Multi-project operations
+    /ezra:process       Process management
+    /ezra:sync          Cloud sync operations
+    /ezra:bootstrap     Bootstrap new project with EZRA
+    /ezra:claude-md     Generate CLAUDE.md governance file
+    /ezra:version       Version and update management
+    /ezra:help          Show all available commands
   `);
 }
 
