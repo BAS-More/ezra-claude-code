@@ -16,13 +16,9 @@
 
 const fs = require('fs');
 const path = require('path');
-// YAML parser — optional dependency, falls back to simple parser
-let yaml;
-try { yaml = require('yaml'); } catch (_) { yaml = null; }
-
+// YAML parser — simple built-in, zero dependencies
 function parseYaml(text) {
-  if (yaml) return yaml.parse(text);
-  // Simple fallback: parse YAML-like key: value pairs
+  // Parse YAML-like key: value pairs
   const result = {};
   const lines = text.split('\n');
   let currentKey = null;

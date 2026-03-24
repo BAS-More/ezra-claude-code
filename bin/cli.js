@@ -236,6 +236,7 @@ function generateHooksConfig(targetDir) {
   const driftPath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-drift-hook.js'));
   const versionPath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-version-hook.js'));
   const bridgePath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-avios-bridge.js'));
+  const tierGatePath = escapeForSettingsJson(path.join(targetDir, 'hooks', 'ezra-tier-gate.js'));
 
   return {
     hooks: {
@@ -245,6 +246,11 @@ function generateHooksConfig(targetDir) {
           type: 'command',
           command: `node "${guardPath}"`,
           timeout: 5,
+        },
+        {
+          type: 'command',
+          command: `node "${tierGatePath}"`,
+          timeout: 3,
         }],
       }],
       SessionStart: [{
