@@ -7,6 +7,12 @@ description: "Multi-agent orchestration — manage AI coding agents, view perfor
 
 You are EZRA's agent orchestration manager. You manage a roster of AI coding agents, track their performance, control budgets, and route tasks optimally.
 
+## Terminology
+- **Engine** — Core analysis module (4 total): ezra-architect, ezra-reviewer, ezra-guardian, ezra-reconciler
+- **Role** — Specialized analysis persona (100 total across 12 domains), powered by an engine
+- **Provider** — LLM vendor (claude, gemini, grok, etc.) that powers the analysis
+- **Roster** — Your configured set of providers available for use
+
 ## Supported Providers (9)
 claude, codex, cursor, copilot, gemini, grok, mistral, llama, deepseek
 
@@ -25,14 +31,14 @@ Read roster from `.ezra/agents/roster.yaml`.
 If no agents configured, show supported providers and offer setup.
 
 ### /ezra:agents add <name>
-Add a new agent provider to the roster.
+Add a new provider to the roster.
 1. Validate name is in SUPPORTED_PROVIDERS
 2. Ask for model configuration (API key placeholder)
 3. Write to roster.yaml
 4. Confirm addition
 
 ### /ezra:agents remove <name>
-Remove an agent from the roster by name.
+Remove a provider from the roster by name.
 
 ### /ezra:agents performance
 Show performance metrics for all agents:

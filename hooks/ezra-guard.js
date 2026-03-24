@@ -104,7 +104,7 @@ process.stdin.on('end', () => {
     }
 
     // Schema validation — warn on missing required keys or unknown top-level keys
-    const KNOWN_KEYS = ['protected_paths', 'allowed_patterns', 'auto_approve', 'version', 'project', 'settings'];
+    const KNOWN_KEYS = ['protected_paths', 'allowed_patterns', 'auto_approve', 'version', 'project', 'settings', 'name', 'language', 'standards', 'strict_types', 'no_any'];
     if (governance && typeof governance === 'object') {
       if (!governance.protected_paths) {
         const msg = _fmt('GUARD_004', { key: 'protected_paths' });
@@ -125,7 +125,16 @@ process.stdin.on('end', () => {
     const relativePath = path.relative(cwd, path.resolve(cwd, filePath));
     
     for (const pp of protectedPaths) {
-      const pattern = pp.pattern || '';
+      // Handle both object {pattern, reason} and string formats
+      let pattern, reason;
+      if (typeof pp === 'string') {
+        const m = pp.match(/^pattern:\s*(.+)/);
+        pattern = m ? m[1].trim() : pp;
+        reason = '';
+      } else {
+        pattern = pp.pattern || '';
+        reason = pp.reason || '';
+      }
       if (matchGlob(relativePath, pattern)) {
         // File matches protected path — check for decision record
         const decisionsDir = path.join(cwd, '.ezra', 'decisions');
@@ -141,7 +150,7 @@ process.stdin.on('end', () => {
               hookEventName: 'PreToolUse',
               // Change "allow" to "deny" to block protected path writes
               permissionDecision: 'allow',
-              permissionDecisionReason: `EZRA: Protected path "${pattern}" — ${pp.reason || 'no reason specified'}. Run /ezra:decide to record a decision authorising this change.`
+              permissionDecisionReason: `EZRA: Protected path "${pattern}" — ${reason || 'no reason specified'}. Run /ezra:decide to record a decision authorising this change.`
             }
           };
           process.stdout.write(JSON.stringify(output));
@@ -164,6 +173,7 @@ process.stdin.on('end', () => {
  * Simple glob matching supporting * and ** patterns
  */
 function matchGlob(filePath, pattern) {
+  if (!pattern) return false;
   // Convert glob to regex
   const normalized = filePath.replace(/\\/g, '/');
   let regex = pattern

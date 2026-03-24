@@ -209,3 +209,10 @@ Full report: .ezra/scans/<filename>
 ```
 
 Execute all phases automatically without asking for confirmation. Use subagents for parallel execution where possible.
+
+## Suggested Next Steps
+
+After a scan, suggest:
+- Run `/ezra:review` for deep code review of flagged files
+- Run `/ezra:guard` before committing to verify compliance
+- Run `/ezra:health` for a pillar-by-pillar breakdown

@@ -116,17 +116,19 @@ Example: `/ezra:settings remove-rule standards 0` removes the first custom rule 
 
 Reset settings to defaults:
 
-1. Confirm with user
-2. Write default settings to `.ezra/settings.yaml`
-3. Confirm reset
+1. **Ask for confirmation:** "This will reset all settings in this section to defaults. Type 'reset' to confirm."
+2. Only proceed if user types exactly 'reset'
+3. Write default settings to `.ezra/settings.yaml`
+4. Confirm reset
 
 ### reset-all
 
 Reset ALL settings to defaults:
 
-1. Confirm with user (this is destructive)
-2. Write complete default settings to `.ezra/settings.yaml`
-3. Confirm reset
+1. **Ask for confirmation:** "This will reset ALL EZRA settings to factory defaults. Type 'reset all' to confirm."
+2. Only proceed if user types exactly 'reset all'
+3. Write complete default settings to `.ezra/settings.yaml`
+4. Confirm reset
 
 This restores every section to factory defaults.
 
@@ -185,3 +187,36 @@ Controls process engine behavior:
 - `active_templates`: Currently active workflow templates
 - `auto_run`: Allow automatic workflow execution
 - `approval_gates`: Require approval at workflow gates
+
+### hooks
+Controls hook behavior:
+
+```
+/ezra:settings hooks             Show hook configuration status
+/ezra:settings hooks --disable   Disable all hooks (adds "enabled: false" to settings)
+/ezra:settings hooks --enable    Re-enable all hooks
+```
+
+When hooks are disabled, EZRA hooks still run but exit immediately without performing checks. This is useful for bulk operations or debugging.
+
+## User Preferences
+
+EZRA supports a `.ezra/preferences.yaml` file for personal defaults that are not shared with the team:
+
+```yaml
+# .ezra/preferences.yaml — Personal defaults (add to .gitignore)
+defaults:
+  agent_count: 6
+  scan_preset: quick-review
+  auto_guard: true
+  oversight_level: warn
+```
+
+Preferences are lower priority than explicit `settings.yaml` values but override built-in defaults.
+
+## Suggested Next Steps
+
+After changing settings, suggest:
+- Run `/ezra:oversight` to verify oversight configuration
+- Run `/ezra:compliance check` to validate compliance rules
+- Run `/ezra:health` to check impact on health score

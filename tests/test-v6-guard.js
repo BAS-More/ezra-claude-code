@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 let passed = 0;
 let failed = 0;
@@ -35,16 +35,12 @@ function cleanup(dir) {
 const hookPath = path.join(__dirname, '..', 'hooks', 'ezra-guard.js');
 
 function runHook(input) {
-  try {
-    const result = execSync(`node "${hookPath}"`, {
-      input: JSON.stringify(input),
-      encoding: 'utf8',
-      timeout: 10000,
-    });
-    return { stdout: result, exitCode: 0 };
-  } catch (err) {
-    return { stdout: err.stdout || '', stderr: err.stderr || '', exitCode: err.status };
-  }
+  const result = spawnSync('node', [hookPath], {
+    input: JSON.stringify(input),
+    encoding: 'utf8',
+    timeout: 10000,
+  });
+  return { stdout: result.stdout || '', stderr: result.stderr || '', exitCode: result.status };
 }
 
 function setupGovernance(dir, protectedPaths) {

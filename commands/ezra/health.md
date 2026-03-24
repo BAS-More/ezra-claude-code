@@ -387,3 +387,10 @@ Update `.ezra/versions/current.yaml` with `last_health_check` and `health_score`
 - Be honest. Do not inflate scores. A 50/100 is a 50/100.
 - Run the actual checks. Read actual files, run actual commands. Never estimate from memory.
 - Show projected improvement. Calculate what the score would be after top remediations.
+
+## Suggested Next Steps
+
+After a health check, suggest:
+- Run `/ezra:advisor` for targeted recommendations on low-scoring pillars
+- Run `/ezra:scan` for detailed analysis of specific findings
+- Run `/ezra:doc-check` if the No Gaps pillar scored low

@@ -9,8 +9,8 @@
 **Fix:**
 1. Restart Claude Code (close and reopen)
 2. Verify files exist:
-   - Global: `~/.claude/commands/ezra/` should contain 22 `.md` files
-   - Local: `./.claude/commands/ezra/` should contain 22 `.md` files
+   - Global: `~/.claude/commands/ezra/` should contain 39 `.md` files
+   - Local: `./.claude/commands/ezra/` should contain 39 `.md` files
 3. Re-run the installer: `npx ezra-claude-code --claude --global`
 
 ### "command not found: npx"

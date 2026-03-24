@@ -3,7 +3,7 @@ name: ezra:init
 description: Initialize EZRA governance for this project. Scans codebase architecture, creates .ezra/ state directory, and establishes baseline knowledge.
 ---
 
-You are initializing the EZRA (Automated Epistemic Governance & Intelligence System) for this project.
+You are initializing EZRA for this project.
 
 ## Phase 1: Create State Directory
 
@@ -15,7 +15,7 @@ Create the `.ezra/` directory structure if it does not exist:
 ├── scans/              # Will hold timestamped scan results
 ├── plans/              # Will hold registered plans for reconciliation
 ├── governance.yaml     # Governance rules and protected paths
-└── knowledge.yaml      # Epistemic state — what EZRA knows
+└── knowledge.yaml      # Codebase knowledge — what EZRA knows
 ```
 
 ## Phase 2: Codebase Discovery

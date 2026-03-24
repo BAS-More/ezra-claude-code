@@ -198,7 +198,7 @@ EZRA persists all state in `.ezra/` at the project root:
 ├── processes/      # Workflow definitions + templates + run history
 ├── versions/       # Immutable changelog + snapshots
 ├── governance.yaml # Rules, protected paths, enforcement
-└── knowledge.yaml  # Epistemic state
+└── knowledge.yaml  # Codebase knowledge
 ```
 
 ## Hooks (Optional)

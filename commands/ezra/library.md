@@ -43,8 +43,10 @@ Add a custom best practice entry interactively.
 Remove an entry by ID.
 
 1. Search for the entry across categories.
-2. Call library.removeEntry(projectDir, category, id).
-3. Confirm removal.
+2. **Ask for confirmation:** "This will permanently remove entry '<title>' (ID: <id>). Type 'remove' to confirm."
+3. Only proceed if user types exactly 'remove'
+4. Call library.removeEntry(projectDir, category, id).
+5. Confirm removal.
 
 ### /ezra:library relevant
 Show best practices relevant to the current file or project type.

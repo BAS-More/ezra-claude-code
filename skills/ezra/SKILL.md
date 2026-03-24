@@ -9,7 +9,7 @@ EZRA is a codebase governance framework. It provides multi-agent, multi-phase an
 
 ## What EZRA Does
 
-1. **Knows your codebase** — Maintains an epistemic state (`.ezra/knowledge.yaml`) documenting architecture, patterns, layers, and dependencies
+1. **Knows your codebase** — Maintains codebase knowledge (`.ezra/knowledge.yaml`) documenting architecture, patterns, layers, and dependencies
 2. **Enforces decisions** — Tracks Architectural Decision Records in `.ezra/decisions/` and verifies code compliance
 3. **Guards integrity** — Protects critical paths from unintended changes, checks standards compliance
 4. **Reviews deeply** — Dispatches parallel agents for architecture, security, and quality analysis

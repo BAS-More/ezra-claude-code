@@ -58,3 +58,10 @@ Generate a human-readable description of the current plan.
 5. **Verification** — quality gate (tests, lint, health)
 6. **Gap Check** — compare against master plan
 7. **Checkpoint** — save progress, update dashboard
+
+## Suggested Next Steps
+
+After creating or updating a plan, suggest:
+- Run `/ezra:reconcile` to compare plan vs implementation
+- Run `/ezra:pm tasks` to manage task queue
+- Run `/ezra:plan gap-check` after completing work to verify coverage

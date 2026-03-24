@@ -122,3 +122,10 @@ Rules: text alternatives, time-based media alternatives, adaptable content,
 distinguishable content, keyboard accessible, enough time, seizures and physical reactions,
 navigable content.
 Maps to standards custom_rules.
+
+## Suggested Next Steps
+
+After a compliance check, suggest:
+- Run `/ezra:scan --preset security-deep` to verify security compliance
+- Run `/ezra:settings` to review and adjust enforcement rules
+- Run `/ezra:health` for overall governance health

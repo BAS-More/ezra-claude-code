@@ -142,3 +142,10 @@ project_manager:
 - If `.ezra/` does not exist, prompt user to run `/ezra:init` first
 - If progress files don't exist, create them on first use
 - All operations are non-destructive and additive
+
+## Suggested Next Steps
+
+After project management operations, suggest:
+- Run `/ezra:progress` for a quick progress snapshot
+- Run `/ezra:plan gap-check` to compare completed work against master plan
+- Run `/ezra:reconcile` to verify milestone completion

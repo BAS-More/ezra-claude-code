@@ -16,7 +16,7 @@ Stop here.
 
 Read the following files:
 1. `.ezra/governance.yaml` — configuration and rules
-2. `.ezra/knowledge.yaml` — epistemic state
+2. `.ezra/knowledge.yaml` — codebase knowledge
 3. `.ezra/decisions/` — count and categorize all decision files
 4. `.ezra/scans/` — find most recent scan, count total scans
 5. `.ezra/plans/` — count active plans, check completion status

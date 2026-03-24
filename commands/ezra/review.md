@@ -211,3 +211,10 @@ Verdict logic:
 - No findings → APPROVE
 
 Execute all phases automatically without asking for confirmation.
+
+## Suggested Next Steps
+
+After a review, suggest:
+- Run `/ezra:guard` before committing changes
+- Run `/ezra:decide` to record any new decisions arising from findings
+- Run `/ezra:reconcile` to verify plan alignment

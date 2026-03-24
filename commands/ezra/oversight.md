@@ -120,3 +120,10 @@ Top Files:
 - Violations are logged to `.ezra/oversight/violations.log`
 - The oversight hook (`ezra-oversight.js`) runs on every Write/Edit via PreToolUse
 - Changes to oversight level take effect immediately for the next operation
+
+## Suggested Next Steps
+
+After reviewing oversight, suggest:
+- Run `/ezra:settings` to adjust intervention levels and thresholds
+- Run `/ezra:compliance check` to verify compliance against active profiles
+- Run `/ezra:scan` to address flagged violations

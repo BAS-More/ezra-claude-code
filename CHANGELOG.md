@@ -5,7 +5,7 @@
 ### EZRA v6 — Complete Multi-Agent Governance Framework
 
 #### Core Engine (ezra-claude-code)
-- **22 hooks** — real-time oversight, project management, settings writer, best practice library, multi-agent orchestration, dashboard data, cloud sync, workflow templates, agent memory, holistic planning, licensing, tier gating, installer
+- **24 hooks** — real-time oversight, project management, settings writer, best practice library, multi-agent orchestration, dashboard data, cloud sync, workflow templates, agent memory, holistic planning, licensing, tier gating, installer, structured logging, error codes
 - **39 slash commands** — full governance command set
 - **1010 tests, 0 failures** — comprehensive coverage across 18 test suites
 - **Zero external dependencies** — pure Node.js

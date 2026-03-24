@@ -36,7 +36,7 @@ Restart Claude Code, then run:
 /ezra:help
 ```
 
-You should see all 22 commands listed.
+You should see all 39 commands listed.
 
 ## First-Time Setup
 

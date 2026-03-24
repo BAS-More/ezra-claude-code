@@ -94,3 +94,20 @@ Total decisions: <count> active, <count> superseded
 ```
 
 Execute automatically. Infer as much as possible from context. Only ask the user for clarification if the decision is genuinely ambiguous.
+
+## Deprecation
+
+If the user says `/ezra:decide --deprecate ADR-NNN`:
+
+1. Look up `ADR-NNN` in `.ezra/decisions/`
+2. Show the decision title and ask: "This will mark ADR-NNN as DEPRECATED. Type 'deprecate' to confirm."
+3. Only proceed if user types exactly 'deprecate'
+4. Set `status: DEPRECATED` and add `deprecated_date: <ISO timestamp>`
+5. Confirm deprecation
+
+## Suggested Next Steps
+
+After recording a decision, suggest:
+- Run `/ezra:guard` to verify the new decision is enforced
+- Run `/ezra:scan` to check impact across the codebase
+- Run `/ezra:reconcile` if this changes an existing plan

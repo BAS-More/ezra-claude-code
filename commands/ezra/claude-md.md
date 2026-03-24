@@ -232,7 +232,7 @@ No risks currently tracked. Run `/ezra:scan` for risk assessment.
 ```markdown
 ## Governance
 
-This project is governed by EZRA (Automated Epistemic Governance & Intelligence System).
+This project is governed by EZRA (עזרא) — The Scribe Who Restores and Enforces Standards.
 
 | Command | Purpose |
 |---------|---------|

@@ -79,7 +79,7 @@ Starting baseline: 1010 tests (19 suites). Final: 1198 tests (22 suites). ALL GR
 
 | Check                    | Result  | Notes                                  |
 |--------------------------|---------|----------------------------------------|
-| Malformed JSON handling  | All 22  | Every hook catches JSON.parse errors   |
+| Malformed JSON handling  | All 24  | Every hook catches JSON.parse errors   |
 | Hook exit codes          | All 0   | No hook blocks on error                |
 | Agent routing_set        | Stub    | Unimplemented (acceptable — documented)|
 | Provider stubs           | 7       | Undocumented but harmless              |
@@ -133,7 +133,7 @@ Starting baseline: 1010 tests (19 suites). Final: 1198 tests (22 suites). ALL GR
 
 | Category          | Score | Max | Notes                            |
 |-------------------|-------|-----|----------------------------------|
-| Test Coverage     | 20/20 | 20  | 24 suites, 1241 tests, 22/22 hooks covered |
+| Test Coverage     | 20/20 | 20  | 27 suites, 1270 tests, 24/24 hooks covered |
 | Security          | 19/20 | 20  | SSRF protection added, path traversal hardened, 0 critical/high remaining |
 | Performance       | 18/20 | 20  | 1 known N+1 (acceptable scope), all I/O bounded |
 | Code Quality      | 20/20 | 20  | Zero deps, clean DAG, consistent require(), lint clean |
