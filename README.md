@@ -130,6 +130,8 @@ npx ezra-claude-code --claude --local
 /ezra:library       Best practice library — browse, search, add across 14 categories
 /ezra:research      Research agent control — automated best practice discovery
 /ezra:cost          Cost tracking and budget management for AI agent usage
+/ezra:handoff       Generate session handoff brief for continuity across conversations
+/ezra:learn         Capture learnings, patterns, and anti-patterns into project memory
 ```
 
 ## Health Pillars

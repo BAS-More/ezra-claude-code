@@ -66,11 +66,19 @@ process.stdin.on('end', () => {
     const cwd = event.cwd || process.cwd();
 
     // Path traversal guard — resolved path must stay within cwd
-    const resolved = path.resolve(cwd, filePath);
+    // SEC-003: Use realpathSync for existing files to prevent symlink bypass
+    let resolved = path.resolve(cwd, filePath);
+    try {
+      if (fs.existsSync(resolved)) {
+        resolved = fs.realpathSync(resolved);
+      }
+    } catch { /* If realpathSync fails, fall back to resolve */ }
     const cwdResolved = path.resolve(cwd);
+    let cwdReal = cwdResolved;
+    try { cwdReal = fs.realpathSync(cwdResolved); } catch { /* fallback */ }
     // Case-insensitive comparison on Windows to prevent drive-letter casing bypass
     const norm = process.platform === 'win32' ? s => s.toLowerCase() : s => s;
-    if (!norm(resolved).startsWith(norm(cwdResolved) + path.sep) && norm(resolved) !== norm(cwdResolved)) {
+    if (!norm(resolved).startsWith(norm(cwdReal) + path.sep) && norm(resolved) !== norm(cwdReal)) {
       const msg = _fmt('GUARD_002', { path: filePath });
       console.error(msg);
       _log(cwd, 'ezra-guard', 'error', msg);
@@ -174,6 +182,8 @@ process.stdin.on('end', () => {
  */
 function matchGlob(filePath, pattern) {
   if (!pattern) return false;
+  // SEC-006: Reject overly complex glob patterns to prevent ReDoS
+  if (pattern.length > 200) return false;
   // Convert glob to regex
   const normalized = filePath.replace(/\\/g, '/');
   let regex = pattern
