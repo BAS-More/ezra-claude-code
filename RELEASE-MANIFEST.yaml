@@ -42,7 +42,7 @@ components:
     deploy_command: "npx vsce publish"
     verify_command: "npx vsce show ezra-governance --json | findstr version"
     rollback_command: "npx vsce unpublish BAS-More.ezra-governance"
-    status: NOT_DEPLOYED
+    status: DEPLOYED  # Published 2026-03-25 via Azure AD token
 
   mcp:
     repo: BAS-More/ezra-mcp
