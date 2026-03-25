@@ -1,4 +1,6 @@
 'use strict';
+
+const MAX_SCAN_DEPTH = 5; // Safety limit for recursive directory scans
 /**
  * hooks/ezra-planner.js — Holistic Planning Engine for EZRA v6
  * Plans comprehensively upfront, delivers in verified chunks.
@@ -43,8 +45,9 @@ function parseVal(v) {
 }
 
 function readYaml(filePath) {
-  if (!fs.existsSync(filePath)) return {};
-  const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+  try {
+    if (!fs.existsSync(filePath)) return {};
+    const lines = fs.readFileSync(filePath, 'utf8').split('\n');
   const result = {};
   let currentKey = null;
   for (const line of lines) {
@@ -69,6 +72,7 @@ function readYaml(filePath) {
     }
   }
   return result;
+  } catch (e) { return {}; }
 }
 
 function writeYaml(filePath, obj) {

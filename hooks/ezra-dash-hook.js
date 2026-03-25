@@ -11,6 +11,8 @@
 
 'use strict';
 
+const MAX_STDIN = 1024 * 1024; // 1 MB stdin safety limit
+
 const fs = require('fs');
 const path = require('path');
 
@@ -21,7 +23,10 @@ try { _log = require('./ezra-hook-logger').logHookEvent; } catch { _log = () => 
 // Read stdin (Claude Code hook protocol)
 let stdinData = '';
 process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => stdinData += chunk);
+process.stdin.on('data', chunk => {
+  stdinData += chunk;
+  if (stdinData.length > MAX_STDIN) { process.exit(0); }
+});
 process.stdin.on('end', () => {
   let event = {};
   try { event = JSON.parse(stdinData); } catch (_) {}

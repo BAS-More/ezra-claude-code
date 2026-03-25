@@ -1,5 +1,7 @@
 'use strict';
 
+const MAX_STDIN = 1024 * 1024; // 1 MB stdin safety limit
+
 /**
  * EZRA Memory Auto-Capture Hook
  * Automatically captures patterns, facts, and lessons from Claude Code tool outputs.
@@ -162,7 +164,10 @@ module.exports = {
 if (require.main === module) {
   let input = '';
   process.stdin.setEncoding('utf8');
-  process.stdin.on('data', d => input += d);
+  process.stdin.on('data', d => {
+  input += d;
+  if (input.length > MAX_STDIN) { process.exit(0); }
+});
   process.stdin.on('end', () => {
     try {
       const data = JSON.parse(input);

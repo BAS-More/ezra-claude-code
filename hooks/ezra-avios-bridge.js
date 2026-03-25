@@ -17,6 +17,8 @@
 
 'use strict';
 
+const MAX_STDIN = 1024 * 1024; // 1 MB stdin safety limit
+
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -208,7 +210,10 @@ function processScanFile(filePath, cwd, projectId) {
 
 let input = '';
 process.stdin.setEncoding('utf8');
-process.stdin.on('data', chunk => input += chunk);
+process.stdin.on('data', chunk => {
+  input += chunk;
+  if (input.length > MAX_STDIN) { process.exit(0); }
+});
 process.stdin.on('end', () => {
   try {
     const event = JSON.parse(input);

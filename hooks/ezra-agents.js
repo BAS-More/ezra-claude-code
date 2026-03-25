@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
+const MAX_STDIN = 1024 * 1024; // 1 MB stdin safety limit
+const MAX_SCAN_DEPTH = 5; // Safety limit for recursive directory scans
+
 /**
  * EZRA Multi-Agent Orchestration Engine
  *
@@ -609,7 +612,10 @@ module.exports = {
 if (require.main === module) {
   let input = '';
   process.stdin.setEncoding('utf8');
-  process.stdin.on('data', chunk => input += chunk);
+  process.stdin.on('data', chunk => {
+  input += chunk;
+  if (input.length > MAX_STDIN) { process.exit(0); }
+});
   process.stdin.on('end', () => {
     try {
       const event = JSON.parse(input);
