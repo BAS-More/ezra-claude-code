@@ -5,6 +5,7 @@
  */
 const https = require('https');
 const http = require('http');
+const dns = require('dns');
 
 // ─── SSRF Protection ────────────────────────────────────────────
 
@@ -19,7 +20,8 @@ const PRIVATE_IP_PATTERNS = [
   /^192\.168\./,                     // Class C private
   /^169\.254\./,                     // link-local
   /^0\./,                            // current network
-  /^::1$/,                           // IPv6 loopback
+  /^::1$/,                           // IPv6 loopback (canonical)
+  /^0*:0*:0*:0*:0*:0*:0*:0*1$/,     // IPv6 loopback (expanded)
   /^fd[0-9a-f]{2}:/i,               // IPv6 unique local
   /^fe80:/i,                         // IPv6 link-local
 ];
@@ -27,12 +29,38 @@ const PRIVATE_IP_PATTERNS = [
 const BLOCKED_HOSTNAMES = ['localhost', '[::1]', '0.0.0.0'];
 
 function isBlockedHost(hostname) {
-  const h = hostname.toLowerCase();
+  const h = hostname.toLowerCase().replace(/^\[|\]$/g, '');
   if (BLOCKED_HOSTNAMES.includes(h)) return true;
+  if (BLOCKED_HOSTNAMES.includes(hostname.toLowerCase())) return true;
   for (const pat of PRIVATE_IP_PATTERNS) {
     if (pat.test(h)) return true;
   }
   return false;
+}
+
+/**
+ * SEC-002: Resolve hostname via DNS and check the resolved IP against SSRF blocklist.
+ * Prevents DNS rebinding attacks where a hostname resolves to a private IP.
+ */
+function resolveAndCheck(hostname) {
+  return new Promise((resolve, reject) => {
+    // If hostname is already an IP literal, just check it directly
+    if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname) || hostname.includes(':')) {
+      if (isBlockedHost(hostname)) {
+        return reject(new Error('SSRF blocked: resolved address is private/internal'));
+      }
+      return resolve();
+    }
+    dns.lookup(hostname, { all: true }, (err, addresses) => {
+      if (err) return reject(new Error(`DNS resolution failed: ${err.message}`));
+      for (const entry of addresses) {
+        if (isBlockedHost(entry.address)) {
+          return reject(new Error(`SSRF blocked: ${hostname} resolves to private/internal address ${entry.address}`));
+        }
+      }
+      resolve();
+    });
+  });
 }
 
 // ─── httpsPost ──────────────────────────────────────────────────
@@ -47,36 +75,42 @@ function isBlockedHost(hostname) {
 function httpsPost(url, body, headers) {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
+    // SEC-004: Enforce HTTPS-only for outbound requests
+    if (urlObj.protocol !== 'https:') {
+      return reject(new Error('SSRF blocked: only HTTPS URLs are allowed'));
+    }
     if (isBlockedHost(urlObj.hostname)) {
       return reject(new Error('SSRF blocked: requests to private/internal addresses are not allowed'));
     }
     const postData = JSON.stringify(body);
-    const mod = urlObj.protocol === 'http:' ? http : https;
-    const options = {
-      hostname: urlObj.hostname,
-      port: urlObj.port || (urlObj.protocol === 'http:' ? 80 : 443),
-      path: urlObj.pathname + urlObj.search,
-      method: 'POST',
-      headers: Object.assign({
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData),
-      }, headers || {}),
-    };
-    const req = mod.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        let parsed;
-        try { parsed = JSON.parse(data); } catch (_) { parsed = data; }
-        resolve({ statusCode: res.statusCode, body: parsed });
+    // SEC-002: Resolve DNS and check resolved IP before connecting
+    resolveAndCheck(urlObj.hostname).then(() => {
+      const options = {
+        hostname: urlObj.hostname,
+        port: urlObj.port || 443,
+        path: urlObj.pathname + urlObj.search,
+        method: 'POST',
+        headers: Object.assign({
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+        }, headers || {}),
+      };
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          let parsed;
+          try { parsed = JSON.parse(data); } catch (_) { parsed = data; }
+          resolve({ statusCode: res.statusCode, body: parsed });
+        });
       });
-    });
-    req.setTimeout(15000, () => {
-      req.destroy(new Error('Request timed out after 15s'));
-    });
-    req.on('error', reject);
-    req.write(postData);
-    req.end();
+      req.setTimeout(15000, () => {
+        req.destroy(new Error('Request timed out after 15s'));
+      });
+      req.on('error', reject);
+      req.write(postData);
+      req.end();
+    }).catch(reject);
   });
 }
 
@@ -91,31 +125,37 @@ function httpsPost(url, body, headers) {
 function httpsGet(url, headers) {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
+    // SEC-004: Enforce HTTPS-only for outbound requests
+    if (urlObj.protocol !== 'https:') {
+      return reject(new Error('SSRF blocked: only HTTPS URLs are allowed'));
+    }
     if (isBlockedHost(urlObj.hostname)) {
       return reject(new Error('SSRF blocked: requests to private/internal addresses are not allowed'));
     }
-    const mod = urlObj.protocol === 'http:' ? http : https;
-    const options = {
-      hostname: urlObj.hostname,
-      port: urlObj.port || (urlObj.protocol === 'http:' ? 80 : 443),
-      path: urlObj.pathname + urlObj.search,
-      method: 'GET',
-      headers: Object.assign({}, headers || {}),
-    };
-    const req = mod.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        let parsed;
-        try { parsed = JSON.parse(data); } catch (_) { parsed = data; }
-        resolve({ statusCode: res.statusCode, body: parsed });
+    // SEC-002: Resolve DNS and check resolved IP before connecting
+    resolveAndCheck(urlObj.hostname).then(() => {
+      const options = {
+        hostname: urlObj.hostname,
+        port: urlObj.port || 443,
+        path: urlObj.pathname + urlObj.search,
+        method: 'GET',
+        headers: Object.assign({}, headers || {}),
+      };
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          let parsed;
+          try { parsed = JSON.parse(data); } catch (_) { parsed = data; }
+          resolve({ statusCode: res.statusCode, body: parsed });
+        });
       });
-    });
-    req.setTimeout(15000, () => {
-      req.destroy(new Error('Request timed out after 15s'));
-    });
-    req.on('error', reject);
-    req.end();
+      req.setTimeout(15000, () => {
+        req.destroy(new Error('Request timed out after 15s'));
+      });
+      req.on('error', reject);
+      req.end();
+    }).catch(reject);
   });
 }
 
@@ -125,6 +165,7 @@ module.exports = {
   httpsPost,
   httpsGet,
   isBlockedHost,
+  resolveAndCheck,
   PRIVATE_IP_PATTERNS,
   BLOCKED_HOSTNAMES,
 };
