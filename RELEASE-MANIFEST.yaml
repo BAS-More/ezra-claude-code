@@ -4,7 +4,7 @@
 
 version: "6.0.0"
 release_date: "2026-03-25"  # Deployment executed
-release_status: PARTIAL  # 4/6 deployed: supabase, core, mcp, dashboard
+release_status: LIVE  # 6/6 deployed: all components live
 
 components:
   core:
@@ -74,7 +74,7 @@ components:
     deploy_command: "./gradlew publishPlugin"
     verify_command: "check marketplace listing"
     rollback_command: "remove from marketplace"
-    status: NOT_DEPLOYED
+    status: DEPLOYED  # Uploaded 2026-03-26, pending JetBrains review
 
 # Deployment order (sequential, with gates)
 deploy_sequence:
