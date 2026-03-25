@@ -77,6 +77,11 @@ function ensureDir(dir) {
 }
 
 function escapeForSettingsJson(p) {
+  // SEC-001: Reject paths with shell metacharacters to prevent command injection
+  // in generated hook command strings (e.g. `node "path"`).
+  if (/[;|&$`(){}!<>'"#\n\r]/.test(p)) {
+    throw new Error(`Unsafe characters in path: ${p}. Install EZRA in a directory without shell metacharacters.`);
+  }
   if (IS_WIN) return p.replace(/\\/g, '\\\\');
   return p;
 }
