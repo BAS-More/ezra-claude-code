@@ -103,7 +103,15 @@ function serializeYaml(obj) {
 }
 // ─── Path Utilities ──────────────────────────────────────────────
 
+function validateProjectDir(projectDir) {
+  if (!projectDir || typeof projectDir !== 'string') return false;
+  const normalized = path.normalize(projectDir);
+  if (normalized.includes('..')) return false;
+  return true;
+}
+
 function settingsPath(projectDir) {
+  if (!validateProjectDir(projectDir)) throw new Error('Invalid project directory: path traversal detected');
   return path.join(projectDir, '.ezra', 'settings.yaml');
 }
 
