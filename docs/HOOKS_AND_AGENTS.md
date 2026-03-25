@@ -8,18 +8,25 @@ Hooks are Node.js scripts that run automatically in response to Claude Code even
 
 After running `npx ezra-claude-code --claude --local`, add the hook configuration to your `.claude/settings.json`. The CLI prints the exact JSON block needed.
 
-Example configuration:
+Example configuration (matches `generateHooksConfig()` output from CLI):
 
 ```json
 {
   "hooks": {
     "PreToolUse": [{
       "matcher": "Edit|Write|MultiEdit",
-      "hooks": [{
-        "type": "command",
-        "command": "node \"/path/to/hooks/ezra-guard.js\"",
-        "timeout": 5
-      }]
+      "hooks": [
+        {
+          "type": "command",
+          "command": "node \"/path/to/hooks/ezra-guard.js\"",
+          "timeout": 5
+        },
+        {
+          "type": "command",
+          "command": "node \"/path/to/hooks/ezra-tier-gate.js\"",
+          "timeout": 3
+        }
+      ]
     }],
     "SessionStart": [{
       "matcher": "startup|compact",
@@ -178,6 +185,219 @@ EZRA │ my-app │ Decisions: 5 │ Health: 82/100 │ Last scan: 2h ago
 - TESTING, DEPENDENCY, CONVENTION → TC (Technical Choice)
 
 **Processing pending items:** Run `/ezra:sync` to review and push pending items to avios-context.
+
+---
+
+### ezra-oversight.js (PreToolUse)
+
+**Purpose:** Real-time code oversight — checks proposed changes against standards and security rules before they are applied.
+
+**Trigger:** Before any Write, Edit, or MultiEdit operation.
+
+**Behaviour:**
+1. Loads oversight settings from `.ezra/settings.yaml` (level: monitor/warn/gate/strict)
+2. Runs file-level and content-level checks against configured rules
+3. Logs violations to `.ezra/oversight/violations.yaml`
+4. At `gate`/`strict` level, can block operations that violate rules
+
+**Key exports:** `runChecks`, `decide`, `logViolations`, `matchGlob`, `loadOversightSettings`, `isSafeRegex`
+
+---
+
+### ezra-tier-gate.js (PreToolUse)
+
+**Purpose:** Blocks Pro/Team-gated commands when the project is on the Core (free) tier.
+
+**Trigger:** Before command invocations — checks license tier eligibility.
+
+**Behaviour:**
+1. Reads license status via `ezra-license.js`
+2. Compares the invoked command against `GATED_COMMANDS`
+3. If the tier is insufficient, outputs a permission denial with upgrade guidance
+4. Core-tier commands always pass through
+
+**Key exports:** `GATED_COMMANDS`, `CORE_COMMANDS`, `checkGate`, `handleHook`
+
+---
+
+### ezra-memory-hook.js (PostToolUse)
+
+**Purpose:** Auto-captures patterns, facts, and lessons from Claude Code tool outputs.
+
+**Trigger:** After any tool use — monitors results for learning opportunities.
+
+**Behaviour:**
+1. Parses the tool output for recognizable patterns, errors, and decisions
+2. Checks for duplicates against existing memory entries
+3. Stores new captures via `ezra-memory.js` with tags and confidence scores
+4. Skips low-value or redundant observations
+
+**Key exports:** `detectPatterns`, `extractTags`, `processToolOutput`, `isDuplicate`, `calculateSimilarity`
+
+---
+
+### ezra-progress-hook.js (PostToolUse)
+
+**Purpose:** Tracks agent progress by monitoring file changes; runs milestone and stall checks periodically.
+
+**Trigger:** After Write, Edit, or MultiEdit operations (non-blocking — always allows).
+
+**Behaviour:**
+1. Logs the file change as activity
+2. Periodically checks milestones and stall conditions via `ezra-pm.js`
+3. Surfaces progress notifications when thresholds are reached
+
+**Key exports:** `processEvent`, `hookOutput`, `parseCheckInterval`, `getActivityCount`, `logActivity`
+
+---
+
+### ezra-settings.js (Utility)
+
+**Purpose:** Read-only settings parser — reads `.ezra/settings.yaml` and merges with defaults.
+
+**Usage:** Imported by most other hooks and commands.
+
+**Key exports:** `loadSettings`, `getStandards`, `getSecurity`, `getOversight`, `getBestPractices`, `getLicensing`, `getPlanning`, `getMemory`, `getWorkflows`, `getSelfLearning`, `getProjectManager`, `getAgents`, `getDashboard`, `getCloudSync`, `getLibrary`, `parseYamlSimple`, `DEFAULTS`, `getDefault`
+
+---
+
+### ezra-settings-writer.js (Utility)
+
+**Purpose:** Write-back engine for `.ezra/settings.yaml` — companion to `ezra-settings.js`.
+
+**Usage:** Used by `/ezra:settings` and related commands.
+
+**Key exports:** `setSetting`, `addRule`, `removeRule`, `resetSection`, `resetAll`, `exportSettings`, `diffSettings`, `initSettings`, `serializeYaml`
+
+---
+
+### ezra-agents.js (Utility)
+
+**Purpose:** Multi-agent orchestration — agent roster management, weighted task assignment, performance tracking, budget management, and LLM provider abstraction.
+
+**Usage:** Used by `/ezra:agents` and scan/review commands.
+
+**Key exports:** `createProvider`, `executeWithFallback`, `loadAgentConfig`, `getAgentRoster`, `assignTask`, `recordTaskResult`, `getAgentPerformance`, `getAgentLeaderboard`, `checkBudget`, `calcCost`
+
+---
+
+### ezra-library.js (Utility)
+
+**Purpose:** Best practice library engine with 14 built-in categories — add, remove, search, and export entries.
+
+**Usage:** Used by `/ezra:library` command.
+
+**Key exports:** `initLibrary`, `getCategories`, `getEntries`, `addEntry`, `removeEntry`, `searchLibrary`, `getRelevant`, `importFromUrl`, `exportLibrary`
+
+---
+
+### ezra-cloud-sync.js (Utility)
+
+**Purpose:** Local state backup/restore and sync manifest generation for future cloud integration.
+
+**Usage:** Used by `/ezra:sync` command.
+
+**Key exports:** `generateManifest`, `createBackup`, `listBackups`, `restoreFromBackup`, `diffManifests`, `pushSync`, `pullSync`, `loadSyncState`, `saveSyncState`, `readCloudSyncSettings`
+
+---
+
+### ezra-dashboard-data.js (Utility)
+
+**Purpose:** Collects health data from `.ezra/` state for portfolio dashboards and handoff briefs.
+
+**Usage:** Used by `/ezra:dash`, `/ezra:portfolio`, `/ezra:handoff` commands.
+
+**Key exports:** `collectProjectHealth`, `generatePortfolioDashboard`, `formatPortfolioDashboard`, `generateHandoff`, `formatHandoff`, `saveHandoff`, `exportDashboardData`, `loadPortfolio`, `savePortfolio`
+
+---
+
+### ezra-error-codes.js (Utility)
+
+**Purpose:** Structured error code catalog with templated messages for all EZRA hooks.
+
+**Usage:** Imported by all hooks for consistent error formatting.
+
+**Key exports:** `ERROR_CODES`, `formatError`
+
+---
+
+### ezra-hook-logger.js (Utility)
+
+**Purpose:** Shared structured JSON-line logger with auto-rotation for all EZRA hooks.
+
+**Usage:** Imported by all hooks for consistent logging.
+
+**Key exports:** `logHookEvent`, `readHookLog`, `MAX_LOG_SIZE`
+
+---
+
+### ezra-http.js (Utility)
+
+**Purpose:** Shared HTTP client with SSRF protection, private IP blocking, and response size limits.
+
+**Usage:** Imported by `ezra-agents.js`, `ezra-cloud-sync.js`, and other cloud-enabled hooks.
+
+**Key exports:** `httpsPost`, `httpsGet`, `isBlockedHost`, `resolveAndCheck`, `PRIVATE_IP_PATTERNS`, `BLOCKED_HOSTNAMES`
+
+---
+
+### ezra-installer.js (Utility)
+
+**Purpose:** CLI installer — copies EZRA hooks, commands, and agents into Claude Code directories.
+
+**Usage:** Called by `bin/cli.js` during install/uninstall.
+
+**Key exports:** `install`, `uninstall`, `update`, `getInstallStatus`, `initProject`, `getEzraRoot`, `HOOK_FILES`, `INSTALL_PATHS`
+
+---
+
+### ezra-license.js (Utility)
+
+**Purpose:** License management engine — Core (free), Pro, and Team tiers via license key validation with HMAC-protected cache.
+
+**Usage:** Imported by `ezra-tier-gate.js` and license commands.
+
+**Key exports:** `validateKey`, `checkLicense`, `isFeatureAvailable`, `getLicenseStatus`, `getCachedLicense`, `refreshLicense`, `tierRank`, `LICENSE_TIERS`, `FEATURE_TIER_MAP`
+
+---
+
+### ezra-memory.js (Utility)
+
+**Purpose:** Persistent project knowledge base — stores patterns, decisions, anti-patterns, and lessons.
+
+**Usage:** Used by `ezra-memory-hook.js` and `/ezra:memory` command.
+
+**Key exports:** `addMemory`, `getMemory`, `updateMemory`, `deleteMemory`, `searchMemory`, `getRelevantMemories`, `listMemories`, `archiveMemory`, `exportMemories`, `importMemories`, `getMemoryStats`
+
+---
+
+### ezra-planner.js (Utility)
+
+**Purpose:** Holistic planning engine — creates plans upfront, decomposes tasks, and delivers in verified chunks.
+
+**Usage:** Used by `/ezra:plan` command.
+
+**Key exports:** `createPlan`, `loadPlan`, `decomposeTasks`, `assignTask`, `advanceTask`, `runGapCheck`, `createCheckpoint`, `getPlanStatus`, `listCheckpoints`, `deletePlan`, `describePlan`
+
+---
+
+### ezra-pm.js (Utility)
+
+**Purpose:** Project manager — milestone tracking, stall detection, health trends, escalation, and daily reports.
+
+**Usage:** Used by `/ezra:pm`, `/ezra:progress` commands and `ezra-progress-hook.js`.
+
+**Key exports:** `loadProjectState`, `checkMilestones`, `detectStalls`, `generateProgressReport`, `calculateHealthTrend`, `checkEscalation`, `generateDailyReport`, `updateProgress`
+
+---
+
+### ezra-workflows.js (Utility)
+
+**Purpose:** Workflow template engine — template management, validation, execution tracking, step dependencies, and conditional logic.
+
+**Usage:** Used by `/ezra:workflow`, `/ezra:process` commands.
+
+**Key exports:** `parseTemplate`, `validateTemplate`, `listTemplates`, `getTemplate`, `createProcess`, `createRun`, `updateRun`, `completeRun`, `listRuns`, `resolveStepDependencies`, `evaluateCondition`, `composeWorkflow`, `getWorkflowStats`
 
 ---
 

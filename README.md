@@ -210,15 +210,29 @@ After installation, add hooks to your `settings.json` for automatic enforcement:
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `ezra-guard.js` | PreToolUse | Warns on protected path edits |
+| `ezra-oversight.js` | PreToolUse | Real-time agent oversight with 4 intervention levels |
+| `ezra-tier-gate.js` | PreToolUse | Blocks Pro/Team-gated commands on Core tier |
 | `ezra-dash-hook.js` | SessionStart | Compact project status every session |
 | `ezra-drift-hook.js` | PostToolUse | Tracks edits, flags stale documents |
 | `ezra-version-hook.js` | PostToolUse | Auto-versions every `.ezra/` change |
 | `ezra-avios-bridge.js` | PostToolUse | Syncs decisions and scan findings to AVI-OS context |
+| `ezra-memory-hook.js` | PostToolUse | Auto-captures patterns and lessons from tool outputs |
+| `ezra-progress-hook.js` | PostToolUse | Tracks agent progress and checks milestones |
 | `ezra-settings.js` | Utility | Unified settings parser for `.ezra/settings.yaml` |
-| `ezra-oversight.js` | PreToolUse | Real-time agent oversight with 4 intervention levels |
-| `ezra-settings-writer.js` | Utility | Settings write-back engine for .ezra/settings.yaml |
-| `ezra-library.js` | Utility | Best practice library engine with 14 categories |
+| `ezra-settings-writer.js` | Utility | Settings write-back engine for `.ezra/settings.yaml` |
 | `ezra-agents.js` | Utility | Multi-agent orchestration with weighted task assignment |
+| `ezra-library.js` | Utility | Best practice library engine with 14 categories |
+| `ezra-cloud-sync.js` | Utility | Local state backup/restore and sync manifest |
+| `ezra-dashboard-data.js` | Utility | Health data collection for dashboards and handoffs |
+| `ezra-error-codes.js` | Utility | Structured error code catalog for all hooks |
+| `ezra-hook-logger.js` | Utility | Shared structured JSON-line logger with auto-rotation |
+| `ezra-http.js` | Utility | Shared HTTP client with SSRF protection |
+| `ezra-installer.js` | Utility | CLI installer for hooks and commands |
+| `ezra-license.js` | Utility | License management engine (Core/Pro/Team) |
+| `ezra-memory.js` | Utility | Persistent project knowledge base |
+| `ezra-planner.js` | Utility | Holistic planning engine with task decomposition |
+| `ezra-pm.js` | Utility | Project manager — milestones, stall detection, health trends |
+| `ezra-workflows.js` | Utility | Workflow template engine with step dependencies |
 
 The installer prints the exact JSON configuration after install.
 
