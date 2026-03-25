@@ -17,52 +17,30 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
-const EZRA_VERSION = '5.0.0';
+const EZRA_VERSION = '6.0.0';
 
-// What we install
+// What we install — dynamically read from source directories (matches bin/cli.js)
+function readDir(dir, ext) {
+  try {
+    return fs.readdirSync(path.join(__dirname, dir))
+      .filter(function(f) { return f.endsWith(ext); })
+      .map(function(f) { return path.join(dir, f); });
+  } catch (e) { return []; }
+}
+
 const MANIFEST = {
-  commands: [
-    'commands/ezra/init.md',
-    'commands/ezra/scan.md',
-    'commands/ezra/guard.md',
-    'commands/ezra/reconcile.md',
-    'commands/ezra/decide.md',
-    'commands/ezra/review.md',
-    'commands/ezra/status.md',
-    'commands/ezra/help.md',
-    'commands/ezra/doc.md',
-    'commands/ezra/dash.md',
-    'commands/ezra/doc-check.md',
-    'commands/ezra/doc-sync.md',
-    'commands/ezra/doc-approve.md',
-    'commands/ezra/version.md',
-    'commands/ezra/health.md',
-    'commands/ezra/advisor.md',
-    'commands/ezra/process.md',
-    'commands/ezra/auto.md',
-    'commands/ezra/multi.md',
-    'commands/ezra/sync.md',
-    'commands/ezra/claude-md.md',
-    'commands/ezra/bootstrap.md',
-    'commands/ezra/agents.md',
-  ],
-  agents: [
-    'agents/ezra-architect.md',
-    'agents/ezra-reviewer.md',
-    'agents/ezra-guardian.md',
-    'agents/ezra-reconciler.md',
-    'agents/registry.yaml',
-  ],
+  commands: readDir(path.join('commands', 'ezra'), '.md'),
+  agents: (function() {
+    try {
+      return fs.readdirSync(path.join(__dirname, 'agents'))
+        .filter(function(f) { return f.endsWith('.md') || f.endsWith('.yaml'); })
+        .map(function(f) { return path.join('agents', f); });
+    } catch (e) { return []; }
+  })(),
   skills: [
-    'skills/ezra/SKILL.md',
+    path.join('skills', 'ezra', 'SKILL.md'),
   ],
-  hooks: [
-    'hooks/ezra-guard.js',
-    'hooks/ezra-dash-hook.js',
-    'hooks/ezra-drift-hook.js',
-    'hooks/ezra-version-hook.js',
-    'hooks/ezra-avios-bridge.js',
-  ],
+  hooks: readDir('hooks', '.js'),
 };
 
 const sourceDir = __dirname;

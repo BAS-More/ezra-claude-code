@@ -36,10 +36,10 @@ Works on **Windows**, **macOS**, and **Linux**.
 
 ```bash
 # Install globally (all projects)
-npx ezra-claude-code --claude --global
+npx ezra-claude-code --global
 
 # Or install locally (current project only)
-npx ezra-claude-code --claude --local
+npx ezra-claude-code --local
 
 # Restart Claude Code, then:
 /ezra:help

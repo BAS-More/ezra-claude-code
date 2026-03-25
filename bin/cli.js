@@ -214,8 +214,8 @@ function showHelp() {
 
   ${c('bold', 'USAGE:')}
     npx ezra-claude-code                      Interactive installer
-    npx ezra-claude-code --claude --global     Install to ~/.claude/
-    npx ezra-claude-code --claude --local      Install to ./.claude/
+    npx ezra-claude-code --global              Install to ~/.claude/
+    npx ezra-claude-code --local               Install to ./.claude/
     npx ezra-claude-code --uninstall           Remove EZRA files
     npx ezra-claude-code --uninstall --global  Remove from global only
     npx ezra-claude-code --uninstall --local   Remove from local only
