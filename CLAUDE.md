@@ -45,6 +45,17 @@ Run all: `node tests/run-tests.js`
 - `test-v6-license.js` — License management
 - `test-v6-agents-real.js` — Agent real-world scenarios
 - `test-v6-http.js` — HTTP module, SSRF protection, URL validation
+- `test-v6-cloud-sync.js` — Cloud sync backup/restore/manifest
+- `test-v6-dash-hook.js` — Dashboard hook session start
+- `test-v6-drift-hook.js` — Drift tracking hook
+- `test-v6-error-codes.js` — Error code catalog and formatting
+- `test-v6-guard.js` — Guard hook protected paths
+- `test-v6-hook-logger.js` — Structured JSON logger
+- `test-v6-installer.js` — Installer copy/uninstall logic
+- `test-v6-memory-hook.js` — Memory auto-capture hook
+- `test-v6-progress-hook.js` — Progress tracking hook
+- `test-v6-tier-gate.js` — Tier gate license enforcement
+- `test-v6-version-hook.js` — Version tracking hook
 - `lint-all.js` — Code quality (strict mode, no console.error, proper exit codes)
 - `test-e2e.js` — End-to-end flows in temp directories
 - `test-uat.js` — Alpha/Beta/UAT acceptance tests
