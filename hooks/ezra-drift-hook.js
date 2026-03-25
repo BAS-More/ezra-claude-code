@@ -113,6 +113,8 @@ process.stdin.on('end', () => {
         existingAffected.push(docId);
         // Increment per-doc counter
         counter.affected_docs[docId] = (counter.affected_docs[docId] || 0) + 1;
+        // F-025: Cap per-doc counter to prevent unbounded growth
+        if (counter.affected_docs[docId] > 10000) counter.affected_docs[docId] = 10000;
       }
     }
 

@@ -59,7 +59,9 @@ function copyFile(src, dest) {
 function getEzraRoot() {
   // Try to find EZRA root by looking for package.json with name "ezra"
   let dir = __dirname;
+  const root = path.parse(dir).root;
   for (let i = 0; i < 5; i++) {
+    if (dir === root) break;
     const pkgPath = path.join(dir, 'package.json');
     if (fs.existsSync(pkgPath)) {
       try {

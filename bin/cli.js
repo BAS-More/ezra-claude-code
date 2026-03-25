@@ -43,21 +43,21 @@ function showBanner() {
 // ─── Manifest ────────────────────────────────────────────────────
 
 const MANIFEST = {
-  commands: fs.readdirSync(path.join(PACKAGE_DIR, 'commands', 'ezra'))
+  commands: (() => { try { return fs.readdirSync(path.join(PACKAGE_DIR, 'commands', 'ezra'))
     .filter(f => f.endsWith('.md'))
-    .map(f => path.join('commands', 'ezra', f)),
-  agents: fs.readdirSync(path.join(PACKAGE_DIR, 'agents'))
+    .map(f => path.join('commands', 'ezra', f)); } catch { return []; } })(),
+  agents: (() => { try { return fs.readdirSync(path.join(PACKAGE_DIR, 'agents'))
     .filter(f => f.endsWith('.md'))
-    .map(f => path.join('agents', f)),
+    .map(f => path.join('agents', f)); } catch { return []; } })(),
   skills: [path.join('skills', 'ezra', 'SKILL.md')],
-  hooks: fs.readdirSync(path.join(PACKAGE_DIR, 'hooks'))
+  hooks: (() => { try { return fs.readdirSync(path.join(PACKAGE_DIR, 'hooks'))
     .filter(f => f.endsWith('.js'))
-    .map(f => path.join('hooks', f)),
-  templates: fs.existsSync(path.join(PACKAGE_DIR, 'templates'))
+    .map(f => path.join('hooks', f)); } catch { return []; } })(),
+  templates: (() => { try { return fs.existsSync(path.join(PACKAGE_DIR, 'templates'))
     ? fs.readdirSync(path.join(PACKAGE_DIR, 'templates'))
         .filter(f => f.endsWith('.yaml') || f.endsWith('.yml'))
         .map(f => path.join('templates', f))
-    : [],
+    : []; } catch { return []; } })(),
 };
 
 // ─── Path helpers ────────────────────────────────────────────────
