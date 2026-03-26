@@ -660,8 +660,8 @@ test('copyDirRecursive: copies directory tree', () => {
 test('settings: DEFAULTS has dashboard section', () => {
   const settings = require('../hooks/ezra-settings.js');
   assert(settings.DEFAULTS.dashboard, 'Should have dashboard section');
-  assertEqual(settings.DEFAULTS.dashboard.auto_export, false);
-  assertEqual(settings.DEFAULTS.dashboard.export_format, 'yaml');
+  assertEqual(settings.DEFAULTS.dashboard.auto_export, true);
+  assertEqual(settings.DEFAULTS.dashboard.export_format, 'json');
 });
 
 test('settings: DEFAULTS has cloud_sync section', () => {
