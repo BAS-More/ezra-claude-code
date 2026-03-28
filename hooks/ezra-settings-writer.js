@@ -347,7 +347,7 @@ if (require.main === module) {
       process.stdout.write(JSON.stringify(result));
     } catch {
       const msg = _fmt('SETTINGS_002', { detail: 'Hook protocol error' });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-settings-writer', 'warn', msg);
       process.stdout.write('{}');
     }

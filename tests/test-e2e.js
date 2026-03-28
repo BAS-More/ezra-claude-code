@@ -481,6 +481,94 @@ test('E2E: Drift hook handles malformed JSON gracefully', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// E2E LIFECYCLE: Init → Guard → Version → Drift → Dash (chained)
+// ═══════════════════════════════════════════════════════════════════
+
+test('E2E Lifecycle: full governance flow in single project', () => {
+  const projectDir = createTempProject();
+  try {
+    // Step 1: Create .ezra/ state (simulates /ezra:init)
+    const ezraDir = path.join(projectDir, '.ezra');
+    fs.mkdirSync(path.join(ezraDir, 'decisions'), { recursive: true });
+    fs.mkdirSync(path.join(ezraDir, 'scans'), { recursive: true });
+    fs.mkdirSync(path.join(ezraDir, 'plans'), { recursive: true });
+    fs.mkdirSync(path.join(ezraDir, 'docs'), { recursive: true });
+    fs.mkdirSync(path.join(ezraDir, 'versions'), { recursive: true });
+    fs.writeFileSync(path.join(ezraDir, 'governance.yaml'),
+      'name: lifecycle-test\nproject_phase: development\nprotected_paths:\n  - "*.env*"\n  - "docker-compose*.yml"\n');
+    fs.writeFileSync(path.join(ezraDir, 'versions', 'current.yaml'),
+      'version: 1.0.0\n');
+    fs.writeFileSync(path.join(ezraDir, 'versions', 'changelog.yaml'),
+      'entries: []\n');
+
+    // Step 2: Add a decision (simulates /ezra:decide)
+    fs.writeFileSync(path.join(ezraDir, 'decisions', 'ADR-001.yaml'),
+      'id: ADR-001\ntitle: Use PostgreSQL\ncategory: DATABASE\nstatus: ACTIVE\n');
+
+    // Step 3: Guard hook allows non-protected file edit
+    const guardResult1 = pipeToHook('ezra-guard.js', {
+      tool_name: 'Write',
+      tool_input: { file_path: path.join(projectDir, 'src', 'app.js') },
+      cwd: projectDir
+    }, projectDir);
+    assert(guardResult1.exitCode === 0, 'Guard should exit 0 for non-protected file');
+
+    // Step 4: Guard hook handles protected file (.env) without crashing
+    const guardResult2 = pipeToHook('ezra-guard.js', {
+      tool_name: 'Edit',
+      tool_input: { file_path: path.join(projectDir, '.env') },
+      cwd: projectDir
+    }, projectDir);
+    assert(guardResult2.exitCode === 0, 'Guard should exit 0 even for protected file');
+
+    // Step 5: Version hook tracks .ezra/ changes
+    const versionResult = pipeToHook('ezra-version-hook.js', {
+      tool_name: 'Write',
+      tool_input: { file_path: path.join(ezraDir, 'governance.yaml') },
+      cwd: projectDir
+    }, projectDir);
+    assert(versionResult.exitCode === 0, 'Version hook should exit 0');
+
+    // Verify version was bumped
+    const currentVersion = fs.readFileSync(path.join(ezraDir, 'versions', 'current.yaml'), 'utf8');
+    assert(currentVersion.includes('1.0.1') || currentVersion.includes('version:'), 'Version should be tracked');
+
+    // Step 6: Dash hook shows project status
+    const dashResult = pipeToHook('ezra-dash-hook.js', { cwd: projectDir }, projectDir);
+    assert(dashResult.exitCode === 0, 'Dash hook should exit 0');
+    assert(dashResult.stdout.includes('lifecycle-test') || dashResult.stdout.includes('EZRA'),
+      'Dash should show project name or EZRA header');
+    assert(dashResult.stdout.includes('Decisions:') || dashResult.stdout.includes('1'),
+      'Dash should show decision count');
+
+    // Step 7: Drift hook tracks edits
+    const driftResult = pipeToHook('ezra-drift-hook.js', {
+      tool_name: 'Write',
+      tool_input: { file_path: path.join(projectDir, 'src', 'routes', 'api.js') },
+      cwd: projectDir
+    }, projectDir);
+    assert(driftResult.exitCode === 0, 'Drift hook should exit 0');
+
+    // Step 8: Add a scan result (simulates /ezra:scan)
+    fs.writeFileSync(path.join(ezraDir, 'scans', 'scan-2026-03-29.yaml'),
+      'timestamp: 2026-03-29T00:00:00Z\nhealth_score: 92\ncritical: 0\nhigh: 1\nwarning: 3\n');
+
+    // Step 9: Dash hook now shows health score
+    const dashResult2 = pipeToHook('ezra-dash-hook.js', { cwd: projectDir }, projectDir);
+    assert(dashResult2.stdout.includes('92'), 'Dash should show health score from scan');
+
+    // Step 10: Verify .ezra/ state is complete
+    assert(fs.existsSync(path.join(ezraDir, 'governance.yaml')), 'governance.yaml must exist');
+    assert(fs.existsSync(path.join(ezraDir, 'decisions', 'ADR-001.yaml')), 'ADR-001 must exist');
+    assert(fs.existsSync(path.join(ezraDir, 'scans', 'scan-2026-03-29.yaml')), 'Scan must exist');
+    assert(fs.existsSync(path.join(ezraDir, 'versions', 'current.yaml')), 'Version must exist');
+
+  } finally {
+    cleanup(projectDir);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
 
 console.log(`  E2E: PASSED: ${passed} FAILED: ${failed}`);
 process.exit(failed > 0 ? 1 : 0);

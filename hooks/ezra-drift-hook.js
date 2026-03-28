@@ -149,7 +149,7 @@ process.stdin.on('end', () => {
       const docList = sorted.map(([id, count]) => `${id} (${count} edits)`).join(', ');
       
       // Output as stderr feedback (non-blocking)
-      console.error(`EZRA: ${counter.edits_since_sync} edits since last doc-sync. Docs potentially stale: ${docList}. Run /ezra:doc-sync to review.`);
+      process.stderr.write(`EZRA: ${counter.edits_since_sync} edits since last doc-sync. Docs potentially stale: ${docList}. Run /ezra:doc-sync to review.` + "\n");
       
       // Track that we reminded about these
       counter.last_reminded = new Date().toISOString();
@@ -165,7 +165,7 @@ process.stdin.on('end', () => {
   } catch (err) {
     // Never block work due to hook errors
     const msg = _fmt('DRIFT_001', { detail: err.message });
-    console.error(msg);
+    process.stderr.write(msg + "\n");
     _log(process.cwd(), 'ezra-drift-hook', 'warn', msg);
     process.exit(0);
   }

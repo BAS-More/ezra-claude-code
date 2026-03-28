@@ -500,7 +500,7 @@ if (require.main === module) {
       }
     } catch {
       const msg = _fmt('LIBRARY_001', { detail: 'Hook protocol error' });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-library', 'warn', msg);
       process.stdout.write('{}');
     }

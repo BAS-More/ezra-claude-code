@@ -201,7 +201,7 @@ process.stdin.on('end', () => {
   } catch (err) {
     // Never block work due to hook errors
     const msg = _fmt('VERSION_001', { detail: err.message });
-    console.error(msg);
+    process.stderr.write(msg + "\n");
     _log(process.cwd(), 'ezra-version-hook', 'warn', msg);
     process.exit(0);
   }

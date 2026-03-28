@@ -130,7 +130,7 @@ if (require.main === module) {
       process.stdout.write(JSON.stringify(result));
     } catch (_) {
       const msg = _fmt('TIER_001', { detail: 'Hook protocol error' });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-tier-gate', 'warn', msg);
       process.stdout.write('{}');
     }

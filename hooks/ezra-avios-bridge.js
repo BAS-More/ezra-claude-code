@@ -286,7 +286,7 @@ process.stdin.on('end', () => {
   } catch (err) {
     // Non-blocking: log error to stderr, always exit 0
     const msg = _fmt('AVIOS_001', { detail: err.message });
-    console.error(msg);
+    process.stderr.write(msg + "\n");
     _log(process.cwd(), 'ezra-avios-bridge', 'warn', msg);
     process.exit(0);
   }

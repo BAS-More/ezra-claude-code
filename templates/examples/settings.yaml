@@ -1,0 +1,59 @@
+# EZRA Settings
+# Controls which EZRA features are enabled and at what level.
+# Managed via /ezra:settings or the VS Code settings panel.
+
+standards:
+  enabled: true
+  level: monitor
+
+security:
+  enabled: true
+  level: warn
+
+oversight:
+  enabled: true
+  level: monitor
+
+best_practices:
+  enabled: true
+  level: monitor
+
+workflows:
+  enabled: true
+  level: monitor
+
+self_learning:
+  enabled: true
+  level: monitor
+
+project_manager:
+  enabled: true
+  level: monitor
+
+library:
+  enabled: true
+  level: monitor
+
+agents:
+  enabled: true
+  level: monitor
+
+dashboard:
+  enabled: true
+  level: monitor
+
+memory:
+  enabled: true
+  level: monitor
+
+planning:
+  enabled: true
+  level: monitor
+
+licensing:
+  enabled: true
+  level: monitor
+
+cloud_sync:
+  enabled: false
+  level: monitor

@@ -512,7 +512,7 @@ if (require.main === module) {
     } catch {
       // Graceful failure — output empty and exit 0
       const msg = _fmt('SETTINGS_001', { detail: 'Hook protocol error' });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-settings', 'warn', msg);
       process.stdout.write('{}');
     }

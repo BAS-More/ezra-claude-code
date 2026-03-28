@@ -167,7 +167,7 @@ function resolveApiKey(providerType, projectDir) {
     }
   } catch {
     const msg = _fmt('AGENTS_002', {});
-    console.error(msg);
+    process.stderr.write(msg + "\n");
     _log(projectDir || process.cwd(), 'ezra-agents', 'info', msg);
   }
   // 2. Try env
@@ -184,7 +184,7 @@ function resolveModel(providerType, projectDir) {
     if (model) return model;
   } catch {
     const msg = _fmt('AGENTS_002', {});
-    console.error(msg);
+    process.stderr.write(msg + "\n");
     _log(projectDir || process.cwd(), 'ezra-agents', 'info', msg);
   }
   if (providerType === 'anthropic') return 'claude-sonnet-4-20250514';
@@ -640,7 +640,7 @@ if (require.main === module) {
       }
     } catch (hookErr) {
       const msg = 'EZRA [AGENTS]: Hook error — ' + (hookErr && hookErr.message ? hookErr.message : 'unknown');
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-agents', 'error', msg);
       process.stdout.write('{}');
     }

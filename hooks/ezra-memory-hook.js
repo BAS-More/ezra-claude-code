@@ -182,7 +182,7 @@ if (require.main === module) {
       process.stdout.write(JSON.stringify(result));
     } catch (e) {
       const msg = _fmt('MEMORY_001', { detail: e.message });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-memory-hook', 'warn', msg);
       process.stdout.write(JSON.stringify({ error: e.message }));
     }

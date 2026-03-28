@@ -240,6 +240,10 @@ function listBackups(projectDir) {
 }
 
 function restoreFromBackup(projectDir, backupName) {
+  // SEC-002: Sanitise backupName to prevent path traversal
+  if (path.basename(backupName) !== backupName) {
+    return { error: 'Invalid backup name: ' + backupName };
+  }
   const backupDir = path.join(getSyncDir(projectDir), 'backups', backupName);
   if (!fs.existsSync(backupDir)) return { error: 'Backup not found: ' + backupName };
 
@@ -512,7 +516,7 @@ if (require.main === module) {
       process.stdout.write(JSON.stringify(result));
     } catch (e) {
       const msg = _fmt('CLOUD_001', { detail: e.message });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-cloud-sync', 'warn', msg);
       process.stdout.write(JSON.stringify({ error: e.message }));
     }

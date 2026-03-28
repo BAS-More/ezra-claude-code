@@ -1,0 +1,24 @@
+# EZRA Knowledge Base
+# Stores project-specific knowledge that EZRA learns over time.
+# Updated by /ezra:learn and the self-learning hooks.
+
+# Project facts discovered during scans
+facts:
+  - "Uses PostgreSQL via Supabase"
+  - "Deployed on Vercel with GitHub CI"
+  - "API follows REST conventions"
+
+# Patterns detected in the codebase
+patterns:
+  - "Service layer pattern in src/services/"
+  - "React components use hooks, no class components"
+  - "Tests use Jest with React Testing Library"
+
+# Red lines — things that should never happen
+red_lines:
+  - "Never commit .env files"
+  - "Never use dynamic code execution"
+  - "Never bypass RLS with service role key in client code"
+
+# Last briefing timestamp
+last_briefing: "2026-03-29T00:00:00Z"

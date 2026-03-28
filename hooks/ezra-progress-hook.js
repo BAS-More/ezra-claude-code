@@ -198,7 +198,7 @@ if (require.main === module) {
       process.stdout.write(JSON.stringify(result));
     } catch {
       const msg = _fmt('PROGRESS_001', { detail: 'Hook protocol error' });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-progress-hook', 'warn', msg);
       process.stdout.write(JSON.stringify(hookOutput()));
     }

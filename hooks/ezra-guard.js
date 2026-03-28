@@ -81,7 +81,7 @@ process.stdin.on('end', () => {
     const norm = process.platform === 'win32' ? s => s.toLowerCase() : s => s;
     if (!norm(resolved).startsWith(norm(cwdReal) + path.sep) && norm(resolved) !== norm(cwdReal)) {
       const msg = _fmt('GUARD_002', { path: filePath });
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(cwd, 'ezra-guard', 'error', msg);
       process.exit(0);
       return;
@@ -105,7 +105,7 @@ process.stdin.on('end', () => {
         governance = JSON.parse(govContent);
       } catch (parseErr) {
         const msg = _fmt('GUARD_003', { reason: 'Invalid YAML/JSON syntax' });
-        console.error(msg);
+        process.stderr.write(msg + "\n");
         _log(cwd, 'ezra-guard', 'warn', msg, 'Run /ezra:health to diagnose.');
         process.exit(0); // Can't parse, allow
         return;
@@ -117,13 +117,13 @@ process.stdin.on('end', () => {
     if (governance && typeof governance === 'object') {
       if (!governance.protected_paths) {
         const msg = _fmt('GUARD_004', { key: 'protected_paths' });
-        console.error(msg);
+        process.stderr.write(msg + "\n");
         _log(cwd, 'ezra-guard', 'warn', msg, 'Run /ezra:init to regenerate governance.yaml.');
       }
       const unknownKeys = Object.keys(governance).filter(k => !KNOWN_KEYS.includes(k));
       if (unknownKeys.length > 0) {
         const msg = 'EZRA [GUARD]: Unknown governance.yaml keys: ' + unknownKeys.join(', ') + '. These will be ignored.';
-        console.error(msg);
+        process.stderr.write(msg + "\n");
         _log(cwd, 'ezra-guard', 'info', msg);
       }
     }
@@ -152,7 +152,7 @@ process.stdin.on('end', () => {
         if (!hasDecision) {
           // Protected path without decision — warn (change to "deny" for blocking)
           const guardMsg = _fmt('GUARD_001', { path: relativePath });
-          console.error(guardMsg);
+          process.stderr.write(guardMsg + "\n");
           _log(cwd, 'ezra-guard', 'warn', guardMsg, 'Run /ezra:decide to authorize.');
           const output = {
             hookSpecificOutput: {

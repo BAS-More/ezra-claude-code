@@ -1,0 +1,45 @@
+# EZRA Governance Configuration
+# This file defines your project's governance rules.
+# Created by /ezra:init or /ezra:bootstrap
+
+# Project identity
+name: my-project
+language: typescript
+framework: nextjs
+project_phase: development
+
+# Protected paths — files that require an architectural decision before editing
+# Uses glob patterns. Guard hook warns when these are edited without a decision.
+protected_paths:
+  - "*.env*"
+  - "**/migrations/**"
+  - "docker-compose*.yml"
+  - "Dockerfile*"
+  - ".github/workflows/**"
+  - "**/keys/**"
+  - "**/*.secret"
+
+# Coding standards enforced during reviews
+standards:
+  strict_types: true
+  no_any: true
+  test_coverage_minimum: 80
+
+# Enforcement behavior
+enforcement:
+  require_decision_for_protected_paths: true
+  block_on_violation: false
+
+# Drift tracking thresholds
+drift:
+  warn_threshold: 10
+  block_threshold: 25
+  block_enabled: false
+
+# AVI-OS integration (optional)
+avios_integration:
+  enabled: false
+  project_id: ""
+  auto_sync: false
+  sync_decisions: true
+  sync_risks: true

@@ -434,7 +434,7 @@ if (require.main === module) {
       const norm = process.platform === 'win32' ? s => s.toLowerCase() : s => s;
       if (!norm(resolvedPath).startsWith(norm(cwdReal) + path.sep) && norm(resolvedPath) !== norm(cwdReal)) {
         const msg = _fmt('GUARD_002', { path: filePath });
-        console.error(msg);
+        process.stderr.write(msg + "\n");
         _log(cwd, 'ezra-oversight', 'error', msg);
         process.exit(0);
         return;
@@ -483,11 +483,11 @@ if (require.main === module) {
       const critCount = violations.filter(v => v.severity === 'critical' || v.severity === 'high').length;
       if (critCount > 0) {
         const msg = _fmt('OVERSIGHT_001', { detail: `${critCount} critical/high issue(s) in ${relativePath}` });
-        console.error(msg);
+        process.stderr.write(msg + "\n");
         _log(cwd, 'ezra-oversight', 'warn', msg, 'Run /ezra:review.');
       } else {
         const msg = _fmt('OVERSIGHT_003', { detail: `${violations.length} issue(s) in ${relativePath}` });
-        console.error(msg);
+        process.stderr.write(msg + "\n");
         _log(cwd, 'ezra-oversight', 'info', msg, 'Run /ezra:scan.');
       }
 
@@ -503,7 +503,7 @@ if (require.main === module) {
     } catch (hookErr) {
       // Hook errors should never block work
       const msg = 'EZRA [OVERSIGHT]: Hook error — ' + (hookErr && hookErr.message ? hookErr.message : 'unknown');
-      console.error(msg);
+      process.stderr.write(msg + "\n");
       _log(process.cwd(), 'ezra-oversight', 'error', msg);
       process.exit(0);
     }
