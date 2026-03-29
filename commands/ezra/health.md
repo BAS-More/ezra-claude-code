@@ -388,6 +388,32 @@ Update `.ezra/versions/current.yaml` with `last_health_check` and `health_score`
 - Run the actual checks. Read actual files, run actual commands. Never estimate from memory.
 - Show projected improvement. Calculate what the score would be after top remediations.
 
+## Subcommand: gate-report
+
+`/ezra:health gate-report <phase>` — Run and display the phase gate report for phase N.
+
+1. Load gate result from `.ezra/gates/phase-<N>.yaml` if it exists (last run).
+2. If no saved result, run `ezra-phase-gate.js runGate(cwd, N)` via `require()`.
+3. Display:
+
+```
+EZRA PHASE GATE — Phase <N>                    <PASSED ✅ / FAILED ❌>
+═══════════════════════════════════════════════════════════════
+Overall Score: <score>/100  │  Run at: <timestamp>
+
+  ✅ Tests         100/100  all tests passing
+  ✅ Lint          100/100  no lint errors
+  ✅ Security      100/100  0 critical/high findings
+  ⏭️  Coverage     skipped  no minimum configured
+  ✅ Standards     100/100  0 critical/high in last scan
+
+BLOCKERS: none  ← or list failing checks
+═══════════════════════════════════════════════════════════════
+```
+
+4. If gate failed, provide specific remediation steps for each blocker.
+5. After displaying, save the result to `.ezra/gates/phase-<N>.yaml`.
+
 ## Suggested Next Steps
 
 After a health check, suggest:
