@@ -386,6 +386,51 @@ function unlockPlan(projectDir, reason) {
   } catch (e) { return { success: false, error: e.message }; }
 }
 
+// ── Quiz2Build integration ────────────────────────────────────────────────────
+
+let _q2bPlan;
+try { _q2bPlan = require('./ezra-quiz2build-client'); } catch (_e) { _q2bPlan = null; }
+
+/**
+ * fromQuiz2BuildDocuments — generate a plan skeleton from Q2B documents.
+ * Reads Architecture Dossier and SDLC Playbook action items → EZRA plan tasks.
+ */
+function fromQuiz2BuildDocuments(projectDir, sessionId) {
+  if (!_q2bPlan) return { error: 'ezra-quiz2build-client not available' };
+
+  const imported = _q2bPlan.importDocuments(projectDir, sessionId, ['architecture_dossier', 'sdlc_playbook']);
+  if (imported.error) return imported;
+
+  const tasks = [];
+  for (const doc of (imported.documents || [])) {
+    if (doc.error || !doc.data) continue;
+    const actions = doc.data.action_items || doc.data.actions || doc.data.tasks || [];
+    for (const action of actions) {
+      const title = typeof action === 'string' ? action : (action.title || action.description || String(action));
+      const complexity = action.complexity || 'medium';
+      const role = action.agent_role || 'code-agent';
+      tasks.push({
+        id: 'Q2B-' + (tasks.length + 1),
+        title: title.slice(0, 120),
+        description: action.description || title,
+        acceptance_criteria: action.acceptance_criteria || ['Task completed as described'],
+        file_targets: action.file_targets || [],
+        depends_on: [],
+        agent_role: AGENT_ROLES.includes(role) ? role : 'code-agent',
+        complexity,
+        source: 'quiz2build',
+        doc_type: doc.type,
+      });
+    }
+  }
+
+  if (tasks.length === 0) {
+    return { warning: 'No action items found in Q2B documents. Using heuristic decomposition.', tasks: [] };
+  }
+
+  return { session_id: sessionId, tasks, count: tasks.length };
+}
+
 module.exports = {
   generatePlan,
   loadPlan,
@@ -395,6 +440,7 @@ module.exports = {
   decomposeTasks,
   suggestPhases,
   detectTaskAreas,
+  fromQuiz2BuildDocuments,
   AGENT_ROLES,
   COMPLEXITY_WEIGHTS,
   MAX_HIGH_COMPLEXITY_PER_PHASE,

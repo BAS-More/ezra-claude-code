@@ -75,7 +75,7 @@ test('E2E: Install → verify all files → uninstall → verify removal', () =>
 
     // Verify command count
     const cmds = fs.readdirSync(path.join(claudeDir, 'commands', 'ezra')).filter(f => f.endsWith('.md'));
-    assert(cmds.length === 40, `Expected 40 commands, got ${cmds.length}`);
+    assert(cmds.length === 41, `Expected 41 commands, got ${cmds.length}`);
 
     // Verify agent count
     const agents = fs.readdirSync(path.join(claudeDir, 'agents')).filter(f => f.endsWith('.md'));
@@ -83,7 +83,7 @@ test('E2E: Install → verify all files → uninstall → verify removal', () =>
 
     // Verify hook count
     const hooks = fs.readdirSync(path.join(claudeDir, 'hooks')).filter(f => f.endsWith('.js'));
-    assert(hooks.length === 41, `Expected 41 hooks, got ${hooks.length}`);
+    assert(hooks.length === 42, `Expected 42 hooks, got ${hooks.length}`);
 
     // Verify skill
     assert(fs.existsSync(path.join(claudeDir, 'skills', 'ezra', 'SKILL.md')), 'SKILL.md missing');

@@ -201,6 +201,15 @@ const DEFAULTS = {
     auto_deploy: false,
     production_approval: true,
   },
+  quiz2build: {
+    endpoint: 'http://localhost:3000',
+    api_key: null,
+    project_id: null,
+    session_id: null,
+    auto_sync: false,
+    sync_facts: true,
+    import_documents_to_library: true,
+  },
 };
 
 // ─── YAML Parser (simple, no deps) ──────────────────────────────
@@ -515,6 +524,10 @@ function getExecution(projectDir) {
   return loadSettings(projectDir).execution;
 }
 
+function getQuiz2Build(projectDir) {
+  return loadSettings(projectDir).quiz2build;
+}
+
 // ─── Exports (for require()) ─────────────────────────────────────
 
 module.exports = {
@@ -535,6 +548,7 @@ module.exports = {
   getLibrary,
   getNotifications,
   getExecution,
+  getQuiz2Build,
   parseYamlSimple,
   parseValue,
   deepMerge,

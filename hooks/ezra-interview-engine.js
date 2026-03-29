@@ -184,7 +184,69 @@ function getProgress(existingDef) {
   return { answered: answered.length, total: DOMAINS.length, pct: Math.round(answered.length / DOMAINS.length * 100) };
 }
 
-module.exports = { DOMAINS, detectGaps, runInterviewCLI, getNextQuestion, applyAnswer, getProgress };
+// ── Quiz2Build integration ────────────────────────────────────────────────────
+
+let _q2b;
+try { _q2b = require('./ezra-quiz2build-client'); } catch (_e) { _q2b = null; }
+
+/**
+ * fromQuiz2BuildSession — hybrid interview mode.
+ * Imports a Q2B session heatmap and marks EZRA domains that are already covered.
+ * Returns { covered_domains[], remaining_domains[], answers_applied, session_score }
+ */
+function fromQuiz2BuildSession(projectDir, sessionId) {
+  if (!_q2b) return { error: 'ezra-quiz2build-client not available' };
+
+  const heatmapResult = _q2b.importHeatmap(projectDir, sessionId);
+  if (heatmapResult.error) return heatmapResult;
+
+  const factResult = _q2b.importFacts(projectDir, sessionId);
+  const scoreResult = _q2b.importScore(projectDir, sessionId);
+
+  const coveredEzraDomains = new Set();
+  const heatmap = heatmapResult.heatmap || {};
+  const domainMap = _q2b.EZRA_DOMAIN_MAP;
+
+  // Mark domains covered where Q2B dimension is MOSTLY_ADDRESSED or better
+  for (const [q2bDim, ezraDomains] of Object.entries(domainMap)) {
+    const cells = Array.isArray(heatmap[q2bDim]) ? heatmap[q2bDim] :
+                  (heatmap.matrix && heatmap.matrix[q2bDim]) ? heatmap.matrix[q2bDim] : [];
+    const hasRedOrAmber = cells.some(c => {
+      const level = (c.colour || c.color || c.level || 'green').toLowerCase();
+      return level === 'red' || level === 'amber';
+    });
+    if (!hasRedOrAmber) {
+      for (const d of ezraDomains) coveredEzraDomains.add(d);
+    }
+  }
+
+  // EZRA-only domains always remain
+  const allDomainIds = DOMAINS.map(d => d.id);
+  const coveredArr = allDomainIds.filter(id => coveredEzraDomains.has(id));
+  const remainingArr = allDomainIds.filter(id => !coveredEzraDomains.has(id));
+
+  // Apply known facts as answers to the definition
+  let answersApplied = 0;
+  const facts = (factResult && !factResult.error && Array.isArray(factResult.facts)) ? factResult.facts : [];
+  for (const fact of facts) {
+    if (fact.domain && DOMAINS.some(d => d.id === fact.domain) && fact.value !== undefined) {
+      // Caller must apply answers using applyAnswer() in their session state
+      answersApplied++;
+    }
+  }
+
+  return {
+    session_id: sessionId,
+    session_score: scoreResult.score || null,
+    covered_domains: coveredArr,
+    remaining_domains: remainingArr,
+    facts,
+    answers_applied: answersApplied,
+    heatmap,
+  };
+}
+
+module.exports = { DOMAINS, detectGaps, runInterviewCLI, getNextQuestion, applyAnswer, getProgress, fromQuiz2BuildSession };
 
 if (require.main === module) {
   // Hook protocol: reads project dir from event, returns gap count

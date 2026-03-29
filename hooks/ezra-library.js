@@ -473,6 +473,55 @@ function syncFromWeb(projectDir, techFilter) {
   });
 }
 
+// --- Quiz2Build Integration ---
+
+let _q2bLib;
+try { _q2bLib = require('./ezra-quiz2build-client'); } catch (_e) { _q2bLib = null; }
+
+const Q2B_DOC_CATEGORY_MAP = {
+  architecture_dossier: 'architecture',
+  sdlc_playbook:        'process',
+  test_strategy:        'testing',
+  security_framework:   'security',
+  api_specification:    'api',
+  deployment_guide:     'deployment',
+  data_model:           'database',
+  risk_register:        'security',
+};
+
+function importFromQuiz2Build(projectDir, sessionId, docTypes) {
+  if (!_q2bLib) return { error: 'ezra-quiz2build-client not available' };
+  const types = Array.isArray(docTypes) ? docTypes : _q2bLib.Q2B_DOCUMENT_TYPES;
+  const imported = _q2bLib.importDocuments(projectDir, sessionId, types);
+  if (imported.error) return imported;
+
+  let added = 0;
+  const errors = [];
+  for (const doc of (imported.documents || [])) {
+    if (doc.error || !doc.data) {
+      errors.push({ type: doc.type, error: doc.error || 'No data' });
+      continue;
+    }
+    const category = Q2B_DOC_CATEGORY_MAP[doc.type] || 'general';
+    const title = doc.data.title || ('Quiz2Build: ' + doc.type.replace(/_/g, ' '));
+    const description = doc.data.summary || doc.data.description || ('Imported from Quiz2Build session ' + sessionId);
+    const r = addEntry(projectDir, {
+      title,
+      category,
+      description,
+      content: doc.data.content || description,
+      source: 'quiz2build',
+      linked_section: 'quiz2build',
+      tags: ['quiz2build', doc.type, 'auto-imported'],
+      severity: 'info',
+      subcategory: doc.type,
+    });
+    if (r.success === false) errors.push({ type: doc.type, error: r.error || r.reason });
+    else added++;
+  }
+  return { session_id: sessionId, added, errors, total: types.length };
+}
+
 // --- Exports ---
 
 module.exports = {
@@ -487,6 +536,7 @@ module.exports = {
   searchLibrary,
   getRelevant,
   importFromUrl,
+  importFromQuiz2Build,
   exportLibrary,
   serializeEntry,
   serializeEntries,

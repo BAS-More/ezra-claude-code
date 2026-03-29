@@ -24,7 +24,7 @@ EZRA is a multi-agent codebase governance framework implemented as a set of Mark
 
 ## Component Architecture
 
-### 1. Commands (40 Markdown files)
+### 1. Commands (41 Markdown files)
 
 Location: `commands/ezra/*.md`
 
@@ -63,7 +63,7 @@ description: Full multi-agent codebase analysis
 | Memory | memory |
 | Licensing | license |
 
-### 2. Hooks (41 Node.js scripts)
+### 2. Hooks (42 Node.js scripts)
 
 Location: `hooks/*.js`
 
