@@ -1,8 +1,8 @@
 # EZRA v6.0.0 — System Validation Report
 
-**Date:** 2026-03-25  
-**Scope:** Full system validation (architecture, security, quality, governance, tests)  
-**Commit:** `3fa13c6` (HEAD → main)  
+**Date:** 2026-03-25
+**Scope:** Full system validation (architecture, security, quality, governance, tests)
+**Commit:** `3fa13c6` (HEAD → main)
 **Node:** >=16.7.0 | **License:** MIT | **Dependencies:** 0
 
 ---

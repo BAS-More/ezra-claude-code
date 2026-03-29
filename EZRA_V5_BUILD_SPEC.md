@@ -102,19 +102,19 @@ Generates a `CLAUDE.md` file from `.ezra/` state so every Claude Code session st
 - Generates CLAUDE.md with sections:
   ```
   # Project: {name}
-  
+
   ## Architecture
   {from knowledge.yaml — layers, patterns, key directories}
-  
+
   ## Active Decisions
   {list of active ADRs — ID, decision text, enforcement paths}
-  
+
   ## Protected Paths
   {from governance.yaml — patterns and reasons}
-  
+
   ## Standards
   {from governance.yaml — coding standards, conventions}
-  
+
   ## Governance
   This project uses EZRA for codebase governance.
   - Run /ezra:status for current health
@@ -163,7 +163,7 @@ One-command project onboarding: scans, creates governance.yaml with sensible def
      Protected paths: {count} configured
      Baseline health: {score}/100
      CLAUDE.md: Generated
-     
+
      Next: Start coding. EZRA is watching.
      ```
 - Idempotent: if .ezra/ already exists, skip init and only update missing pieces
@@ -320,14 +320,14 @@ Reads `.ezra/` state from multiple project directories and produces a unified he
   ```
   EZRA PORTFOLIO HEALTH
   ═══════════════════════════════════════════════════════
-  
+
   Project          Health  Decisions  Drift  Last Scan
   ─────────────────────────────────────────────────────
   Quiz2Biz         82/100  12 active  3/10   2026-03-19
   BnM Platform     45/100   6 active  18/10  2026-03-15
   MAH SDK          91/100  17 active  0/10   2026-03-18
   Reward Service   —/100    0 active  —      Never
-  
+
   ⚠️ BnM Platform: drift threshold exceeded (18 edits)
   ⚠️ Reward Service: EZRA not initialized
   ```
@@ -364,24 +364,24 @@ Exports current project state as a structured briefing document — lives in the
   ```
   EZRA HANDOFF BRIEF — {project} — {date}
   ═══════════════════════════════════════════════
-  
+
   HEALTH: {score}/100 | VERSION: {version}
-  
+
   ARCHITECTURE
   {2-3 line summary from knowledge.yaml}
-  
+
   RECENT DECISIONS (last 10)
   - ADR-012: Switched to Fastify [ACTIVE]
   - ADR-011: Added Redis caching layer [ACTIVE]
-  
+
   RECENT CHANGES (last 20 changelog entries)
   - CHG-045: Decision ADR-012 created
   - CHG-044: Scan completed (score: 82)
-  
+
   OPEN ITEMS
   - 3 critical documents missing
   - Drift counter: 7 edits since last sync
-  
+
   RECENT COMMITS
   - a1b2c3d fix: resolve auth middleware issue
   - e4f5g6h feat: add user preferences API
@@ -506,14 +506,14 @@ custom_rules:
     max_lines: 500
     severity: warning  # warning | error
     paths: ["src/**/*.ts", "src/**/*.js"]
-    
+
   - id: require-auth-middleware
     description: "All API route files must import auth middleware"
     type: content_required
     pattern: "import.*authMiddleware|require.*authMiddleware"
     severity: error
     paths: ["src/routes/**/*.ts"]
-    
+
   - id: no-console-log
     description: "No console.log in production code"
     type: content_forbidden

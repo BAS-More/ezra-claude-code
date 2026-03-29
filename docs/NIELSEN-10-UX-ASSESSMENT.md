@@ -1,8 +1,8 @@
 # Nielsen's 10 Usability Heuristics Assessment — EZRA v6.0.0
 
-**Date:** March 25, 2026  
-**Assessor:** Automated UX Audit (Claude Opus 4.6)  
-**Scope:** EZRA framework v6.0.0 — 39 commands, 22 hooks, 4 agents, CLI installer, 6 templates, full documentation suite  
+**Date:** March 25, 2026
+**Assessor:** Automated UX Audit (Claude Opus 4.6)
+**Scope:** EZRA framework v6.0.0 — 39 commands, 22 hooks, 4 agents, CLI installer, 6 templates, full documentation suite
 **Methodology:** Jakob Nielsen's 10 Usability Heuristics for User Interface Design, adapted for CLI/developer-experience (DX) evaluation
 
 ---
