@@ -16,11 +16,32 @@ Show research agent status: last run, next scheduled, budget used.
 2. Display status (currently: not_configured).
 3. Show message: Cloud research agent available in Phase 6.
 
-### /ezra:research run
-Trigger manual research run.
+### /ezra:research run [--tech <stack>]
+Trigger a local web scrape from whitelisted sources.
 
-1. Return placeholder message: Cloud research agent not configured.
-2. Explain this feature requires Phase 6 (cloud agent deployment).
+1. Load ezra-bp-scheduler.js and call runScheduledFetch(projectDir) (override isDue check for manual run).
+2. If --tech flag provided, pass tech_filter from argument; otherwise load from settings self_learning.tech_filter.
+3. Display: fetched_count, pending_count for review, any per-URL errors.
+4. Show message: Run /ezra:research pending to review and approve scraped entries.
+
+### /ezra:research pending
+Show scraped entries awaiting approval.
+
+1. Call ezra-bp-scheduler.js getPendingEntries(projectDir).
+2. Display each entry: URL, category, word_count, fetched_at.
+3. Show: Use /ezra:research approve <filename> or /ezra:research reject <filename>.
+
+### /ezra:research approve <filename>
+Approve a pending scraped entry and add it to the library.
+
+1. Call ezra-bp-scheduler.js approveEntry(projectDir, filename).
+2. Confirm approval and show the entry was added to the library.
+
+### /ezra:research reject <filename>
+Reject a pending scraped entry.
+
+1. Call ezra-bp-scheduler.js rejectEntry(projectDir, filename).
+2. Confirm rejection.
 
 ### /ezra:research config
 Show research agent configuration.

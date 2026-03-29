@@ -87,6 +87,9 @@ const DEFAULTS = {
       enabled: false,
       shared_domains: [],
     },
+    scrape_frequency: 'weekly',
+    auto_add: false,
+    tech_filter: [],
   },
   project_manager: {
     enabled: true,

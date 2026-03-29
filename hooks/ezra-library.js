@@ -447,6 +447,32 @@ function exportLibrary(projectDir) {
   return { categories: LIBRARY_CATEGORIES.length, total_entries: total, entries: allEntries };
 }
 
+// --- Web sync (Phase 8) ---
+
+function syncFromWeb(projectDir, techFilter) {
+  const scraper = require('./ezra-scraper.js');
+  return scraper.scrapeForTech(techFilter || []).then(results => {
+    let added = 0;
+    const errors = [];
+    for (const r of results) {
+      if (r.error) { errors.push({ url: r.url, error: r.error }); continue; }
+      try {
+        addEntry(projectDir, {
+          title: 'Web: ' + (r.url.replace(/^https?:\/\//, '').split('/')[0]),
+          category: r.category || 'general',
+          content: (r.content || '').slice(0, 500),
+          source: r.url,
+          linked_section: 'web-scrape',
+          tech_stack: techFilter || [],
+          tags: ['auto-scraped'],
+        });
+        added++;
+      } catch (e) { errors.push({ url: r.url, error: e.message }); }
+    }
+    return { added, errors };
+  });
+}
+
 // --- Exports ---
 
 module.exports = {
@@ -465,6 +491,7 @@ module.exports = {
   serializeEntry,
   serializeEntries,
   parseEntries,
+  syncFromWeb,
 };
 
 // --- Hook Protocol ---
