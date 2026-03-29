@@ -90,7 +90,7 @@ test('E2E: Install → verify all files → uninstall → verify removal', () =>
 
     // Verify templates
     const templates = fs.readdirSync(path.join(claudeDir, 'ezra-templates')).filter(f => f.endsWith('.yaml'));
-    assert(templates.length === 6, `Expected 6 templates, got ${templates.length}`);
+    assert(templates.length === 7, `Expected 7 templates, got ${templates.length}`);
 
     // Uninstall
     const uninstall = runCli('--uninstall --local', tmp);

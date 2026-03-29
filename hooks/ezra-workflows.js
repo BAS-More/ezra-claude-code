@@ -19,7 +19,7 @@ try { _fmt = require('./ezra-error-codes').formatError; } catch { _fmt = (c) => 
 
 // ─── Constants ───────────────────────────────────────────────────
 
-const STEP_TYPES = ['ezra', 'shell', 'manual', 'conditional', 'parallel', 'checkpoint', 'command', 'report', 'approval', 'review', 'validate'];
+const STEP_TYPES = ['ezra', 'shell', 'manual', 'conditional', 'parallel', 'checkpoint', 'command', 'report', 'approval', 'review', 'validate', 'check', 'script'];
 const STEP_ON_FAILURE = ['stop', 'skip', 'ask', 'retry'];
 const WORKFLOW_STATUSES = ['draft', 'active', 'archived', 'running', 'completed', 'failed'];
 const TEMPLATE_DIR = 'templates';

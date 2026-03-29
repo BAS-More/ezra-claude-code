@@ -249,9 +249,9 @@ test('UAT: README claims 37 hooks — verified', () => {
   assert(hooks.length === 37, `README says 37, actual: ${hooks.length}`);
 });
 
-test('UAT: README claims 6 templates — verified', () => {
+test('UAT: README claims 7 templates — verified', () => {
   const tmpls = fs.readdirSync(path.join(ROOT, 'templates')).filter(f => f.endsWith('.yaml'));
-  assert(tmpls.length === 6, `README says 6, actual: ${tmpls.length}`);
+  assert(tmpls.length === 7, `README says 7, actual: ${tmpls.length}`);
 });
 
 test('UAT: README claims Node >= 16.7.0 — package.json matches', () => {

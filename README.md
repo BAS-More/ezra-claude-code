@@ -151,7 +151,7 @@ Grades: **A** (90+), **B** (75-89), **C** (60-74), **D** (40-59), **F** (0-39)
 
 ## Process Templates
 
-EZRA ships with 6 built-in process templates:
+EZRA ships with 7 built-in process templates:
 
 | Template | Steps | Purpose |
 |----------|-------|---------|

@@ -112,10 +112,10 @@ test('1 skill file exists', () => {
   assert(fs.existsSync(p), 'SKILL.md missing');
 });
 
-test('6 template files exist', () => {
+test('7 template files exist', () => {
   const dir = path.join(ROOT, 'templates');
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml'));
-  assert(files.length === 6, `Expected 6 templates, found ${files.length}`);
+  assert(files.length === 7, `Expected 7 templates, found ${files.length}`);
 });
 
 // ─── Cross-platform ──────────────────────────────────────────────
