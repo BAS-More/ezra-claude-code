@@ -10,11 +10,12 @@ EZRA (עזרא) — The Scribe Who Restores and Enforces Standards
 ═══════════════════════════════════════════════════════════════
 Enforce. Zero-drift. Restore. Audit.
 
-COMMANDS (39 total)
+COMMANDS (41 total)
 
 ── SETUP & ONBOARDING ──
   /ezra:init          Initialize EZRA for this project
   /ezra:bootstrap     One-command project onboarding
+  /ezra:interview     Interactive gap interview for project definition
   /ezra:help          This help text
 
 ── ANALYSIS & REVIEW ──
@@ -22,6 +23,7 @@ COMMANDS (39 total)
   /ezra:review        Dynamic multi-agent code review (smart agent selection)
   /ezra:agents        Agent management — list, recommend, deploy, search (100 roles)
   /ezra:health        5-pillar health assessment
+  /ezra:assess        Quiz2Build readiness assessment integration
 
 ── DECISIONS & DOCUMENTATION ──
   /ezra:decide        Record an architectural decision

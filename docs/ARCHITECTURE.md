@@ -41,7 +41,7 @@ description: Full multi-agent codebase analysis
 
 **Design principle:** Commands describe *what* to do, not *how*. Claude Code's intelligence handles the execution. This makes commands portable, testable, and version-controllable.
 
-**Command categories (39 total):**
+**Command categories (41 total):**
 
 | Category | Commands |
 |----------|----------|
@@ -63,7 +63,7 @@ description: Full multi-agent codebase analysis
 | Memory | memory |
 | Licensing | license |
 
-### 2. Hooks (43 Node.js scripts)
+### 2. Hooks (44 Node.js scripts)
 
 Location: `hooks/*.js`
 
