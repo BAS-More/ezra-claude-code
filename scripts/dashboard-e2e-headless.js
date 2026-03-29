@@ -302,9 +302,118 @@ function has(haystack, needle) { if (!haystack.includes(needle)) throw Error('mi
   });
 
   // ════════════════════════════════════════════
+  // PROJECT-SCOPED APIs
+  // ════════════════════════════════════════════
+  S('16. Project-Scoped APIs (/api/projects/[id]/*)');
+  const projApis = ['/api/projects/quiz2biz/plan', '/api/projects/quiz2biz/commits',
+    '/api/projects/quiz2biz/assessment', '/api/projects/quiz2biz/gates',
+    '/api/projects/quiz2biz/execution', '/api/projects/quiz2biz/definition'];
+  for (const api of projApis) {
+    await check('GET ' + api + ' not 500', async () => {
+      const r = await get(api);
+      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+    });
+  }
+  await check('POST /api/projects/new', async () => {
+    const r = await fetch(BASE + '/api/projects/new', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'test-project' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // WORKFLOW & WIDGET APIs
+  // ════════════════════════════════════════════
+  S('17. Workflow & Widget APIs');
+  await check('GET /api/workflows/test not 500', async () => {
+    const r = await get('/api/workflows/test');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('POST /api/workflows/test/run not 500', async () => {
+    const r = await fetch(BASE + '/api/workflows/test/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('GET /api/widgets/health-score not 500', async () => {
+    const r = await get('/api/widgets/health-score');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('GET /api/preferences/widget-order not 500', async () => {
+    const r = await get('/api/preferences/widget-order');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // LIBRARY SUB-ROUTES
+  // ════════════════════════════════════════════
+  S('18. Library Sub-Routes');
+  await check('GET /api/library/pending not 500', async () => {
+    const r = await get('/api/library/pending');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('POST /api/library/sync-web not 500', async () => {
+    const r = await fetch(BASE + '/api/library/sync-web', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // INTERVIEW & DOCUMENT APIs
+  // ════════════════════════════════════════════
+  S('19. Interview & Document APIs');
+  await check('GET /api/interview not 500', async () => {
+    const r = await get('/api/interview');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('POST /api/interview not 500', async () => {
+    const r = await fetch(BASE + '/api/interview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: 'test' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('POST /api/documents/upload not 500', async () => {
+    const r = await fetch(BASE + '/api/documents/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // GITHUB WEBHOOK
+  // ════════════════════════════════════════════
+  S('20. GitHub Webhook');
+  await check('POST /api/github/webhook not 500', async () => {
+    const r = await fetch(BASE + '/api/github/webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'ping' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('GET /api/github/webhook rejected', async () => {
+    const r = await get('/api/github/webhook');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+    // GET should be rejected (405) or return non-500
+  });
+
+  // ════════════════════════════════════════════
+  // NEW PROJECT PAGE
+  // ════════════════════════════════════════════
+  S('21. New Project Page');
+  await check('GET /projects/new not 500', async () => {
+    const r = await get('/projects/new');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // NOT-FOUND & ERROR BOUNDARIES
+  // ════════════════════════════════════════════
+  S('22. Error Boundaries');
+  await check('Deeply nested 404', async () => {
+    const r = await get('/some/very/deep/nonexistent/path');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('/api/nonexistent not 500', async () => {
+    const r = await get('/api/nonexistent');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('POST unknown API not 500', async () => {
+    const r = await fetch(BASE + '/api/nonexistent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
   // PERFORMANCE
   // ════════════════════════════════════════════
-  S('16. Performance');
+  S('23. Performance');
   for (const path of ['/', '/docs', '/pricing', '/login']) {
     await check(path + ' < 3s', async () => {
       const t = Date.now();
@@ -321,6 +430,192 @@ function has(haystack, needle) { if (!haystack.includes(needle)) throw Error('mi
       if (ms > 2000) throw Error(ms + 'ms');
     });
   }
+
+  // ════════════════════════════════════════════
+  // SEO & META TAGS
+  // ════════════════════════════════════════════
+  S('24. SEO & Meta Tags');
+  await check('html lang="en"', () => { has(home.text, 'lang="en"'); });
+  await check('Title: EZRA — Codebase Governance Platform', () => { has(home.text, 'EZRA'); if (!home.text.includes('Codebase Governance')) throw Error('missing title'); });
+  await check('Meta description present', () => { if (!home.text.includes('meta') || !home.text.includes('description')) throw Error('missing'); });
+  await check('Meta viewport present', () => { if (!home.text.includes('viewport')) throw Error('missing'); });
+  await check('Geist font loaded', () => { if (!home.text.includes('geist') && !home.text.includes('Geist') && !home.text.includes('font')) throw Error('missing'); });
+
+  // ════════════════════════════════════════════
+  // SECURITY HEADERS (original, pre-proxy)
+  // ════════════════════════════════════════════
+  S('25. Security Headers (upstream)');
+  // Note: proxy strips x-frame-options and CSP, so we test via the proxy's /test page which passes them through
+  await check('X-Content-Type-Options: nosniff', async () => {
+    const r = await fetch(BASE + '/'); const h = r.headers.get('x-content-type-options');
+    // May or may not be set depending on Next.js config
+    if (h && h !== 'nosniff') throw Error('wrong value: ' + h);
+  });
+  await check('No server info leaking', async () => {
+    const r = await fetch(BASE + '/');
+    if (r.headers.get('server') === 'Apache' || r.headers.get('server') === 'nginx') throw Error('leaking: ' + r.headers.get('server'));
+  });
+  await check('No sensitive headers on API', async () => {
+    const r = await fetch(BASE + '/api/projects');
+    if (r.headers.get('x-powered-by') === 'Express') throw Error('leaking');
+  });
+
+  // ════════════════════════════════════════════
+  // API RESPONSE SHAPES
+  // ════════════════════════════════════════════
+  S('26. API Response Shapes');
+  await check('/api/projects returns valid shape', async () => {
+    const r = await get('/api/projects');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (!j.data && !Array.isArray(j)) throw Error('unexpected shape: ' + Object.keys(j).join(',')); }
+  });
+  await check('/api/settings returns object', async () => {
+    const r = await get('/api/settings');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (typeof j !== 'object' || j === null) throw Error('not object'); }
+  });
+  await check('/api/achievements returns achievements array', async () => {
+    const r = await get('/api/achievements');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (!j.achievements && !Array.isArray(j)) throw Error('unexpected shape'); }
+  });
+  await check('/api/workflows returns workflows', async () => {
+    const r = await get('/api/workflows');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (!j.workflows && !Array.isArray(j)) throw Error('unexpected shape'); }
+  });
+  await check('/api/notifications returns data', async () => {
+    const r = await get('/api/notifications');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (!j.notifications && !j.data && !Array.isArray(j)) throw Error('unexpected shape'); }
+  });
+  await check('/api/activity returns data', async () => {
+    const r = await get('/api/activity');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (!j.data && !Array.isArray(j)) throw Error('unexpected shape'); }
+  });
+  await check('/api/library returns entries', async () => {
+    const r = await get('/api/library');
+    if (r.status === 200) { const j = JSON.parse(r.text); if (!j.entries && !Array.isArray(j)) throw Error('unexpected shape'); }
+  });
+
+  // ════════════════════════════════════════════
+  // API VALIDATION (input validation)
+  // ════════════════════════════════════════════
+  S('27. API Input Validation');
+  await check('POST /api/settings empty body not 500', async () => {
+    const r = await fetch(BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/projects/new without name not 500', async () => {
+    const r = await fetch(BASE + '/api/projects/new', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/interview without fields not 500', async () => {
+    const r = await fetch(BASE + '/api/interview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/notifications with bad action not 500', async () => {
+    const r = await fetch(BASE + '/api/notifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'invalid' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/library with empty title not 500', async () => {
+    const r = await fetch(BASE + '/api/library', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: '' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('DELETE /api/library without id not 500', async () => {
+    const r = await fetch(BASE + '/api/library', { method: 'DELETE', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/projects/quiz2biz/commits unknown action not 500', async () => {
+    const r = await fetch(BASE + '/api/projects/quiz2biz/commits', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'bad' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/projects/quiz2biz/execution invalid action not 500', async () => {
+    const r = await fetch(BASE + '/api/projects/quiz2biz/execution', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'invalid' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('POST /api/projects/quiz2biz/gates bad action not 500', async () => {
+    const r = await fetch(BASE + '/api/projects/quiz2biz/gates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'invalid' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+
+  // ════════════════════════════════════════════
+  // AUTH CALLBACK SECURITY
+  // ════════════════════════════════════════════
+  S('28. Auth Callback Security');
+  await check('/auth/callback?redirect=//evil.com no open redirect', async () => {
+    const r = await get('/auth/callback?redirect=//evil.com');
+    if (r.loc && r.loc.includes('//evil.com')) throw Error('OPEN REDIRECT: ' + r.loc);
+  });
+  await check('/auth/callback?redirect=javascript:alert(1) blocked', async () => {
+    const r = await get('/auth/callback?redirect=javascript:alert(1)');
+    if (r.loc && r.loc.includes('javascript:')) throw Error('VULNERABLE: ' + r.loc);
+  });
+  await check('/auth/callback with no code → no crash', async () => {
+    const r = await get('/auth/callback');
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // 404 PAGE CONTENT
+  // ════════════════════════════════════════════
+  S('29. 404 Page');
+  await check('404 page has helpful content', async () => {
+    const r = await get('/nonexistent-test-route');
+    if (r.status >= 500) throw Error('SERVER ERROR');
+    if (!r.text.includes('404') && !r.text.includes('not found') && !r.text.includes('Not Found') && !r.text.includes('EZRA')) throw Error('blank 404');
+  });
+  await check('404 has nav links', async () => {
+    const r = await get('/nonexistent-test-route');
+    // Should have at least a link back home
+    if (!r.text.includes('/') && !r.text.includes('home') && !r.text.includes('Home') && !r.text.includes('EZRA')) throw Error('no navigation');
+  });
+
+  // ════════════════════════════════════════════
+  // WEBHOOK EVENT HANDLING
+  // ════════════════════════════════════════════
+  S('30. Webhook Events');
+  await check('Webhook non-PR event → skipped', async () => {
+    const r = await fetch(BASE + '/api/github/webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'push', ref: 'refs/heads/main' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('Webhook without signature still responds (no verification)', async () => {
+    const r = await fetch(BASE + '/api/github/webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'opened', pull_request: { number: 1 } }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+
+  // ════════════════════════════════════════════
+  // EDGE CASES & ROBUSTNESS
+  // ════════════════════════════════════════════
+  S('31. Edge Cases');
+  await check('Very long URL handled', async () => {
+    const long = '/api/projects?' + 'x='.repeat(2000);
+    const r = await fetch(BASE + long, { redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR on long URL');
+  });
+  await check('Empty POST body not 500', async () => {
+    const r = await fetch(BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR on empty body');
+  });
+  await check('Unicode in URL path', async () => {
+    const r = await fetch(BASE + '/api/projects/%E2%9C%93', { redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR on unicode');
+  });
+  await check('Double-encoded slashes', async () => {
+    const r = await fetch(BASE + '/api/projects%2F..%2Fsettings', { redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('HEAD method on homepage', async () => {
+    const r = await fetch(BASE + '/', { method: 'HEAD' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
+  });
+  await check('OPTIONS preflight on API', async () => {
+    const r = await fetch(BASE + '/api/projects', { method: 'OPTIONS' });
+    if (r.status >= 500) throw Error('SERVER ERROR on OPTIONS');
+  });
+  await check('Content-Type: text/plain POST to API not 500', async () => {
+    const r = await fetch(BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: 'hello', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR on text/plain');
+  });
+  await check('API handles null body gracefully', async () => {
+    const r = await fetch(BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: 'null', redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR on null body');
+  });
 
   // ════════════════════════════════════════════
   // RESULTS

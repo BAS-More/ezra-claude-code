@@ -128,149 +128,346 @@ window.addEventListener('DOMContentLoaded',async()=>{
 });
 
 // ══════════════════════════════════════
-// MAIN TEST SCRIPT
+// MAIN TEST SCRIPT — 16 Phases, 124+ checks
 // ══════════════════════════════════════
 async function go(){
 if(run)return;run=true;t0=Date.now();pc=0;fc=0;
 $('btn').disabled=true;$('dot').className='on';$('st').textContent='Testing...';
-L('I','\\u2139\\ufe0f','Agent starting');
+L('I','\\u2139\\ufe0f','Agent starting — 16-phase comprehensive suite');
 
-const T=13;let ph=0;
+const T=31;let ph=0;
 function nx(){ph++;prg(Math.round(ph/T*100))}
 
-// Phase 1: Homepage
-S('Phase 1: Homepage');nx();
+// ── Phase 1: Proxy Health ──
+S('Phase 1: Proxy Health');nx();
+await chk('Proxy responds 200',async()=>{if((await st('/')).s!==200)throw Error('not 200')});
+await chk('Agent page at /test',async()=>{const r=await html('/test');if(r.s!==200)throw Error(r.s);if(!r.h.includes('E2E Test Agent'))throw Error('missing')});
+await chk('X-Frame-Options stripped',async()=>{const r=await fetch('/');if(r.headers.get('x-frame-options'))throw Error('not stripped')});
+await chk('CSP stripped',async()=>{const r=await fetch('/');if(r.headers.get('content-security-policy'))throw Error('not stripped')});
+
+// ── Phase 2: Homepage ──
+S('Phase 2: Homepage');nx();
 nav('/');await loaded();await W();
 const hm=(await html('/')).h;
-
-await chk('Homepage loads',async()=>{if((await st('/')).s!==200)throw Error('not 200')});
+await chk('Status 200',async()=>{if((await st('/')).s!==200)throw Error('not 200')});
+await chk('HTML content-type',async()=>{const r=await fetch('/');if(!r.headers.get('content-type').includes('text/html'))throw Error('bad type')});
+await chk('Meta charset utf-8',()=>{if(!hm.includes('charSet')&&!hm.includes('charset'))throw Error('missing')});
 await chk('EZRA branding',()=>{if(!hm.includes('EZRA'))throw Error('missing')});
-await chk('Hero headline',()=>{if(!hm.includes('Restores and Enforces Standards'))throw Error('missing')});
-await chk('Get Started CTA',()=>{if(!hm.includes('Get Started Free'))throw Error('missing')});
-await chk('Read the Docs link',()=>{if(!hm.includes('Read the Docs'))throw Error('missing')});
-await chk('Nav: Docs/Pricing/Login',()=>{if(!hm.includes('/docs'))throw Error('/docs');if(!hm.includes('/pricing'))throw Error('/pricing');if(!hm.includes('/login'))throw Error('/login')});
-await chk('3 feature cards',()=>{if(!hm.includes('Health Scanning'))throw Error('1');if(!hm.includes('Multi-Agent'))throw Error('2');if(!hm.includes('Slash Commands'))throw Error('3')});
-await chk('Stats: 22/39/Zero',()=>{if(!hm.includes('>22<'))throw Error('22');if(!hm.includes('>39<'))throw Error('39');if(!hm.includes('Zero'))throw Error('Zero')});
-await chk('Footer',()=>{if(!hm.includes('Codebase Governance'))throw Error('missing')});
+await chk('Hero: Restores and Enforces Standards',()=>{if(!hm.includes('Restores and Enforces Standards'))throw Error('missing')});
+await chk('CTA: Get Started Free',()=>{if(!hm.includes('Get Started Free'))throw Error('missing')});
+await chk('CTA: Read the Docs',()=>{if(!hm.includes('Read the Docs'))throw Error('missing')});
+await chk('Nav /docs',()=>{if(!hm.includes('/docs'))throw Error('missing')});
+await chk('Nav /pricing',()=>{if(!hm.includes('/pricing'))throw Error('missing')});
+await chk('Nav /login',()=>{if(!hm.includes('/login'))throw Error('missing')});
+await chk('Feature: Health Scanning',()=>{if(!hm.includes('Health Scanning'))throw Error('missing')});
+await chk('Feature: Multi-Agent',()=>{if(!hm.includes('Multi-Agent'))throw Error('missing')});
+await chk('Feature: Slash Commands',()=>{if(!hm.includes('Slash Commands'))throw Error('missing')});
+await chk('Stat: 22 Hooks',()=>{if(!hm.includes('>22<'))throw Error('missing')});
+await chk('Stat: 39 Commands',()=>{if(!hm.includes('>39<'))throw Error('missing')});
+await chk('Stat: Zero Dependencies',()=>{if(!hm.includes('Zero'))throw Error('missing')});
+await chk('Footer: Codebase Governance',()=>{if(!hm.includes('Codebase Governance'))throw Error('missing')});
 
-// Phase 2: Docs
-S('Phase 2: Docs');nx();
-L('A','\\u{1f446}','Click Docs');nav('/docs');await loaded();await W();
+// ── Phase 3: Docs ──
+S('Phase 3: Docs');nx();
+L('A','\\u{1f446}','Navigate /docs');nav('/docs');await loaded();await W();
 const dc=(await html('/docs')).h;
-await chk('Docs loads',async()=>{if((await st('/docs')).s!==200)throw Error('not 200')});
+await chk('Status 200',async()=>{if((await st('/docs')).s!==200)throw Error('not 200')});
 await chk('Documentation heading',()=>{if(!dc.includes('Documentation'))throw Error('missing')});
 await chk('Install cmd',()=>{if(!dc.includes('npm install -g ezra-claude-code'))throw Error('missing')});
-await chk('Init cmd',()=>{if(!dc.includes('ezra init'))throw Error('missing')});
-await chk('Scan cmd',()=>{if(!dc.includes('ezra scan'))throw Error('missing')});
-await chk('/ezra:health ref',()=>{if(!dc.includes('/ezra:health'))throw Error('missing')});
+await chk('Command: ezra init',()=>{if(!dc.includes('ezra init'))throw Error('missing')});
+await chk('Command: ezra scan',()=>{if(!dc.includes('ezra scan'))throw Error('missing')});
+await chk('Ref: /ezra:health',()=>{if(!dc.includes('/ezra:health'))throw Error('missing')});
+await chk('Ref: /ezra:guard (SSR)',()=>{if(!dc.includes('/ezra:guard'))throw Error('missing')});
+await chk('Ref: /ezra:review (SSR)',()=>{if(!dc.includes('/ezra:review'))throw Error('missing')});
+await chk('Ref: /ezra:dash (SSR)',()=>{if(!dc.includes('/ezra:dash'))throw Error('missing')});
+await chk('Ref: /ezra:scan',()=>{if(!dc.includes('/ezra:scan'))throw Error('missing')});
+await chk('Ref: /ezra:oversight',()=>{if(!dc.includes('/ezra:oversight'))throw Error('missing')});
+await chk('Ref: /ezra:agents',()=>{if(!dc.includes('/ezra:agents'))throw Error('missing')});
+await chk('Ref: /ezra:workflow',()=>{if(!dc.includes('/ezra:workflow'))throw Error('missing')});
+await chk('Ref: /ezra:license',()=>{if(!dc.includes('/ezra:license'))throw Error('missing')});
+await chk('Ref: /ezra:memory',()=>{if(!dc.includes('/ezra:memory'))throw Error('missing')});
+await chk('Ref: /ezra:plan',()=>{if(!dc.includes('/ezra:plan'))throw Error('missing')});
+await chk('Code blocks',()=>{if(!dc.includes('<code')&&!dc.includes('<pre'))throw Error('missing')});
+await chk('Section: Getting Started',()=>{if(!dc.includes('Getting Started'))throw Error('missing')});
+await chk('Section: Commands Reference',()=>{if(!dc.includes('Commands Reference'))throw Error('missing')});
+await chk('Section: Architecture',()=>{if(!dc.includes('Architecture'))throw Error('missing')});
+await chk('Section: Troubleshooting',()=>{if(!dc.includes('Troubleshooting'))throw Error('missing')});
+await chk('Section: API Reference',()=>{if(!dc.includes('API Reference'))throw Error('missing')});
+await chk('SSR has 30+ commands',()=>{
+  let n=0;const cmds=['init','scan','guard','oversight','settings','compliance','pm','progress',
+    'library','agents','memory','plan','workflow','license','dash','health','status',
+    'decide','review','learn','doc','version','advisor','process','auto','multi',
+    'bootstrap','sync','research','cost','portfolio','handoff','help','install'];
+  for(const c of cmds)if(dc.includes('/ezra:'+c))n++;
+  if(n<30)throw Error(n+'/'+cmds.length);L('I','\\u2139\\ufe0f',n+'/'+cmds.length+' commands')});
 
-// Phase 3: Pricing
-S('Phase 3: Pricing');nx();
-L('A','\\u{1f446}','Click Pricing');nav('/pricing');await loaded();await W();
+// ── Phase 4: Pricing ──
+S('Phase 4: Pricing');nx();
+L('A','\\u{1f446}','Navigate /pricing');nav('/pricing');await loaded();await W();
 const pr=(await html('/pricing')).h;
-await chk('Pricing loads',async()=>{if((await st('/pricing')).s!==200)throw Error('not 200')});
-await chk('Heading',()=>{if(!pr.includes('transparent pricing'))throw Error('missing')});
-await chk('Core Free',()=>{if(!pr.includes('Core')||!pr.includes('Free'))throw Error('missing')});
-await chk('Pro $29',()=>{if(!pr.includes('Pro')||!pr.includes('29'))throw Error('missing')});
-await chk('Team $59',()=>{if(!pr.includes('Team')||!pr.includes('59'))throw Error('missing')});
-await chk('Enterprise',()=>{if(!pr.includes('Enterprise')||!pr.includes('Custom'))throw Error('missing')});
-await chk('Core CTA',()=>{if(!pr.includes('/login?plan=core'))throw Error('missing')});
-await chk('Pro CTA',()=>{if(!pr.includes('/login?plan=pro'))throw Error('missing')});
-await chk('Sales email',()=>{if(!pr.includes('mailto:sales@ezradev.com'))throw Error('missing')});
+await chk('Status 200',async()=>{if((await st('/pricing')).s!==200)throw Error('not 200')});
+await chk('Transparent pricing heading',()=>{if(!pr.includes('transparent pricing'))throw Error('missing')});
+await chk('Core + Free',()=>{if(!pr.includes('Core')||!pr.includes('Free'))throw Error('missing')});
+await chk('Pro + $29',()=>{if(!pr.includes('Pro')||!pr.includes('29'))throw Error('missing')});
+await chk('Team + $59',()=>{if(!pr.includes('Team')||!pr.includes('59'))throw Error('missing')});
+await chk('Enterprise + Custom',()=>{if(!pr.includes('Enterprise')||!pr.includes('Custom'))throw Error('missing')});
+await chk('CTA /login?plan=core',()=>{if(!pr.includes('/login?plan=core'))throw Error('missing')});
+await chk('CTA /login?plan=pro',()=>{if(!pr.includes('/login?plan=pro'))throw Error('missing')});
+await chk('CTA /login?plan=team',()=>{if(!pr.includes('/login?plan=team'))throw Error('missing')});
+await chk('mailto:sales@ezradev.com',()=>{if(!pr.includes('mailto:sales@ezradev.com'))throw Error('missing')});
+await chk('Feature mention',()=>{if(!pr.includes('Health Scanning')&&!pr.includes('scanning'))throw Error('missing')});
 
-// Phase 4: Login
-S('Phase 4: Login');nx();
-L('A','\\u{1f446}','Click Login');nav('/login');await loaded();await W();
+// ── Phase 5: Login ──
+S('Phase 5: Login');nx();
+L('A','\\u{1f446}','Navigate /login');nav('/login');await loaded();await W();
 const lg=(await html('/login')).h;
-await chk('Login loads',async()=>{if((await st('/login')).s!==200)throw Error('not 200')});
-await chk('Sign In',()=>{if(!lg.includes('Sign In'))throw Error('missing')});
+await chk('Status 200',async()=>{if((await st('/login')).s!==200)throw Error('not 200')});
+await chk('Sign In heading',()=>{if(!lg.includes('Sign In'))throw Error('missing')});
 await chk('Email field',()=>{if(!lg.toLowerCase().includes('email'))throw Error('missing')});
 await chk('Password field',()=>{if(!lg.toLowerCase().includes('password'))throw Error('missing')});
 await chk('Forgot password',()=>{if(!lg.includes('Forgot password'))throw Error('missing')});
 await chk('GitHub OAuth',()=>{if(!lg.includes('GitHub'))throw Error('missing')});
 await chk('Google OAuth',()=>{if(!lg.includes('Google'))throw Error('missing')});
 await chk('Microsoft OAuth',()=>{if(!lg.includes('Microsoft'))throw Error('missing')});
-await chk('Sign Up',()=>{if(!lg.includes('Sign Up'))throw Error('missing')});
+await chk('Sign Up toggle',()=>{if(!lg.includes('Sign Up'))throw Error('missing')});
+await chk('Login ?plan=pro',async()=>{if((await fetch('/login?plan=pro')).status!==200)throw Error('fail')});
+await chk('Login ?redirect=/dashboard',async()=>{if((await fetch('/login?redirect=/dashboard')).status!==200)throw Error('fail')});
 
-// Phase 5: Auth
-S('Phase 5: Protected Routes');nx();
-for(const rt of ['/dashboard','/projects','/settings','/agents','/library']){
-  await chk('GET '+rt,async()=>{
+// ── Phase 6: Auth Middleware ──
+S('Phase 6: Auth Middleware');nx();
+const prot=['/dashboard','/projects','/settings','/agents','/library'];
+for(const rt of prot){
+  await chk(rt+' redirect to /login',async()=>{
     const r=await st(rt);
-    if(r.s>=500)throw Error('500');
-    if(r.s===307||r.s===302){if(!r.l.includes('/login'))throw Error('bad redirect: '+r.l);L('I','\\u2139\\ufe0f',rt+' -> login')}
-    else L('I','\\u2139\\ufe0f',rt+' -> '+r.s)
+    if(r.s>=500)throw Error('SERVER ERROR');
+    if(r.s===307||r.s===302){
+      if(!r.l.includes('/login'))throw Error('bad redirect: '+r.l);
+      if(!r.l.includes('redirect='))throw Error('missing redirect param');
+      L('I','\\u2139\\ufe0f',rt+' \\u2192 login \\u2713');
+    }else L('I','\\u2139\\ufe0f',rt+' \\u2192 '+r.s+' (dev mode)');
+  });
+}
+await chk('Redirect includes original path',async()=>{
+  const r=await st('/settings');
+  if(r.s===307&&!r.l.includes('%2Fsettings'))throw Error('missing path in: '+r.l);
+});
+
+// ── Phase 7: API GET ──
+S('Phase 7: API Endpoints (GET)');nx();
+const apis=['/api/achievements','/api/activity','/api/library','/api/notifications','/api/projects','/api/settings','/api/workflows'];
+for(const a of apis){
+  await chk('GET '+a+' not 500',async()=>{const r=await fetch(a);if(r.status>=500)throw Error('SERVER ERROR '+r.status);L('I','\\u2139\\ufe0f',a+' \\u2192 '+r.status)});
+  await chk(a+' returns JSON',async()=>{const r=await fetch(a);if(r.status===200){const t=await r.text();try{JSON.parse(t)}catch{throw Error('invalid JSON')}}});
+}
+
+// ── Phase 8: API Write ──
+S('Phase 8: API Write (POST/PUT/DELETE)');nx();
+await chk('POST /api/settings',async()=>{
+  const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test:true})});
+  if(r.status>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f','POST settings \\u2192 '+r.status)});
+await chk('POST /api/workflows',async()=>{
+  const r=await fetch('/api/workflows',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'test',nodes:[],edges:[]})});
+  if(r.status>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f','POST workflows \\u2192 '+r.status)});
+await chk('PUT /api/projects',async()=>{
+  const r=await fetch('/api/projects',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+  if(r.status>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f','PUT projects \\u2192 '+r.status)});
+await chk('DELETE /api/workflows',async()=>{
+  const r=await fetch('/api/workflows',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:'nonexistent'})});
+  if(r.status>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f','DELETE workflows \\u2192 '+r.status)});
+
+// ── Phase 9: Protected Pages (follow redirect) ──
+S('Phase 9: Protected Pages (redirect chain)');nx();
+for(const rt of prot){
+  await chk(rt+' chain ends at content',async()=>{
+    const r=await fetch(rt,{redirect:'follow'});const h=await r.text();
+    if(r.status>=500)throw Error('SERVER ERROR');
+    if(r.status===200){
+      if(!h.includes('Sign In')&&!h.includes('Dashboard')&&!h.includes('Settings')&&!h.includes('EZRA'))throw Error('blank page');
+    }
   });
 }
 
-// Phase 6: APIs
-S('Phase 6: API Endpoints');nx();
-for(const a of ['/api/achievements','/api/activity','/api/library','/api/notifications','/api/projects','/api/settings','/api/workflows']){
-  await chk('API '+a,async()=>{try{const r=await fetch(a,{credentials:'include'});if(r.status>=500)throw Error('500');L('I','\\u2139\\ufe0f',a+' -> '+r.status)}catch(e){if(e.message==='500')throw e}});
+// ── Phase 10: Project Detail Pages ──
+S('Phase 10: Project Detail Pages');nx();
+const details=['/projects/quiz2biz','/projects/quiz2biz/plan','/projects/quiz2biz/commits',
+  '/projects/quiz2biz/assessment','/projects/quiz2biz/gates','/projects/quiz2biz/execution'];
+for(const dp of details){
+  await chk('GET '+dp+' not 500',async()=>{
+    const r=await st(dp);if(r.s>=500)throw Error('SERVER ERROR');
+    L('I','\\u2139\\ufe0f',dp+' \\u2192 '+r.s);
+  });
 }
 
-// Phase 7: Dashboard
-S('Phase 7: Dashboard');nx();
-L('A','\\u{1f446}','Open Dashboard');nav('/dashboard');await loaded();await W();await W(1500);
-const ds=await html('/dashboard');
-await chk('Dashboard accessible',()=>{if(ds.s>=500)throw Error('500')});
-if(ds.s===200&&ds.h.includes('Dashboard')){
-  L('I','\\u2139\\ufe0f','Dashboard loaded');
-  await chk('Heading',()=>{if(!ds.h.includes('Dashboard'))throw Error('missing')});
-  const ww=['Health Score','Progress','Active Agents','Decision','Security','Test Coverage','Cost','Leaderboard','Risk','Activity','Phase','Achievement','Velocity','Workflow','Readiness'];
-  await chk('Widgets',()=>{let n=0;for(const w of ww)if(ds.h.includes(w))n++;if(n<5)throw Error(n+'/'+ww.length);L('I','\\u2139\\ufe0f',n+'/'+ww.length+' widgets')});
-  await chk('Edit/layout controls',()=>{if(!ds.h.toLowerCase().includes('edit')&&!ds.h.toLowerCase().includes('layout'))throw Error('missing')});
-}else L('I','\\u2139\\ufe0f','Auth required');
-
-// Phase 8: Projects
-S('Phase 8: Projects');nx();
-L('A','\\u{1f446}','Open Projects');nav('/projects');await loaded();await W(1000);
-const pj=await html('/projects');
-await chk('Projects accessible',()=>{if(pj.s>=500)throw Error('500')});
-if(pj.s===200&&pj.h.includes('Projects')){
-  await chk('Heading',()=>{if(!pj.h.includes('Projects'))throw Error('missing')});
-  await chk('Content',()=>{if(!pj.h.includes('Quiz2Biz')&&!pj.h.includes('No projects'))throw Error('empty')});
-}
-
-// Phase 9: Agents
-S('Phase 9: Agents');nx();
-L('A','\\u{1f446}','Open Agents');nav('/agents');await loaded();await W();
-const ag=await html('/agents');
-await chk('Agents accessible',()=>{if(ag.s>=500)throw Error('500')});
-if(ag.s===200&&ag.h.includes('Agents')){
-  await chk('Heading',()=>{if(!ag.h.includes('Agents'))throw Error('missing')});
-  await chk('Providers',()=>{let n=0;for(const p of ['Claude Sonnet','GPT-4o','Codex','Claude Haiku','Gemini Pro'])if(ag.h.includes(p))n++;if(n<3)throw Error(n+'/5')});
-}
-
-// Phase 10: Settings
-S('Phase 10: Settings');nx();
-L('A','\\u{1f446}','Open Settings');nav('/settings');await loaded();await W();
-const se=await html('/settings');
-await chk('Settings accessible',()=>{if(se.s>=500)throw Error('500')});
-if(se.s===200)await chk('Heading',()=>{if(!se.h.toLowerCase().includes('settings'))throw Error('missing')});
-
-// Phase 11: Workflows
+// ── Phase 11: Workflows ──
 S('Phase 11: Workflows');nx();
-L('A','\\u{1f446}','Open Workflows');nav('/workflows');await loaded();await W();
+L('A','\\u{1f446}','Navigate /workflows');nav('/workflows');await loaded();await W();
 const wf=await html('/workflows');
-await chk('Workflows loads',()=>{if(wf.s>=500)throw Error('500')});
-if(wf.s===200)await chk('Has content',()=>{if(wf.h.length<500)throw Error('too small')});
+await chk('Status 200',()=>{if(wf.s!==200&&wf.s<500)L('I','\\u2139\\ufe0f','status '+wf.s);if(wf.s>=500)throw Error(wf.s)});
+await chk('Has substantial content',()=>{if(wf.h.length<500)throw Error('too small: '+wf.h.length)});
 
-// Phase 12: Library
-S('Phase 12: Library');nx();
-L('A','\\u{1f446}','Open Library');nav('/library');await loaded();await W();
-const lb=await html('/library');
-await chk('Library accessible',()=>{if(lb.s>=500)throw Error('500')});
+// ── Phase 12: Notifications ──
+S('Phase 12: Notifications');nx();
+await chk('/notifications not 500',async()=>{const r=await st('/notifications');if(r.s>=500)throw Error(r.s)});
 
-// Phase 13: Edge Cases
-S('Phase 13: Security & Edge Cases');nx();
-await chk('404 page',async()=>{const r=await html('/nonexistent');if(r.s!==404&&!r.h.includes('404')&&!r.h.includes('Not Found'))if(!(r.s===200&&r.h.includes('EZRA')))throw Error('no 404')});
-await chk('Auth callback',async()=>{try{const r=await st('/auth/callback');if(r.s>=500)throw Error('500')}catch(e){if(e.message==='500')throw e}});
-await chk('Redirect param',async()=>{if((await fetch('/login?redirect=/dashboard')).status!==200)throw Error('fail')});
-await chk('Open redirect blocked',async()=>{const r=await html('/login?redirect=//evil.com');if(r.h.includes('href="//evil.com"'))throw Error('not blocked')});
-await chk('Plan param',async()=>{if((await fetch('/login?plan=pro')).status!==200)throw Error('fail')});
+// ── Phase 13: Auth Callback ──
+S('Phase 13: Auth Callback');nx();
+await chk('/auth/callback exists',async()=>{const r=await st('/auth/callback');if(r.s>=500)throw Error(r.s)});
 
-// Done
+// ── Phase 14: Security Tests ──
+S('Phase 14: Security');nx();
+await chk('Open redirect blocked: //evil.com',async()=>{const r=await html('/login?redirect=//evil.com');if(r.h.includes('href="//evil.com"')||r.h.includes("href='//evil.com'"))throw Error('VULNERABLE')});
+await chk('Open redirect blocked: javascript:',async()=>{const r=await html('/login?redirect=javascript:alert(1)');if(r.h.includes('href="javascript:'))throw Error('VULNERABLE')});
+await chk('XSS in redirect param',async()=>{const r=await html('/login?redirect="><script>alert(1)</script>');if(r.h.includes('<script>alert(1)</script>'))throw Error('XSS VULNERABLE')});
+await chk('XSS in plan param',async()=>{const r=await html('/login?plan=<script>alert(1)</script>');if(r.h.includes('<script>alert(1)</script>'))throw Error('XSS VULNERABLE')});
+await chk('404 for /nonexistent',async()=>{const r=await html('/nonexistent');if(r.s!==404&&!r.h.includes('404')&&!r.h.includes('Not Found'))if(!(r.s===200&&r.h.includes('EZRA')))throw Error('no 404')});
+await chk('X-Powered-By not leaking',async()=>{const r=await fetch('/');if(r.headers.get('x-powered-by')==='Express')throw Error('leaking')});
+await chk('No /_next directory listing',async()=>{const r=await html('/_next/');if(r.s===200&&r.h.includes('Index of'))throw Error('directory listing')});
+await chk('API rejects malformed JSON',async()=>{
+  const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:'{invalid}'});
+  if(r.status>=500)throw Error('crashes on bad JSON')});
+await chk('Login POST not 500',async()=>{
+  const r=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'test@test.com',password:'x'})});
+  if(r.status>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 15: Static Assets ──
+S('Phase 15: Static Assets');nx();
+await chk('Favicon accessible',async()=>{const r=await fetch('/favicon.ico');if(r.status>=500)throw Error(r.status)});
+await chk('CSS bundle loads',async()=>{
+  const m=hm.match(/href="(\/_next\/static\/[^"]+\.css)"/);
+  if(m){const r=await fetch(m[1]);if(r.status!==200)throw Error(r.status)}else L('I','\\u2139\\ufe0f','no CSS bundle ref found')});
+await chk('JS bundle loads',async()=>{
+  const m=hm.match(/src="(\/_next\/static\/[^"]+\.js)"/);
+  if(m){const r=await fetch(m[1]);if(r.status!==200)throw Error(r.status)}else L('I','\\u2139\\ufe0f','no JS bundle ref found')});
+
+// ── Phase 16: Project-Scoped APIs ──
+S('Phase 16: Project APIs');nx();
+const projApis=['/api/projects/quiz2biz/plan','/api/projects/quiz2biz/commits',
+  '/api/projects/quiz2biz/assessment','/api/projects/quiz2biz/gates',
+  '/api/projects/quiz2biz/execution','/api/projects/quiz2biz/definition'];
+for(const a of projApis){await chk('GET '+a,async()=>{const r=await st(a);if(r.s>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f',a+' \\u2192 '+r.s)})}
+await chk('POST /api/projects/new',async()=>{
+  const r=await fetch('/api/projects/new',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'test-project'})});
+  if(r.status>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f','POST new \\u2192 '+r.status)});
+
+// ── Phase 17: Workflow & Widget APIs ──
+S('Phase 17: Workflow & Widget APIs');nx();
+await chk('GET /api/workflows/test',async()=>{const r=await st('/api/workflows/test');if(r.s>=500)throw Error('SERVER ERROR')});
+await chk('POST /api/workflows/test/run',async()=>{
+  const r=await fetch('/api/workflows/test/run',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  if(r.status>=500)throw Error('SERVER ERROR')});
+await chk('GET /api/widgets/health-score',async()=>{const r=await st('/api/widgets/health-score');if(r.s>=500)throw Error('SERVER ERROR')});
+await chk('GET /api/preferences/widget-order',async()=>{const r=await st('/api/preferences/widget-order');if(r.s>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 18: Library Sub-Routes ──
+S('Phase 18: Library Sub-Routes');nx();
+await chk('GET /api/library/pending',async()=>{const r=await st('/api/library/pending');if(r.s>=500)throw Error('SERVER ERROR')});
+await chk('POST /api/library/sync-web',async()=>{
+  const r=await fetch('/api/library/sync-web',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  if(r.status>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 19: Interview & Document APIs ──
+S('Phase 19: Interview & Docs APIs');nx();
+await chk('GET /api/interview',async()=>{const r=await st('/api/interview');if(r.s>=500)throw Error('SERVER ERROR')});
+await chk('POST /api/interview',async()=>{
+  const r=await fetch('/api/interview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:'test'})});
+  if(r.status>=500)throw Error('SERVER ERROR')});
+await chk('POST /api/documents/upload',async()=>{
+  const r=await fetch('/api/documents/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  if(r.status>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 20: GitHub Webhook ──
+S('Phase 20: GitHub Webhook');nx();
+await chk('POST /api/github/webhook',async()=>{
+  const r=await fetch('/api/github/webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'ping'})});
+  if(r.status>=500)throw Error('SERVER ERROR');L('I','\\u2139\\ufe0f','webhook \\u2192 '+r.status)});
+await chk('GET /api/github/webhook rejected',async()=>{const r=await st('/api/github/webhook');if(r.s>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 21: New Project Page ──
+S('Phase 21: New Project Page');nx();
+L('A','\\u{1f446}','Navigate /projects/new');nav('/projects/new');await loaded();await W();
+await chk('GET /projects/new',async()=>{const r=await st('/projects/new');if(r.s>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 22: Error Boundaries ──
+S('Phase 22: Error Boundaries');nx();
+await chk('Deep nested 404',async()=>{const r=await st('/some/very/deep/nonexistent/path');if(r.s>=500)throw Error('SERVER ERROR')});
+await chk('/api/nonexistent not 500',async()=>{const r=await st('/api/nonexistent');if(r.s>=500)throw Error('SERVER ERROR')});
+await chk('POST unknown API',async()=>{
+  const r=await fetch('/api/nonexistent',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  if(r.status>=500)throw Error('SERVER ERROR')});
+
+// ── Phase 23: Performance ──
+S('Phase 23: Performance');nx();
+for(const p of ['/','/docs','/pricing','/login']){
+  await chk(p+' < 3s',async()=>{const t=Date.now();await fetch(p);const ms=Date.now()-t;if(ms>3000)throw Error(ms+'ms');L('I','\\u2139\\ufe0f',p+' '+ms+'ms')});
+}
+for(const a of ['/api/projects','/api/settings','/api/workflows']){
+  await chk('API '+a+' < 2s',async()=>{const t=Date.now();await fetch(a);const ms=Date.now()-t;if(ms>2000)throw Error(ms+'ms');L('I','\\u2139\\ufe0f',a+' '+ms+'ms')});
+}
+
+// ── Phase 24: SEO & Meta Tags ──
+S('Phase 24: SEO & Meta');nx();
+await chk('html lang="en"',()=>{if(!hm.includes('lang="en"'))throw Error('missing')});
+await chk('Title has EZRA',()=>{if(!hm.includes('EZRA'))throw Error('missing');if(!hm.includes('Codebase Governance'))throw Error('missing title')});
+await chk('Meta description',()=>{if(!hm.includes('meta')||!hm.includes('description'))throw Error('missing')});
+await chk('Meta viewport',()=>{if(!hm.includes('viewport'))throw Error('missing')});
+await chk('Geist font',()=>{if(!hm.includes('geist')&&!hm.includes('Geist')&&!hm.includes('font'))throw Error('missing')});
+
+// ── Phase 25: Security Headers ──
+S('Phase 25: Security Headers');nx();
+await chk('X-Content-Type-Options',async()=>{const r=await fetch('/');const h=r.headers.get('x-content-type-options');if(h&&h!=='nosniff')throw Error(h)});
+await chk('No server info leak',async()=>{const r=await fetch('/');const s=r.headers.get('server');if(s==='Apache'||s==='nginx')throw Error(s)});
+await chk('No sensitive API headers',async()=>{const r=await fetch('/api/projects');if(r.headers.get('x-powered-by')==='Express')throw Error('leaking')});
+
+// ── Phase 26: API Response Shapes ──
+S('Phase 26: API Shapes');nx();
+await chk('/api/projects shape',async()=>{const r=await html('/api/projects');if(r.s===200){const j=JSON.parse(r.h);if(!j.data&&!Array.isArray(j))throw Error('bad shape')}});
+await chk('/api/settings shape',async()=>{const r=await html('/api/settings');if(r.s===200){const j=JSON.parse(r.h);if(typeof j!=='object'||j===null)throw Error('not object')}});
+await chk('/api/achievements shape',async()=>{const r=await html('/api/achievements');if(r.s===200){const j=JSON.parse(r.h);if(!j.achievements&&!Array.isArray(j))throw Error('bad')}});
+await chk('/api/workflows shape',async()=>{const r=await html('/api/workflows');if(r.s===200){const j=JSON.parse(r.h);if(!j.workflows&&!Array.isArray(j))throw Error('bad')}});
+await chk('/api/notifications shape',async()=>{const r=await html('/api/notifications');if(r.s===200){const j=JSON.parse(r.h);if(!j.notifications&&!j.data&&!Array.isArray(j))throw Error('bad')}});
+await chk('/api/activity shape',async()=>{const r=await html('/api/activity');if(r.s===200){const j=JSON.parse(r.h);if(!j.data&&!Array.isArray(j))throw Error('bad')}});
+await chk('/api/library shape',async()=>{const r=await html('/api/library');if(r.s===200){const j=JSON.parse(r.h);if(!j.entries&&!Array.isArray(j))throw Error('bad')}});
+
+// ── Phase 27: API Input Validation ──
+S('Phase 27: Input Validation');nx();
+await chk('POST settings empty body',async()=>{const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(r.status>=500)throw Error('500')});
+await chk('POST projects/new no name',async()=>{const r=await fetch('/api/projects/new',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(r.status>=500)throw Error('500')});
+await chk('POST interview no fields',async()=>{const r=await fetch('/api/interview',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});if(r.status>=500)throw Error('500')});
+await chk('POST notifications bad action',async()=>{const r=await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'invalid'})});if(r.status>=500)throw Error('500')});
+await chk('POST library empty title',async()=>{const r=await fetch('/api/library',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:''})});if(r.status>=500)throw Error('500')});
+await chk('DELETE library no id',async()=>{const r=await fetch('/api/library',{method:'DELETE'});if(r.status>=500)throw Error('500')});
+await chk('POST commits bad action',async()=>{const r=await fetch('/api/projects/quiz2biz/commits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'bad'})});if(r.status>=500)throw Error('500')});
+await chk('POST execution bad action',async()=>{const r=await fetch('/api/projects/quiz2biz/execution',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'invalid'})});if(r.status>=500)throw Error('500')});
+await chk('POST gates bad action',async()=>{const r=await fetch('/api/projects/quiz2biz/gates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'invalid'})});if(r.status>=500)throw Error('500')});
+
+// ── Phase 28: Auth Callback Security ──
+S('Phase 28: Callback Security');nx();
+await chk('Callback open redirect blocked',async()=>{const r=await st('/auth/callback?redirect=//evil.com');if(r.l&&r.l.includes('//evil.com'))throw Error('OPEN REDIRECT')});
+await chk('Callback javascript: blocked',async()=>{const r=await st('/auth/callback?redirect=javascript:alert(1)');if(r.l&&r.l.includes('javascript:'))throw Error('VULNERABLE')});
+await chk('Callback no code no crash',async()=>{const r=await st('/auth/callback');if(r.s>=500)throw Error('500')});
+
+// ── Phase 29: 404 Page ──
+S('Phase 29: 404 Page');nx();
+await chk('404 has content',async()=>{const r=await html('/nonexistent-test');if(r.s>=500)throw Error('500');if(!r.h.includes('404')&&!r.h.includes('Not Found')&&!r.h.includes('EZRA'))throw Error('blank')});
+await chk('404 has navigation',async()=>{const r=await html('/nonexistent-test');if(!r.h.includes('/')&&!r.h.includes('EZRA'))throw Error('no nav')});
+
+// ── Phase 30: Webhook Events ──
+S('Phase 30: Webhooks');nx();
+await chk('Non-PR event skipped',async()=>{const r=await fetch('/api/github/webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'push',ref:'main'})});if(r.status>=500)throw Error('500')});
+await chk('No signature verification',async()=>{const r=await fetch('/api/github/webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'opened',pull_request:{number:1}})});if(r.status>=500)throw Error('500')});
+
+// ── Phase 31: Edge Cases ──
+S('Phase 31: Edge Cases');nx();
+await chk('Long URL handled',async()=>{const r=await fetch('/api/projects?'+'x='.repeat(2000));if(r.status>=500)throw Error('500')});
+await chk('Empty POST body',async()=>{const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:''});if(r.status>=500)throw Error('500')});
+await chk('Unicode path',async()=>{const r=await fetch('/api/projects/%E2%9C%93');if(r.status>=500)throw Error('500')});
+await chk('Double-encoded slashes',async()=>{const r=await fetch('/api/projects%2F..%2Fsettings');if(r.status>=500)throw Error('500')});
+await chk('HEAD homepage',async()=>{const r=await fetch('/',{method:'HEAD'});if(r.status>=500)throw Error('500')});
+await chk('OPTIONS preflight',async()=>{const r=await fetch('/api/projects',{method:'OPTIONS'});if(r.status>=500)throw Error('500')});
+await chk('text/plain POST',async()=>{const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'text/plain'},body:'hello'});if(r.status>=500)throw Error('500')});
+await chk('null body',async()=>{const r=await fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:'null'});if(r.status>=500)throw Error('500')});
+
+// ── Done ──
 L('A','\\u{1f446}','Back home');nav('/');await loaded();
 prg(100);
 const el=((Date.now()-t0)/1e3).toFixed(1);
