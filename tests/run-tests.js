@@ -46,6 +46,7 @@ const SUITES = [
   { name: 'V7-Interview', script: 'test-v7-interview.js' },
   { name: 'V7-PlanGenerator', script: 'test-v7-plan-generator.js' },
   { name: 'V7-Scraper', script: 'test-v7-scraper.js' },
+  { name: 'V7-Execution', script: 'test-v7-execution.js' },
 
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },

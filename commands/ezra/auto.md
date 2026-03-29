@@ -288,6 +288,41 @@ Full run report: .ezra/processes/runs/<filename>
 
 Persist to `.ezra/processes/runs/` and log to changelog.
 
+## Plan-Driven Mode (/ezra:auto plan-driven)
+
+Executes a locked master plan task by task using the EZRA execution engine.
+
+### Pre-conditions
+- A locked plan must exist in `.ezra/plans/master-plan.yaml` (status: locked)
+- Run `/ezra:plan lock` first if needed
+
+### Execution Flow
+1. Load plan via `ezra-plan-generator.js loadPlan(projectDir)`
+2. Create run state via `ezra-execution-state.js createRun(projectDir, plan_id)`
+3. For each task in the plan (ordered by phase then index):
+   a. Pre-task guard check (same as standard execution loop)
+   b. Dispatch task via `ezra-agent-dispatcher.js dispatchTask(projectDir, task)`
+   c. If direct strategy: present task prompt to Claude Code for execution
+   d. If specialist strategy: route via MAH client (ezra-mah-client.js)
+   e. Post-task verify via `ezra-task-verifier.js verifyTask(projectDir, task, result)`
+   f. Record result via `ezra-execution-state.js recordTaskComplete/recordTaskFailed`
+   g. Checkpoint every 5 tasks
+4. After each phase's gate task: run phase gate (see /ezra:health gate-report)
+   - Gate must return `passed: true` before advancing to next phase
+   - On gate fail: attempt fix-and-recheck (up to max_fix_retries from settings)
+   - If gate still fails after retries: HALT with remediation guidance
+5. On run completion: call `ezra-execution-state.js completeRun(projectDir)`
+
+### Resume mode
+`/ezra:auto plan-driven --from-task N` — resume from task index N (uses saved execution state).
+
+### Settings
+Reads from `ezra-settings.js` execution section:
+- `max_fix_retries` (default: 3)
+- `checkpoint_every_n_tasks` (default: 5)
+- `pause_on_decision` (default: true)
+- `specialist_routing` (default: false — use MAH SDK for specialist roles)
+
 ## Rules
 
 - **Pre-flight confirmation is MANDATORY.** Never start without explicit user consent.
@@ -297,3 +332,4 @@ Persist to `.ezra/processes/runs/` and log to changelog.
 - **On HALT**: always provide specific remediation steps and the resume command.
 - **All output is captured** in the run report. Nothing is lost.
 - **Time limits are enforced.** A runaway step will be killed at timeout.
+- **Phase gates are mandatory in plan-driven mode.** A phase cannot advance unless its gate passes.

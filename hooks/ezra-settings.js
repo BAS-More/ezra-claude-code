@@ -91,6 +91,13 @@ const DEFAULTS = {
     auto_add: false,
     tech_filter: [],
   },
+  execution: {
+    max_fix_retries: 3,
+    checkpoint_every_n_tasks: 5,
+    pause_on_decision: true,
+    specialist_routing: false,
+    mah_endpoint: 'http://localhost:3001',
+  },
   project_manager: {
     enabled: true,
     mode: 'hybrid',

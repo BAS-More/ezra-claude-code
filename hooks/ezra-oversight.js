@@ -367,6 +367,11 @@ function decide(violations, level) {
       const msg = `GATE: ${violations.length} low/medium issue(s) — ${summary}`;
       return { decision: 'allow', message: msg };
     }
+    case 'phase-gate': {
+      // Hard block — cannot be skipped. Used during plan-driven execution phase boundaries.
+      const msg = `PHASE-GATE: Hard block — ${violations.length} issue(s) must be resolved before phase can advance — ${summary}`;
+      return { decision: 'deny', message: msg };
+    }
     case 'strict': {
       const msg = `STRICT: Blocked — ${violations.length} issue(s) detected — ${summary}`;
       return { decision: 'deny', message: msg };
