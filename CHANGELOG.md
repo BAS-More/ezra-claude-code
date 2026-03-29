@@ -1,5 +1,27 @@
 # Changelog
 
+All notable changes to EZRA are documented here.
+
+## [6.1.0] — 2026-03-30
+
+### Added
+- Document registry expanded from 55 to 81 SDLC types across 3 new cross-cutting categories:
+  - Governance & AI (10): ai-usage-policy, prompt-library, agent-runbook, cost-model, data-lineage, privacy-impact, accessibility, localization, error-catalog, runbook-alerts
+  - DevOps & Platform (8): cicd-pipeline, container-spec, secrets-mgmt, network-arch, capacity-plan, feature-flags, rollback-plan, load-test-plan
+  - Team & Process (8): team-charter, onboarding-dev, incident-postmortem, vendor-register, tech-debt-register, decision-framework, release-calendar, api-versioning
+- 17 new drift detection relevance rules for the new document types
+- Cross-cutting types distributed across lifecycle phases in doc-check gap analysis
+- TESTING.md — full test strategy documentation
+- BRANCHING-STRATEGY.md — trunk-based development workflow
+- CODE_OF_CONDUCT.md — Contributor Covenant v2.1
+- GitHub issue templates (bug report, feature request) and PR template
+- V7 component test suites: YAML utils, event bus, project definition, scheduler, doc ingester, phase suggester, deploy trigger, settings, execution state, achievements, interview engine, agent dispatcher, MAH client, task verifier, Quiz2Build client
+- Total test count: 2,466 across 58 test files
+
+### Fixed
+- Guard hook parseYaml treating indented sub-keys (e.g. `reason:`) as top-level keys, producing false "Unknown governance.yaml keys" warnings
+- Added `project_phase` to guard hook KNOWN_KEYS whitelist
+
 ## [6.0.0] — 2026-03-24
 
 ### EZRA v6 — Complete Multi-Agent Governance Framework
