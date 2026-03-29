@@ -51,6 +51,7 @@ const SUITES = [
   { name: 'V7-Notifier', script: 'test-v7-notifier.js' },
   { name: 'V7-CommitEngine', script: 'test-v7-commit-engine.js' },
   { name: 'V7-Quiz2Build',  script: 'test-v7-quiz2build.js' },
+  { name: 'V7-Phase7',      script: 'test-v7-phase7.js' },
 
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },

@@ -14,7 +14,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D16.7-brightgreen)](https://nodejs.org)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/BAS-More/ezra-claude-code)
 
-EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 41 slash commands, 4 subagent engines with 100 specialized roles, 42 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
+EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 41 slash commands, 4 subagent engines with 100 specialized roles, 43 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
 
 ### Identity
 
@@ -51,7 +51,7 @@ npx ezra-claude-code --local
 |-----------|-------------|
 | **41 Slash Commands** | Governance, documents, dashboard, processes, autonomous execution, multi-project, planning, memory, licensing, assessment |
 | **4 Subagent Engines + 100 Roles** | Architect, Reviewer, Guardian, Reconciler — plus 100 specialized roles across 12 domains |
-| **42 Lifecycle Hooks** | Protected path guard, session dashboard, drift detection, version tracking, oversight, memory capture, workflows, licensing, cloud sync, best practice scraper, execution engine |
+| **43 Lifecycle Hooks** | Protected path guard, session dashboard, drift detection, version tracking, oversight, memory capture, workflows, licensing, cloud sync, best practice scraper, execution engine |
 | **55 Document Types** | Full SDLC coverage from business case through decommissioning |
 | **5-Pillar Health** | On-Track, No Gaps, Clean, Secure, Best Practices (scored 0-100) |
 | **Process Engine** | Adjustable step-by-step workflows saved as portable templates |

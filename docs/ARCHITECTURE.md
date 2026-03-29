@@ -63,7 +63,7 @@ description: Full multi-agent codebase analysis
 | Memory | memory |
 | Licensing | license |
 
-### 2. Hooks (42 Node.js scripts)
+### 2. Hooks (43 Node.js scripts)
 
 Location: `hooks/*.js`
 

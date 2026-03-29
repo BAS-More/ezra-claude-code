@@ -1,0 +1,43 @@
+name: Release Preparation
+description: Full pre-release workflow — security gate, tests, docs, reconcile, commit
+version: 1
+guard_rails:
+  enforce_quality_gates: true
+  require_clean_git: true
+  min_health_score: 70
+steps:
+  - id: 1
+    name: Health Gate
+    type: command
+    command: health
+    description: Verify minimum health score before release
+
+  - id: 2
+    name: Security Audit
+    type: ezra
+    agent: reviewer
+    description: Run OWASP-aligned security scan
+
+  - id: 3
+    name: Doc Coverage Check
+    type: command
+    command: doc-check
+    description: Verify document coverage for release phase
+
+  - id: 4
+    name: Plan Reconciliation
+    type: command
+    command: reconcile
+    description: Compare plan vs implementation
+
+  - id: 5
+    name: Phase Gate
+    type: check
+    description: Run full phase gate — tests, lint, coverage, security, standards
+
+  - id: 6
+    name: Release Commit
+    type: command
+    command: auto
+    args: commit-phase
+    description: Batch-commit all changed files (max 10 per batch)

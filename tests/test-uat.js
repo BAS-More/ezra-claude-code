@@ -244,14 +244,14 @@ test('UAT: README claims 4 subagents — verified', () => {
   assert(agents.length === 4, `README says 4, actual: ${agents.length}`);
 });
 
-test('UAT: README claims 42 hooks — verified', () => {
+test('UAT: README claims 43 hooks — verified', () => {
   const hooks = fs.readdirSync(path.join(ROOT, 'hooks')).filter(f => f.endsWith('.js'));
-  assert(hooks.length === 42, `README says 42, actual: ${hooks.length}`);
+  assert(hooks.length === 43, `README says 43, actual: ${hooks.length}`);
 });
 
-test('UAT: README claims 7 templates — verified', () => {
+test('UAT: README claims 8 templates — verified', () => {
   const tmpls = fs.readdirSync(path.join(ROOT, 'templates')).filter(f => f.endsWith('.yaml'));
-  assert(tmpls.length === 7, `README says 7, actual: ${tmpls.length}`);
+  assert(tmpls.length === 8, `README says 8, actual: ${tmpls.length}`);
 });
 
 test('UAT: README claims Node >= 16.7.0 — package.json matches', () => {

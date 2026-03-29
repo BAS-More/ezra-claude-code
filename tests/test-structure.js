@@ -101,10 +101,10 @@ test('4 agent files exist', () => {
   assert(files.length === 4, `Expected 4 agents, found ${files.length}`);
 });
 
-test('42 hook files exist', () => {
+test('43 hook files exist', () => {
   const dir = path.join(ROOT, 'hooks');
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.js'));
-  assert(files.length === 42, `Expected 42 hooks, found ${files.length}`);
+  assert(files.length === 43, `Expected 43 hooks, found ${files.length}`);
 });
 
 test('1 skill file exists', () => {
@@ -112,10 +112,10 @@ test('1 skill file exists', () => {
   assert(fs.existsSync(p), 'SKILL.md missing');
 });
 
-test('7 template files exist', () => {
+test('8 template files exist', () => {
   const dir = path.join(ROOT, 'templates');
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml'));
-  assert(files.length === 7, `Expected 7 templates, found ${files.length}`);
+  assert(files.length === 8, `Expected 8 templates, found ${files.length}`);
 });
 
 // ─── Cross-platform ──────────────────────────────────────────────

@@ -83,14 +83,14 @@ test('E2E: Install → verify all files → uninstall → verify removal', () =>
 
     // Verify hook count
     const hooks = fs.readdirSync(path.join(claudeDir, 'hooks')).filter(f => f.endsWith('.js'));
-    assert(hooks.length === 42, `Expected 42 hooks, got ${hooks.length}`);
+    assert(hooks.length === 43, `Expected 43 hooks, got ${hooks.length}`);
 
     // Verify skill
     assert(fs.existsSync(path.join(claudeDir, 'skills', 'ezra', 'SKILL.md')), 'SKILL.md missing');
 
     // Verify templates
     const templates = fs.readdirSync(path.join(claudeDir, 'ezra-templates')).filter(f => f.endsWith('.yaml'));
-    assert(templates.length === 7, `Expected 7 templates, got ${templates.length}`);
+    assert(templates.length === 8, `Expected 8 templates, got ${templates.length}`);
 
     // Uninstall
     const uninstall = runCli('--uninstall --local', tmp);

@@ -1,0 +1,45 @@
+name: Security Audit
+description: Full OWASP security audit — scan, dependencies, secrets, report
+version: 1
+guard_rails:
+  block_on_critical: true
+steps:
+  - id: 1
+    name: OWASP Security Scan
+    type: ezra
+    agent: reviewer
+    description: Run OWASP Top 10 analysis via reviewer agent
+
+  - id: 2
+    name: Dependency Audit
+    type: shell
+    command: npm audit --json
+    description: Audit npm dependencies for known vulnerabilities
+
+  - id: 3
+    name: Secrets Check
+    type: validate
+    description: Check for hardcoded secrets and API keys
+
+  - id: 4
+    name: Standards Check
+    type: command
+    command: guard
+    description: Verify protected paths and standards compliance
+
+  - id: 5
+    name: Compliance Report
+    type: command
+    command: compliance
+    description: Generate compliance evidence pack
+
+  - id: 6
+    name: Security Report
+    type: report
+    description: Aggregate findings into security report
+
+  - id: 7
+    name: Remediation Decision
+    type: approval
+    auto_approve: false
+    description: Review findings and approve or escalate

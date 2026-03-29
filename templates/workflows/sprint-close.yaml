@@ -1,0 +1,35 @@
+name: Sprint Close
+description: End-of-sprint closure — all gates, doc sync, reconcile, snapshot
+version: 1
+guard_rails:
+  enforce_quality_gates: true
+steps:
+  - id: 1
+    name: Run All Tests
+    type: check
+    description: Full test suite must pass
+
+  - id: 2
+    name: Multi-Agent Scan
+    type: ezra
+    agent: all
+    description: Run all 4 agents in parallel
+
+  - id: 3
+    name: Doc Sync
+    type: command
+    command: doc-sync
+    description: Detect and propose doc updates
+
+  - id: 4
+    name: Plan Reconciliation
+    type: command
+    command: reconcile
+    description: Compare sprint plan vs actual implementation
+
+  - id: 5
+    name: Version Snapshot
+    type: command
+    command: version
+    args: snapshot
+    description: Create named sprint-end checkpoint

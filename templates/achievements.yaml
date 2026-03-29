@@ -1,0 +1,142 @@
+# EZRA Achievement Definitions
+# Used by ezra-achievement-engine.js and the dashboard gamification system
+version: 1
+categories:
+  - governance
+  - quality
+  - execution
+  - documentation
+  - security
+
+achievements:
+  - id: first_decision
+    name: First Decision
+    description: Record your first architectural decision
+    icon: "🏛️"
+    category: governance
+    points: 10
+    rules:
+      - metric: decisions
+        operator: ">="
+        value: 1
+
+  - id: governance_foundation
+    name: Governance Foundation
+    description: Record 5 architectural decisions
+    icon: "📜"
+    category: governance
+    points: 25
+    rules:
+      - metric: decisions
+        operator: ">="
+        value: 5
+
+  - id: first_scan
+    name: First Scan
+    description: Run your first codebase scan
+    icon: "🔍"
+    category: quality
+    points: 10
+    rules:
+      - metric: scans
+        operator: ">="
+        value: 1
+
+  - id: health_a
+    name: Grade A Health
+    description: Achieve a health score of 90 or above
+    icon: "🏆"
+    category: quality
+    points: 50
+    rules:
+      - metric: health_score
+        operator: ">="
+        value: 90
+
+  - id: health_b
+    name: Grade B Health
+    description: Achieve a health score of 75 or above
+    icon: "⭐"
+    category: quality
+    points: 25
+    rules:
+      - metric: health_score
+        operator: ">="
+        value: 75
+
+  - id: phase_complete
+    name: Phase Complete
+    description: Complete your first execution phase
+    icon: "🎯"
+    category: execution
+    points: 30
+    rules:
+      - metric: phases_completed
+        operator: ">="
+        value: 1
+
+  - id: gate_champion
+    name: Gate Champion
+    description: Pass 5 phase gates
+    icon: "🛡️"
+    category: execution
+    points: 40
+    rules:
+      - metric: gates_passed
+        operator: ">="
+        value: 5
+
+  - id: commit_streak
+    name: Commit Streak
+    description: Create 10 commits
+    icon: "💾"
+    category: execution
+    points: 20
+    rules:
+      - metric: commits
+        operator: ">="
+        value: 10
+
+  - id: docs_complete
+    name: Documentation Complete
+    description: Have at least 10 SDLC documents created
+    icon: "📚"
+    category: documentation
+    points: 35
+    rules:
+      - metric: documents
+        operator: ">="
+        value: 10
+
+  - id: security_clean
+    name: Security Clean
+    description: Achieve a security gate score of 90 or above
+    icon: "🔒"
+    category: security
+    points: 45
+    rules:
+      - metric: security_score
+        operator: ">="
+        value: 90
+
+  - id: zero_drift
+    name: Zero Drift
+    description: Sync all documents — no stale docs
+    icon: "✨"
+    category: documentation
+    points: 30
+    rules:
+      - metric: stale_docs
+        operator: "==="
+        value: 0
+
+  - id: library_builder
+    name: Library Builder
+    description: Add 20 entries to the best practice library
+    icon: "🏗️"
+    category: quality
+    points: 25
+    rules:
+      - metric: library_entries
+        operator: ">="
+        value: 20
