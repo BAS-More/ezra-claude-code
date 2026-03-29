@@ -217,7 +217,7 @@ test('BETA: Multiple installs to same directory are safe', () => {
 
     const cd = path.join(tmp, '.claude');
     const cmds = fs.readdirSync(path.join(cd, 'commands', 'ezra')).filter(f => f.endsWith('.md'));
-    assert(cmds.length === 39, `Should still have 39 commands, got ${cmds.length}`);
+    assert(cmds.length === 40, `Should still have 40 commands, got ${cmds.length}`);
   } finally { rm(tmp); }
 });
 
@@ -234,9 +234,9 @@ test('BETA: Uninstall on non-EZRA directory is safe', () => {
 // UAT TESTS — README Promise Verification
 // ═══════════════════════════════════════════════════════════════════
 
-test('UAT: README claims 39 commands — verified', () => {
+test('UAT: README claims 40 commands — verified', () => {
   const cmds = fs.readdirSync(path.join(ROOT, 'commands', 'ezra')).filter(f => f.endsWith('.md'));
-  assert(cmds.length === 39, `README says 39, actual: ${cmds.length}`);
+  assert(cmds.length === 40, `README says 40, actual: ${cmds.length}`);
 });
 
 test('UAT: README claims 4 subagents — verified', () => {
@@ -244,9 +244,9 @@ test('UAT: README claims 4 subagents — verified', () => {
   assert(agents.length === 4, `README says 4, actual: ${agents.length}`);
 });
 
-test('UAT: README claims 25 hooks — verified', () => {
+test('UAT: README claims 28 hooks — verified', () => {
   const hooks = fs.readdirSync(path.join(ROOT, 'hooks')).filter(f => f.endsWith('.js'));
-  assert(hooks.length === 25, `README says 25, actual: ${hooks.length}`);
+  assert(hooks.length === 28, `README says 28, actual: ${hooks.length}`);
 });
 
 test('UAT: README claims 5 templates — verified', () => {

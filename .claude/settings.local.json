@@ -13,7 +13,18 @@
       "Bash(grep -Pn catchs*\\\\\\(s*\\\\\\)s*{ hooks/*.js bin/*.js)",
       "Bash(node hooks/ezra-guard.js)",
       "Bash(node hooks/ezra-oversight.js)",
-      "Bash(node hooks/ezra-progress-hook.js)"
+      "Bash(node hooks/ezra-progress-hook.js)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(cat C:/Dev/ezra-dashboard/supabase/migrations/*.sql)",
+      "Bash(npm --prefix C:/Dev/ezra-dashboard run lint)",
+      "Bash(find /c/Users/avi/.claude/projects -type f \\\\\\(-name *.md -o -name *.json \\\\\\) -o -type d -maxdepth 1)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Dev/Ezra/**)",
+      "Bash(npm list:*)",
+      "Bash(mkdir -p /c/tmp/ezra-docx)",
+      "Bash(npm init:*)",
+      "Bash(node generate.js)"
     ]
   }
 }
