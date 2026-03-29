@@ -559,6 +559,7 @@ module.exports = {
   saveHandoff,
   exportDashboardData,
   saveDashboardExport,
+  syncToDashboard,
 };
 
 // ─── Hook Protocol ───────────────────────────────────────────────
@@ -570,7 +571,7 @@ if (require.main === module) {
   input += d;
   if (input.length > MAX_STDIN) { process.exit(0); }
 });
-  process.stdin.on('end', () => {
+  process.stdin.on('end', async () => {
     try {
       const data = JSON.parse(input);
       const action = data.action || 'collect';
@@ -588,6 +589,9 @@ if (require.main === module) {
           break;
         case 'export':
           result = exportDashboardData(projectDir);
+          break;
+        case 'sync':
+          result = await syncToDashboard(projectDir, data.sync_action || 'sync');
           break;
         default:
           result = { error: 'Unknown action: ' + action };

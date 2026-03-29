@@ -100,8 +100,8 @@ test('dashData: has all expected exports', () => {
   }
 });
 
-test('dashData: exports count is 16', () => {
-  assertEqual(Object.keys(dashData).length, 16);
+test('dashData: exports count is 17', () => {
+  assertEqual(Object.keys(dashData).length, 17);
 });
 
 // --- YAML Helpers ---
