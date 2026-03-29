@@ -44,6 +44,7 @@ const SUITES = [
   { name: 'V6-Version-Hook', script: 'test-v6-version-hook.js' },
 
   { name: 'V7-Interview', script: 'test-v7-interview.js' },
+  { name: 'V7-PlanGenerator', script: 'test-v7-plan-generator.js' },
 
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },

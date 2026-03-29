@@ -36,10 +36,36 @@ List all checkpoints and gap reports with timestamps.
 ### describe
 Generate a human-readable description of the current plan.
 
+### generate
+Generate a master plan automatically from the project definition.
+- Reads `.ezra/project-definition.yaml` (run `/ezra:interview` first if missing)
+- Uses heuristic decomposer to break project into tasks and phases
+- Writes `master-plan.yaml`, `tasks.yaml`, `phases.yaml` to `.ezra/plans/`
+- Adds gate tasks at the end of each phase automatically
+- Status: `draft` — editable until locked
+
+### review
+Display the generated plan in a readable format. Shows phases, tasks, complexity, gate tasks, and acceptance criteria.
+
+### lock
+Lock the plan to prevent further edits. Required before `/ezra:auto plan-driven` can execute it.
+Sets plan status to `locked`.
+
+### unlock [reason]
+Unlock a locked plan for editing. Records the reason.
+
+### phases
+List all phases with task counts, complexity breakdown, and gate task status.
+
 ## Usage
 
 \`\`\`
-/ezra:plan create — start a new master plan
+/ezra:plan create — start a new master plan (manual spec)
+/ezra:plan generate — auto-generate plan from project-definition.yaml
+/ezra:plan review — display plan in readable format
+/ezra:plan lock — lock plan before execution
+/ezra:plan unlock "Need to add feature X" — unlock for editing
+/ezra:plan phases — list phases with complexity scores
 /ezra:plan status — view current plan progress
 /ezra:plan tasks — list all tasks
 /ezra:plan assign 0 code-agent — assign task 0

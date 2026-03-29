@@ -536,6 +536,52 @@ function describePlan(projectDir) {
   return lines.join('\n');
 }
 
+// ─── lockPlan / unlockPlan / addPhaseGate ───────────────────────
+
+function lockPlan(projectDir) {
+  const planPath = path.join(getPlansDir(projectDir), MASTER_PLAN_FILE);
+  if (!fs.existsSync(planPath)) return { success: false, error: 'No master-plan.yaml found.' };
+  try {
+    const plan = readYaml(planPath);
+    plan.status = 'locked';
+    plan.locked_at = new Date().toISOString();
+    writeYaml(planPath, plan);
+    return { success: true, status: 'locked' };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+function unlockPlan(projectDir, reason) {
+  const planPath = path.join(getPlansDir(projectDir), MASTER_PLAN_FILE);
+  if (!fs.existsSync(planPath)) return { success: false, error: 'No master-plan.yaml found.' };
+  try {
+    const plan = readYaml(planPath);
+    plan.status = 'active';
+    plan.unlocked_at = new Date().toISOString();
+    if (reason) plan.unlock_reason = reason;
+    writeYaml(planPath, plan);
+    return { success: true, status: 'active' };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+function addPhaseGate(projectDir, phaseNumber) {
+  const queuePath = path.join(getPlansDir(projectDir), TASK_QUEUE_FILE);
+  if (!fs.existsSync(queuePath)) return { success: false, error: 'No task-queue.yaml found.' };
+  try {
+    const queue = readYaml(queuePath);
+    const total = parseInt(queue.total_tasks, 10) || 0;
+    const gateId = 'gate-' + generateId();
+    queue['task_' + total + '_id'] = gateId;
+    queue['task_' + total + '_name'] = 'Phase ' + phaseNumber + ' gate';
+    queue['task_' + total + '_type'] = 'gate';
+    queue['task_' + total + '_phase'] = phaseNumber;
+    queue['task_' + total + '_status'] = 'pending';
+    queue['task_' + total + '_assigned_to'] = 'test-engineer';
+    queue.total_tasks = total + 1;
+    writeYaml(queuePath, queue);
+    return { success: true, gate_id: gateId, task_index: total };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
 // ─── createPlanFromDefinition ────────────────────────────────────
 
 /**
@@ -627,4 +673,7 @@ module.exports = {
   getGapReportsDir,
   generateId,
   createPlanFromDefinition,
+  lockPlan,
+  unlockPlan,
+  addPhaseGate,
 };

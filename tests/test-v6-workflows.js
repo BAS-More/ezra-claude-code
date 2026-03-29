@@ -60,7 +60,7 @@ test('STEP_TYPES: has all expected types', () => {
   for (const t of expected) {
     assert(wf.STEP_TYPES.includes(t), 'Missing type: ' + t);
   }
-  assertEqual(wf.STEP_TYPES.length, 9);
+  assertEqual(wf.STEP_TYPES.length, 11);
 });
 
 test('STEP_ON_FAILURE: has all expected values', () => {

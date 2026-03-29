@@ -1,0 +1,48 @@
+name: "Plan Review"
+version: "1.0"
+description: "Workflow for reviewing and locking an AI-generated plan before execution"
+trigger: "manual"
+
+steps:
+  - id: 1
+    name: "Review generated plan"
+    type: "review"
+    command: "plan"
+    args: "review"
+    description: "Display all phases, tasks, gate tasks, and acceptance criteria"
+    blocking: false
+
+  - id: 2
+    name: "Validate phase ordering"
+    type: "validate"
+    description: "Confirm tasks are correctly grouped — no dependency violations"
+    blocking: true
+    on_failure: "stop"
+
+  - id: 3
+    name: "User adjusts tasks if needed"
+    type: "approval"
+    description: "User may reorder tasks, change phases, or add/remove tasks before locking"
+    auto_approve: false
+    timeout_minutes: 60
+
+  - id: 4
+    name: "Lock plan"
+    type: "command"
+    command: "plan"
+    args: "lock"
+    description: "Lock the plan — prevents further edits, enables execution"
+    blocking: true
+
+  - id: 5
+    name: "Confirm ready for execution"
+    type: "approval"
+    description: "Confirm: run /ezra:auto plan-driven to begin autonomous execution"
+    auto_approve: false
+
+guard_rails:
+  require_all_phases_have_gates: true
+  require_project_definition: true
+  require_locked_before_execution: true
+  max_tasks_per_phase: 15
+  max_high_complexity_per_phase: 8

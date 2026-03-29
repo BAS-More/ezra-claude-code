@@ -23,6 +23,7 @@ const EXPECTED = [
   'sprint-close.yaml',
   'security-audit.yaml',
   'onboarding.yaml',
+  'plan-review.yaml',
 ];
 
 const REQUIRED_FIELDS = ['name', 'description', 'version', 'steps'];

@@ -19,7 +19,7 @@ try { _fmt = require('./ezra-error-codes').formatError; } catch { _fmt = (c) => 
 
 // ─── Constants ───────────────────────────────────────────────────
 
-const STEP_TYPES = ['ezra', 'shell', 'manual', 'conditional', 'parallel', 'checkpoint', 'command', 'report', 'approval'];
+const STEP_TYPES = ['ezra', 'shell', 'manual', 'conditional', 'parallel', 'checkpoint', 'command', 'report', 'approval', 'review', 'validate'];
 const STEP_ON_FAILURE = ['stop', 'skip', 'ask', 'retry'];
 const WORKFLOW_STATUSES = ['draft', 'active', 'archived', 'running', 'completed', 'failed'];
 const TEMPLATE_DIR = 'templates';
@@ -170,7 +170,8 @@ function listTemplates(projectRoot) {
       const t = parseTemplate(path.join(dir, f));
       return {
         filename: f,
-        name: t ? t.name : f.replace('.yaml', ''),
+        name: f.replace('.yaml', ''),
+        display_name: t ? t.name : f.replace('.yaml', ''),
         description: t ? t.description : '',
         steps: t ? t.steps.length : 0,
         version: t ? t.version : 1,

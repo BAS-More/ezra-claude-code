@@ -14,7 +14,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D16.7-brightgreen)](https://nodejs.org)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/BAS-More/ezra-claude-code)
 
-EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 40 slash commands, 4 subagent engines with 100 specialized roles, 28 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
+EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 40 slash commands, 4 subagent engines with 100 specialized roles, 30 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
 
 ### Identity
 
@@ -151,7 +151,7 @@ Grades: **A** (90+), **B** (75-89), **C** (60-74), **D** (40-59), **F** (0-39)
 
 ## Process Templates
 
-EZRA ships with 5 built-in process templates:
+EZRA ships with 6 built-in process templates:
 
 | Template | Steps | Purpose |
 |----------|-------|---------|
@@ -160,6 +160,7 @@ EZRA ships with 5 built-in process templates:
 | `sprint-close` | 5 | Tests, scan, doc sync, reconcile, snapshot |
 | `security-audit` | 7 | OWASP scan, dep audit, secrets check, report |
 | `onboarding` | 4 | Init, scan, doc check, advisor |
+| `plan-review` | 5 | Review generated plan, adjust phases, lock for execution |
 
 Create custom processes from plain English:
 

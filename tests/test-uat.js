@@ -244,14 +244,14 @@ test('UAT: README claims 4 subagents — verified', () => {
   assert(agents.length === 4, `README says 4, actual: ${agents.length}`);
 });
 
-test('UAT: README claims 28 hooks — verified', () => {
+test('UAT: README claims 30 hooks — verified', () => {
   const hooks = fs.readdirSync(path.join(ROOT, 'hooks')).filter(f => f.endsWith('.js'));
-  assert(hooks.length === 28, `README says 28, actual: ${hooks.length}`);
+  assert(hooks.length === 30, `README says 30, actual: ${hooks.length}`);
 });
 
-test('UAT: README claims 5 templates — verified', () => {
+test('UAT: README claims 6 templates — verified', () => {
   const tmpls = fs.readdirSync(path.join(ROOT, 'templates')).filter(f => f.endsWith('.yaml'));
-  assert(tmpls.length === 5, `README says 5, actual: ${tmpls.length}`);
+  assert(tmpls.length === 6, `README says 6, actual: ${tmpls.length}`);
 });
 
 test('UAT: README claims Node >= 16.7.0 — package.json matches', () => {
@@ -300,9 +300,9 @@ test('UAT: All 5 health pillars documented in README', () => {
   }
 });
 
-test('UAT: All 5 template names documented in README', () => {
+test('UAT: All 6 template names documented in README', () => {
   const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
-  const templates = ['full-remediation', 'release-prep', 'sprint-close', 'security-audit', 'onboarding'];
+  const templates = ['full-remediation', 'release-prep', 'sprint-close', 'security-audit', 'onboarding', 'plan-review'];
   for (const t of templates) {
     assert(readme.includes(t), `README missing template: ${t}`);
   }
