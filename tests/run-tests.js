@@ -61,6 +61,15 @@ const SUITES = [
   { name: 'V7-PhaseSugg',   script: 'test-v7-phase-suggester.js' },
   { name: 'V7-DeployTrig',  script: 'test-v7-deploy-trigger.js' },
 
+  { name: 'V7-Settings',    script: 'test-v7-settings.js' },
+  { name: 'V7-ExecState',   script: 'test-v7-execution-state.js' },
+  { name: 'V7-Achievements',script: 'test-v7-achievement-engine.js' },
+  { name: 'V7-InterviewEng',script: 'test-v7-interview-engine.js' },
+  { name: 'V7-AgentDisp',   script: 'test-v7-agent-dispatcher.js' },
+  { name: 'V7-MAHClient',   script: 'test-v7-mah-client.js' },
+  { name: 'V7-TaskVerifier', script: 'test-v7-task-verifier.js' },
+  { name: 'V7-Q2BClient',   script: 'test-v7-quiz2build-client.js' },
+
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },
   { name: 'UAT', script: 'test-uat.js' },
