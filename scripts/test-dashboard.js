@@ -1249,6 +1249,21 @@ const server = http.createServer((req, res) => {
   res.end('Not found');
 });
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error('');
+    console.error('ERROR: Port ' + PORT + ' is already in use.');
+    console.error('Fix:   Run this to kill it:');
+    console.error('       netstat -ano | findstr :' + PORT);
+    console.error('       Stop-Process -Id <PID> -Force');
+    console.error('  Or:  Set EZRA_TEST_PORT=3001 to use a different port');
+    console.error('');
+  } else {
+    console.error('Server error:', err.message);
+  }
+  process.exit(1);
+});
+
 server.listen(PORT, () => {
   console.log('');
   console.log('EZRA Test Dashboard');
@@ -1256,6 +1271,7 @@ server.listen(PORT, () => {
   console.log('  URL:    http://localhost:' + PORT);
   console.log('  Suites: ' + SUITES.length);
   console.log('  Mode:   E2E browser dashboard');
+  console.log('  Test:   http://localhost:' + PORT + '/test');
   console.log('════════════════════════════════════════');
   console.log('');
   console.log('Open your browser to http://localhost:' + PORT);

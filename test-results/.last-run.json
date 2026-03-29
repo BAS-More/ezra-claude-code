@@ -1,14 +1,266 @@
 {
-  "status": "failed",
-  "totalPassed": 42,
-  "totalFailed": 1,
-  "timestamp": "2026-03-29T09:48:19.116Z",
+  "status": "passed",
+  "totalPassed": 1982,
+  "totalFailed": 0,
+  "timestamp": "2026-03-29T10:09:23.194Z",
   "suites": [
     {
-      "name": "EdgeTest",
-      "passed": 42,
-      "failed": 1,
+      "name": "Structure",
+      "passed": 20,
+      "failed": 0,
+      "duration": 113
+    },
+    {
+      "name": "Commands",
+      "passed": 192,
+      "failed": 0,
+      "duration": 72
+    },
+    {
+      "name": "Hooks",
+      "passed": 41,
+      "failed": 0,
+      "duration": 1741
+    },
+    {
+      "name": "CLI",
+      "passed": 9,
+      "failed": 0,
+      "duration": 1626
+    },
+    {
+      "name": "Templates",
+      "passed": 45,
+      "failed": 0,
+      "duration": 72
+    },
+    {
+      "name": "AVI-OS Bridge",
+      "passed": 7,
+      "failed": 0,
+      "duration": 916
+    },
+    {
+      "name": "V6-Oversight",
+      "passed": 68,
+      "failed": 0,
+      "duration": 180
+    },
+    {
+      "name": "V6-PM",
+      "passed": 92,
+      "failed": 0,
+      "duration": 945
+    },
+    {
+      "name": "V6-Settings-Writer",
+      "passed": 116,
+      "failed": 0,
+      "duration": 412
+    },
+    {
+      "name": "V6-Settings-RoundTrip",
+      "passed": 27,
+      "failed": 0,
+      "duration": 92
+    },
+    {
+      "name": "V6-Library",
+      "passed": 45,
+      "failed": 0,
+      "duration": 379
+    },
+    {
+      "name": "V6-Agents",
+      "passed": 39,
+      "failed": 0,
       "duration": 123
+    },
+    {
+      "name": "V6-Dashboard",
+      "passed": 54,
+      "failed": 0,
+      "duration": 393
+    },
+    {
+      "name": "V6-Workflows",
+      "passed": 47,
+      "failed": 0,
+      "duration": 148
+    },
+    {
+      "name": "V6-Memory",
+      "passed": 36,
+      "failed": 0,
+      "duration": 322
+    },
+    {
+      "name": "V6-Planner",
+      "passed": 60,
+      "failed": 0,
+      "duration": 310
+    },
+    {
+      "name": "V6-Integration",
+      "passed": 44,
+      "failed": 0,
+      "duration": 373
+    },
+    {
+      "name": "V6-License",
+      "passed": 53,
+      "failed": 0,
+      "duration": 245
+    },
+    {
+      "name": "V6-Agents-Real",
+      "passed": 47,
+      "failed": 0,
+      "duration": 205
+    },
+    {
+      "name": "V6-HTTP",
+      "passed": 45,
+      "failed": 0,
+      "duration": 108
+    },
+    {
+      "name": "V6-Hook-Logger",
+      "passed": 12,
+      "failed": 0,
+      "duration": 128
+    },
+    {
+      "name": "V6-Error-Codes",
+      "passed": 11,
+      "failed": 0,
+      "duration": 86
+    },
+    {
+      "name": "V6-Cloud-Sync",
+      "passed": 37,
+      "failed": 0,
+      "duration": 277
+    },
+    {
+      "name": "V6-Dash-Hook",
+      "passed": 12,
+      "failed": 0,
+      "duration": 2610
+    },
+    {
+      "name": "V6-Drift-Hook",
+      "passed": 12,
+      "failed": 0,
+      "duration": 906
+    },
+    {
+      "name": "V6-Guard",
+      "passed": 15,
+      "failed": 0,
+      "duration": 649
+    },
+    {
+      "name": "V6-Installer",
+      "passed": 20,
+      "failed": 0,
+      "duration": 326
+    },
+    {
+      "name": "V6-Memory-Hook",
+      "passed": 0,
+      "failed": 0,
+      "duration": 68
+    },
+    {
+      "name": "V6-Progress-Hook",
+      "passed": 0,
+      "failed": 0,
+      "duration": 70
+    },
+    {
+      "name": "V6-Tier-Gate",
+      "passed": 0,
+      "failed": 0,
+      "duration": 61
+    },
+    {
+      "name": "V6-Version-Hook",
+      "passed": 0,
+      "failed": 0,
+      "duration": 237
+    },
+    {
+      "name": "V7-Interview",
+      "passed": 39,
+      "failed": 0,
+      "duration": 121
+    },
+    {
+      "name": "V7-PlanGenerator",
+      "passed": 52,
+      "failed": 0,
+      "duration": 117
+    },
+    {
+      "name": "V7-Scraper",
+      "passed": 38,
+      "failed": 0,
+      "duration": 102
+    },
+    {
+      "name": "V7-Execution",
+      "passed": 40,
+      "failed": 0,
+      "duration": 152
+    },
+    {
+      "name": "V7-PhaseGate",
+      "passed": 73,
+      "failed": 0,
+      "duration": 184
+    },
+    {
+      "name": "V7-Notifier",
+      "passed": 45,
+      "failed": 0,
+      "duration": 231
+    },
+    {
+      "name": "V7-CommitEngine",
+      "passed": 79,
+      "failed": 0,
+      "duration": 405
+    },
+    {
+      "name": "V7-Quiz2Build",
+      "passed": 59,
+      "failed": 0,
+      "duration": 122
+    },
+    {
+      "name": "V7-Phase7",
+      "passed": 41,
+      "failed": 0,
+      "duration": 111
+    },
+    {
+      "name": "Lint",
+      "passed": 264,
+      "failed": 0,
+      "duration": 143
+    },
+    {
+      "name": "E2E",
+      "passed": 22,
+      "failed": 0,
+      "duration": 3378
+    },
+    {
+      "name": "UAT",
+      "passed": 24,
+      "failed": 0,
+      "duration": 3072
     }
   ]
 }
