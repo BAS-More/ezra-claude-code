@@ -69,11 +69,15 @@ function run(event) {
     let high = 0;
     const scanDir = path.join(ezraDir, 'scans');
     if (fs.existsSync(scanDir)) {
-      const scans = fs.readdirSync(scanDir).filter(f => f.includes('scan')).sort().reverse();
+      const scans = fs.readdirSync(scanDir).filter(f => f.includes('scan') || f.includes('health')).sort((a, b) => {
+        const ma = fs.statSync(path.join(scanDir, a)).mtimeMs;
+        const mb = fs.statSync(path.join(scanDir, b)).mtimeMs;
+        return mb - ma;
+      });
       if (scans.length > 0) {
         const scanContent = fs.readFileSync(path.join(scanDir, scans[0]), 'utf8');
         const dateMatch = scanContent.match(/timestamp:\s*(.+)/);
-        const healthMatch = scanContent.match(/health_score:\s*(\d+)/);
+        const healthMatch = scanContent.match(/(?:health_score|overall_score):\s*(\d+)/);
         const critMatch = scanContent.match(/critical:\s*(\d+)/);
         const highMatch = scanContent.match(/high:\s*(\d+)/);
         if (dateMatch) lastScan = dateMatch[1].trim().substring(0, 10);
@@ -89,11 +93,16 @@ function run(event) {
     const regPath = path.join(ezraDir, 'docs', 'registry.yaml');
     if (fs.existsSync(regPath)) {
       const reg = fs.readFileSync(regPath, 'utf8');
-      const docMatches = reg.match(/- id:/g);
-      if (docMatches) docCount = docMatches.length;
+      const totalMatch = reg.match(/total_existing:\s*(\d+)/);
+      if (totalMatch) docCount = parseInt(totalMatch[1]);
+      else {
+        const docsSection = reg.split(/\nmissing:/)[0];
+        const docMatches = docsSection.match(/- type:/g);
+        if (docMatches) docCount = docMatches.length;
+      }
       const critDocs = ['prd', 'tad', 'adr', 'deploy-runbook', 'go-live', 'dr-plan', 'handover'];
       for (const cd of critDocs) {
-        if (!reg.includes(`id: ${cd}`)) criticalGaps++;
+        if (!reg.includes(`type: ${cd}`)) criticalGaps++;
       }
     } else {
       criticalGaps = 7;
