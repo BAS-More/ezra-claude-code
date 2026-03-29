@@ -146,7 +146,7 @@ Saved to:  .ezra/decisions/ADR-005.yaml
 ### `/ezra:doc`
 Create, update, list, or reference SDLC documents.
 
-- Supports 55 document types (business case, API spec, test strategy, runbook, etc.)
+- Supports 81 document types (business case, API spec, test strategy, runbook, etc.)
 - Usage: `/ezra:doc create api-spec`, `/ezra:doc list`, `/ezra:doc status`
 - Documents tracked in `.ezra/docs/registry.yaml`
 

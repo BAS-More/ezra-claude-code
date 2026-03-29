@@ -285,7 +285,7 @@ Every 10 edits or 3+ hits on same doc → stderr reminder:
 ├── plans/
 │   └── sprint-12.yaml   # Registered plans for reconciliation
 ├── docs/
-│   ├── registry.yaml    # Document registry (55 types)
+│   ├── registry.yaml    # Document registry (81 types)
 │   ├── proposals/       # Pending doc update proposals
 │   └── .drift-counter.json
 ├── versions/

@@ -88,6 +88,22 @@ process.stdin.on('end', () => {
       { patterns: [/\.ezra\/decisions\//i], docs: ['adr'] },
       { patterns: [/monitoring|health|metrics|logging/i], docs: ['monitoring', 'ops-manual'] },
       { patterns: [/components?\//i, /pages?\//i, /views?\//i, /ui\//i], docs: ['user-guide', 'wireframes'] },
+      { patterns: [/\.github\/workflows/i, /pipeline/i, /\.gitlab-ci/i], docs: ['cicd-pipeline'] },
+      { patterns: [/k8s/i, /kubernetes/i, /helm/i, /compose/i], docs: ['container-spec'] },
+      { patterns: [/secret/i, /vault/i, /credential/i], docs: ['secrets-mgmt'] },
+      { patterns: [/firewall/i, /proxy/i, /cors/i, /csp/i], docs: ['network-arch'] },
+      { patterns: [/feature.?flag/i, /toggle/i, /unleash/i, /launchdarkly/i], docs: ['feature-flags'] },
+      { patterns: [/rollback/i, /revert/i, /restore/i], docs: ['rollback-plan'] },
+      { patterns: [/(load|stress|perf).?test/i, /k6/i, /artillery/i, /jmeter/i], docs: ['load-test-plan'] },
+      { patterns: [/llm/i, /openai/i, /anthropic/i, /claude/i, /prompt/i], docs: ['ai-usage-policy', 'agent-runbook'] },
+      { patterns: [/a11y/i, /accessibility/i, /aria/i, /wcag/i], docs: ['accessibility'] },
+      { patterns: [/i18n/i, /l10n/i, /locale/i, /translation/i, /intl/i], docs: ['localization'] },
+      { patterns: [/error.?code/i, /error.?catalog/i], docs: ['error-catalog'] },
+      { patterns: [/alert/i, /pager/i, /oncall/i, /escalat/i], docs: ['runbook-alerts'] },
+      { patterns: [/privacy/i, /gdpr/i, /pii/i, /consent/i], docs: ['privacy-impact', 'data-lineage'] },
+      { patterns: [/tech.?debt/i, /deprecat/i], docs: ['tech-debt-register'] },
+      { patterns: [/vendor/i, /saas/i, /third.?party/i], docs: ['vendor-register'] },
+      { patterns: [/api.?version/i, /v[0-9]+\//i], docs: ['api-versioning'] },
     ];
 
     // Check which docs this file change affects

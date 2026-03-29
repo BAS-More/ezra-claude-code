@@ -14,7 +14,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D16.7-brightgreen)](https://nodejs.org)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/BAS-More/ezra-claude-code)
 
-EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 41 slash commands, 4 subagent engines with 100 specialized roles, 43 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
+EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 41 slash commands, 4 subagent engines with 100 specialized roles, 43 lifecycle hooks, 81 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
 
 ### Identity
 
@@ -24,7 +24,7 @@ What Ezra did for Israel, this system does for codebases:
 
 - **Restored the standard** — Ezra re-established the Torah as the authoritative source of truth. EZRA establishes architectural decisions, coding standards, and governance rules as the authoritative source for your project.
 - **Audited compliance** — Ezra conducted a public audit of the people's adherence to the law. EZRA scans your codebase against recorded decisions, protected paths, and configured standards.
-- **Documented everything** — Ezra was a Sofer (scribe) — the original documentation specialist. He ensured the text was accurate, complete, and accessible. EZRA manages 55 SDLC document types across the full project lifecycle.
+- **Documented everything** — Ezra was a Sofer (scribe) — the original documentation specialist. He ensured the text was accurate, complete, and accessible. EZRA manages 81 SDLC document types across the full project lifecycle.
 - **Enforced with authority** — Ezra didn't suggest. He governed. When he found violations, he required correction. EZRA's guard rails halt autonomous execution the moment a violation is detected.
 - **Taught and elevated** — Ezra didn't just enforce — he taught the people to understand the standards themselves. EZRA's advisor provides lifecycle-aware guidance, best practices, and forward-looking recommendations.
 
@@ -52,7 +52,7 @@ npx ezra-claude-code --local
 | **41 Slash Commands** | Governance, documents, dashboard, processes, autonomous execution, multi-project, planning, memory, licensing, assessment |
 | **4 Subagent Engines + 100 Roles** | Architect, Reviewer, Guardian, Reconciler — plus 100 specialized roles across 12 domains |
 | **43 Lifecycle Hooks** | Protected path guard, session dashboard, drift detection, version tracking, oversight, memory capture, workflows, licensing, cloud sync, best practice scraper, execution engine |
-| **55 Document Types** | Full SDLC coverage from business case through decommissioning |
+| **81 Document Types** | Full SDLC coverage from business case through decommissioning |
 | **5-Pillar Health** | On-Track, No Gaps, Clean, Secure, Best Practices (scored 0-100) |
 | **Process Engine** | Adjustable step-by-step workflows saved as portable templates |
 | **Autonomous Execution** | Runs processes start-to-finish under continuous guard rail monitoring |
@@ -198,7 +198,7 @@ EZRA persists all state in `.ezra/` at the project root:
 ├── decisions/      # Architectural Decision Records
 ├── scans/          # Scan + health results
 ├── plans/          # Plans for reconciliation
-├── docs/           # 55-type SDLC document library + proposals
+├── docs/           # 81-type SDLC document library + proposals
 ├── processes/      # Workflow definitions + templates + run history
 ├── versions/       # Immutable changelog + snapshots
 ├── governance.yaml # Rules, protected paths, enforcement
