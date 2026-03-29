@@ -1,0 +1,55 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "EZRA: Run All Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/run-tests.js",
+            "cwd": "${workspaceFolder}",
+            "env": { "EZRA_TEST": "1" },
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "name": "EZRA: Run Current Test File",
+            "type": "node",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "env": { "EZRA_TEST": "1" },
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "name": "EZRA: E2E Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/test-e2e.js",
+            "cwd": "${workspaceFolder}",
+            "env": { "EZRA_TEST": "1" },
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "name": "EZRA: UAT Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/test-uat.js",
+            "cwd": "${workspaceFolder}",
+            "env": { "EZRA_TEST": "1" },
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "name": "EZRA: Lint All",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/lint-all.js",
+            "cwd": "${workspaceFolder}",
+            "env": { "EZRA_TEST": "1" },
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**"]
+        }
+    ]
+}

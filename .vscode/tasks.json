@@ -1,0 +1,129 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "EZRA: Run All Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/run-tests.js"],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: Lint All",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/lint-all.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: E2E Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-e2e.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: UAT Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-uat.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: Structure Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-structure.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: Command Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-commands.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: Hook Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-hooks.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: CLI Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-cli.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: Template Tests",
+            "type": "shell",
+            "command": "node",
+            "args": ["tests/test-templates.js"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "EZRA: Run Current Test File",
+            "type": "shell",
+            "command": "node",
+            "args": ["${file}"],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

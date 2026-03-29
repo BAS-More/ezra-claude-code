@@ -1,3 +1,15 @@
 {
-    "prisma.pinToPrisma6": true
+    "prisma.pinToPrisma6": true,
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": false,
+    "python.testing.unittestArgs": [],
+    "python.testing.pytestArgs": [],
+    "python.testing.autoTestDiscoverOnSaveEnabled": false,
+    "files.associations": {
+        "tests/*.js": "javascript"
+    },
+    "search.exclude": {
+        "**/test-results/**": true,
+        "**/.ezra/**": true
+    }
 }
