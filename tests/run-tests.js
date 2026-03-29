@@ -49,6 +49,7 @@ const SUITES = [
   { name: 'V7-Execution', script: 'test-v7-execution.js' },
   { name: 'V7-PhaseGate', script: 'test-v7-phase-gate.js' },
   { name: 'V7-Notifier', script: 'test-v7-notifier.js' },
+  { name: 'V7-CommitEngine', script: 'test-v7-commit-engine.js' },
 
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },

@@ -187,6 +187,20 @@ const DEFAULTS = {
     backup_retention: 5,
     sync_on_change: false,
   },
+  github: {
+    token: null,
+    repo_owner: null,
+    repo_name: null,
+    base_branch: 'main',
+    auto_merge_on_green: false,
+    require_review: true,
+  },
+  deploy: {
+    target: 'custom',
+    hook_url: null,
+    auto_deploy: false,
+    production_approval: true,
+  },
 };
 
 // ─── YAML Parser (simple, no deps) ──────────────────────────────
