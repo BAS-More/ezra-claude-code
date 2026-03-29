@@ -55,7 +55,7 @@ description: Full multi-agent codebase analysis
 | Integration | sync, handoff, help |
 | Governance | oversight, compliance |
 | Settings | settings |
-| Intelligence | learn, library, research |
+| Intelligence | learn, library, research, interview |
 | Project Mgmt | pm, progress, plan |
 | Agents | agents |
 | Cost | cost, portfolio |
