@@ -241,6 +241,9 @@ async function autoMerge(projectDir, prNumber) {
   }
 }
 
+// batchCommits is an alias for batchFiles (groups file arrays into commit batches)
+const batchCommits = batchFiles;
+
 module.exports = {
   MAX_FILES_PER_BATCH,
   PROTECTED_BRANCHES,
@@ -248,6 +251,7 @@ module.exports = {
   getChangedFiles,
   getStagedFiles,
   batchFiles,
+  batchCommits,
   generateCommitMessage,
   inferCommitType,
   inferScope,

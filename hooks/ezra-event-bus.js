@@ -164,6 +164,11 @@ function clearQueue(projectDir) {
   } catch { /* silent */ }
 }
 
+// getQueue is an alias for getUnprocessed (returns all pending events)
+function getQueue(projectDir, eventType) {
+  return getUnprocessed(projectDir, eventType);
+}
+
 module.exports = {
   EVENT_TYPES,
   on,
@@ -172,6 +177,7 @@ module.exports = {
   persistEvent,
   markProcessed,
   getUnprocessed,
+  getQueue,
   clearQueue,
 };
 
