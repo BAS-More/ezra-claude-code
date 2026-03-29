@@ -24,7 +24,17 @@
       "Bash(npm list:*)",
       "Bash(mkdir -p /c/tmp/ezra-docx)",
       "Bash(npm init:*)",
-      "Bash(node generate.js)"
+      "Bash(node generate.js)",
+      "Bash(taskkill //F //IM \"node.exe\" //FI \"WINDOWTITLE eq npm\")",
+      "Bash(taskkill //PID 25536 //F)",
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/package.json''\\).version\\)\")",
+      "Bash(node bin/cli.js --info)",
+      "Bash(node /c/Dev/Ezra/hooks/ezra-guard.js)",
+      "Bash(node /c/Dev/Ezra/hooks/ezra-version-hook.js)",
+      "Bash(node /c/Dev/Ezra/hooks/ezra-dash-hook.js)",
+      "Bash(node /c/Dev/Ezra/hooks/ezra-drift-hook.js)",
+      "Bash(node $f)",
+      "Bash(wc -l /c/Dev/Ezra/commands/ezra/*.md)"
     ]
   }
 }

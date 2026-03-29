@@ -24,7 +24,7 @@ try { _fmt = require('./ezra-error-codes').formatError; } catch { _fmt = (c) => 
 
 // YAML parser — simple built-in, zero dependencies
 function parseYaml(text) {
-  // Parse YAML-like key: value pairs
+  // Parse YAML-like key: value pairs (top-level only)
   const result = {};
   const lines = text.split('\n');
   let currentKey = null;
@@ -32,16 +32,21 @@ function parseYaml(text) {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) continue;
-    const kvMatch = trimmed.match(/^(\w+):\s*(.*)$/);
-    if (kvMatch) {
-      if (/^(__proto__|constructor|prototype)$/.test(kvMatch[1])) continue;
-      currentKey = kvMatch[1];
-      const val = kvMatch[2].trim();
-      if (val) { result[currentKey] = val; currentList = null; }
-      else { result[currentKey] = []; currentList = currentKey; }
+    // Only treat unindented lines as top-level keys
+    const indent = line.match(/^(\s*)/)[1].length;
+    if (indent === 0) {
+      const kvMatch = trimmed.match(/^(\w+):\s*(.*)$/);
+      if (kvMatch) {
+        if (/^(__proto__|constructor|prototype)$/.test(kvMatch[1])) continue;
+        currentKey = kvMatch[1];
+        const val = kvMatch[2].trim();
+        if (val) { result[currentKey] = val; currentList = null; }
+        else { result[currentKey] = []; currentList = currentKey; }
+      }
     } else if (trimmed.startsWith('- ') && currentList) {
       result[currentList].push(trimmed.slice(2).trim());
     }
+    // Indented sub-keys (e.g. reason: under a list item) are skipped — not top-level
   }
   return result;
 }
@@ -113,7 +118,7 @@ process.stdin.on('end', () => {
     }
 
     // Schema validation — warn on missing required keys or unknown top-level keys
-    const KNOWN_KEYS = ['protected_paths', 'allowed_patterns', 'auto_approve', 'version', 'project', 'settings', 'name', 'language', 'standards', 'strict_types', 'no_any'];
+    const KNOWN_KEYS = ['protected_paths', 'allowed_patterns', 'auto_approve', 'version', 'project', 'settings', 'name', 'language', 'standards', 'strict_types', 'no_any', 'project_phase', 'reason'];
     if (governance && typeof governance === 'object') {
       if (!governance.protected_paths) {
         const msg = _fmt('GUARD_004', { key: 'protected_paths' });
