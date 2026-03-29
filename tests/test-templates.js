@@ -17,7 +17,7 @@ function test(name, fn) {
 
 function assert(condition, msg) { if (!condition) throw new Error(msg); }
 
-const EXPECTED = [
+const PROCESS_TEMPLATES = [
   'full-remediation.yaml',
   'release-prep.yaml',
   'sprint-close.yaml',
@@ -25,12 +25,17 @@ const EXPECTED = [
   'onboarding.yaml',
   'plan-review.yaml',
   'phase-gate.yaml',
+];
+
+const DATA_TEMPLATES = [
   'achievements.yaml',
 ];
 
+const EXPECTED = [...PROCESS_TEMPLATES, ...DATA_TEMPLATES];
+
 const REQUIRED_FIELDS = ['name', 'description', 'version', 'steps'];
 
-for (const tmpl of EXPECTED) {
+for (const tmpl of PROCESS_TEMPLATES) {
   const filePath = path.join(TMPL_DIR, tmpl);
 
   test(`${tmpl} exists`, () => {
@@ -62,7 +67,6 @@ for (const tmpl of EXPECTED) {
 
   test(`${tmpl} step types are valid`, () => {
     const content = fs.readFileSync(filePath, 'utf8');
-    const validTypes = ['command', 'ezra', 'script', 'check', 'approval', 'report'];
     const typeMatches = content.match(/type: (\w+)/g) || [];
     for (const match of typeMatches) {
       if (match === 'type: command' || match === 'type: ezra' || match === 'type: script' ||
@@ -74,6 +78,17 @@ for (const tmpl of EXPECTED) {
   test(`${tmpl} has guard_rails section`, () => {
     const content = fs.readFileSync(filePath, 'utf8');
     assert(content.includes('guard_rails:'), `${tmpl} missing guard_rails section`);
+  });
+}
+
+for (const tmpl of DATA_TEMPLATES) {
+  const filePath = path.join(TMPL_DIR, tmpl);
+  test(`${tmpl} exists`, () => {
+    assert(fs.existsSync(filePath), `${tmpl} not found`);
+  });
+  test(`${tmpl} has version field`, () => {
+    const content = fs.readFileSync(filePath, 'utf8');
+    assert(content.includes('version:'), `${tmpl} missing version field`);
   });
 }
 

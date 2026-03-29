@@ -155,7 +155,9 @@ test('parseTemplate: returns null for missing file', () => {
 test('parseTemplate: parses all existing templates', () => {
   const ezraRoot = path.resolve(__dirname, '..');
   const dir = path.join(ezraRoot, 'templates');
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml'));
+  // Skip data templates that are not process templates (no steps)
+  const DATA_TEMPLATES = ['achievements.yaml'];
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml') && !DATA_TEMPLATES.includes(f));
   for (const f of files) {
     const t = wf.parseTemplate(path.join(dir, f));
     assert(t, 'Should parse ' + f);
@@ -250,7 +252,9 @@ test('validateTemplate: null template returns errors', () => {
 
 test('validateTemplate: all existing templates are valid', () => {
   const ezraRoot = path.resolve(__dirname, '..');
-  const templates = wf.listTemplates(ezraRoot);
+  // Skip data templates that are not process templates (no steps)
+  const DATA_TEMPLATES = ['achievements'];
+  const templates = wf.listTemplates(ezraRoot).filter(t => !DATA_TEMPLATES.includes(t.name));
   for (const tInfo of templates) {
     const t = wf.getTemplate(ezraRoot, tInfo.name);
     const errors = wf.validateTemplate(t);
