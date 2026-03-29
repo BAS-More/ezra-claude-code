@@ -109,7 +109,8 @@ test('isDuplicate is a function', () => {
 });
 
 test('isDuplicate returns boolean', () => {
-  const r = isDuplicate('test content', []);
+  // isDuplicate(projectDir, content) — projectDir is path, content is string
+  const r = isDuplicate('/tmp/test-project', 'test content for dedup check');
   assert(typeof r === 'boolean');
 });
 
@@ -135,6 +136,7 @@ test('calculateSimilarity handles empty strings', () => {
 
 // --- Report ---
 console.log(`\n  test-v6-memory-hook: ${passed} passed, ${failed} failed`);
+console.log(`  test-v6-memory-hook: PASSED: ${passed} FAILED: ${failed}`);
 if (failed > 0) {
   results.filter(r => r.status === 'FAIL').forEach(r => console.log(`    ✗ ${r.name}: ${r.error}`));
 }

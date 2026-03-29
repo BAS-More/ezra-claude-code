@@ -51,19 +51,19 @@ test('logActivity is a function', () => {
 });
 
 // --- parseCheckInterval ---
-test('parseCheckInterval parses minutes', () => {
-  const ms = parseCheckInterval('5m');
-  assert(ms === 5 * 60 * 1000, `expected 300000, got ${ms}`);
+test('parseCheckInterval parses every_N_tasks', () => {
+  const n = parseCheckInterval('every_10_tasks');
+  assert(n === 10, `expected 10, got ${n}`);
 });
 
-test('parseCheckInterval parses hours', () => {
-  const ms = parseCheckInterval('2h');
-  assert(ms === 2 * 60 * 60 * 1000, `expected 7200000, got ${ms}`);
+test('parseCheckInterval parses every_1_tasks', () => {
+  const n = parseCheckInterval('every_1_tasks');
+  assert(n === 1, `expected 1, got ${n}`);
 });
 
-test('parseCheckInterval parses seconds', () => {
-  const ms = parseCheckInterval('30s');
-  assert(ms === 30 * 1000, `expected 30000, got ${ms}`);
+test('parseCheckInterval passes through numbers', () => {
+  const n = parseCheckInterval(42);
+  assert(n === 42, `expected 42, got ${n}`);
 });
 
 test('parseCheckInterval returns default for invalid input', () => {
@@ -83,13 +83,15 @@ test('getActivityCount returns a number', () => {
 });
 
 // --- hookOutput ---
-test('hookOutput returns a string', () => {
+test('hookOutput returns an object', () => {
   const out = hookOutput({ tool: 'test', event: 'test' });
-  assert(typeof out === 'string' || out === null || out === undefined);
+  assert(typeof out === 'object' && out !== null, `expected object, got ${typeof out}`);
+  assert(out.hookSpecificOutput, 'should have hookSpecificOutput');
 });
 
 // --- Report ---
 console.log(`\n  test-v6-progress-hook: ${passed} passed, ${failed} failed`);
+console.log(`  test-v6-progress-hook: PASSED: ${passed} FAILED: ${failed}`);
 if (failed > 0) {
   results.filter(r => r.status === 'FAIL').forEach(r => console.log(`    ✗ ${r.name}: ${r.error}`));
 }

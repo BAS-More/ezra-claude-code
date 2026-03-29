@@ -85,6 +85,7 @@ test('hook exits cleanly with invalid JSON stdin', () => {
 
 // --- Report ---
 console.log(`\n  test-v6-version-hook: ${passed} passed, ${failed} failed`);
+console.log(`  test-v6-version-hook: PASSED: ${passed} FAILED: ${failed}`);
 if (failed > 0) {
   results.filter(r => r.status === 'FAIL').forEach(r => console.log(`    ✗ ${r.name}: ${r.error}`));
 }
