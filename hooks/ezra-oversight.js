@@ -24,9 +24,10 @@ const fs = require('fs');
 const path = require('path');
 
 // EZRA feedback helpers (non-blocking)
-let _log, _fmt;
+let _log, _fmt, _eventBus;
 try { _log = require('./ezra-hook-logger').logHookEvent; } catch { _log = () => {}; }
 try { _fmt = require('./ezra-error-codes').formatError; } catch { _fmt = (c) => 'EZRA: ' + c; }
+try { _eventBus = require('./ezra-event-bus'); } catch { _eventBus = null; }
 
 // ─── Settings Loader (inline, no external deps) ─────────────────
 
@@ -370,6 +371,16 @@ function decide(violations, level) {
     case 'phase-gate': {
       // Hard block — cannot be skipped. Used during plan-driven execution phase boundaries.
       const msg = `PHASE-GATE: Hard block — ${violations.length} issue(s) must be resolved before phase can advance — ${summary}`;
+      // Emit decision_needed event so notification system can alert user
+      if (_eventBus) {
+        try {
+          _eventBus.emit(process.cwd(), 'decision_needed', {
+            message: msg,
+            violation_count: violations.length,
+            summary,
+          });
+        } catch { /* non-blocking */ }
+      }
       return { decision: 'deny', message: msg };
     }
     case 'strict': {

@@ -389,9 +389,9 @@ test('ezra-library.js uses strict mode', () => {
   assert(c.includes(String.fromCharCode(39)+'use strict'+String.fromCharCode(39)), 'No strict mode');
 });
 
-test('37 hook files exist', () => {
+test('39 hook files exist', () => {
   const files = fs.readdirSync(path.join(ROOT, 'hooks')).filter(f => f.endsWith('.js'));
-  assert(files.length === 37, 'Expected 37 hooks, found ' + files.length + ': ' + files.join(', '));
+  assert(files.length === 39, 'Expected 39 hooks, found ' + files.length + ': ' + files.join(', '));
 });
 
 test('40 command files exist', () => {

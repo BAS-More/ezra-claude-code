@@ -98,6 +98,22 @@ const DEFAULTS = {
     specialist_routing: false,
     mah_endpoint: 'http://localhost:3001',
   },
+  notifications: {
+    email: {
+      provider: 'resend',
+      api_key: null,
+      to: null,
+      from: null,
+    },
+    slack: {
+      webhook_url: null,
+    },
+    teams: {
+      webhook_url: null,
+    },
+    dashboard: true,
+    on_events: ['decision_needed', 'phase_complete', 'gate_failed', 'gate_passed', 'deployment_complete'],
+  },
   project_manager: {
     enabled: true,
     mode: 'hybrid',
@@ -476,6 +492,15 @@ function getCloudSync(projectDir) {
 function getLibrary(projectDir) {
   return loadSettings(projectDir).library;
 }
+
+function getNotifications(projectDir) {
+  return loadSettings(projectDir).notifications;
+}
+
+function getExecution(projectDir) {
+  return loadSettings(projectDir).execution;
+}
+
 // ─── Exports (for require()) ─────────────────────────────────────
 
 module.exports = {
@@ -494,6 +519,8 @@ module.exports = {
   getDashboard,
   getCloudSync,
   getLibrary,
+  getNotifications,
+  getExecution,
   parseYamlSimple,
   parseValue,
   deepMerge,
