@@ -161,7 +161,19 @@ workflows:
   approval_gates: false
 ```
 
-## Phase 6: Report
+## Phase 6: Update .gitignore
+
+Add `.ezra/settings.yaml` to the project's `.gitignore` (or create one if absent). This file can contain API keys, tokens, and per-developer preferences that must not be committed.
+
+```
+# Append to .gitignore
+# EZRA per-project settings (may contain secrets/tokens)
+.ezra/settings.yaml
+```
+
+Also add `.ezra/execution/` if the project will use autonomous execution mode (contains run state).
+
+## Phase 7: Report
 
 Present a compact summary:
 

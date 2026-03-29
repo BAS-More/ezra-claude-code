@@ -14,7 +14,7 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D16.7-brightgreen)](https://nodejs.org)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/BAS-More/ezra-claude-code)
 
-EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 39 slash commands, 4 subagent engines with 100 specialized roles, 24 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
+EZRA is a multi-agent codebase governance framework for [Claude Code](https://claude.ai/code). It provides 39 slash commands, 4 subagent engines with 100 specialized roles, 25 lifecycle hooks, 55 SDLC document types, 5-pillar health enforcement, autonomous process execution with guard rails, and multi-project portfolio orchestration.
 
 ### Identity
 

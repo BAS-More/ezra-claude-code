@@ -10,7 +10,7 @@ EZRA is a multi-agent codebase governance framework implemented as a set of Mark
 │                                                             │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
 │  │ Commands │  │  Hooks   │  │  Agents  │  │   Skill   │  │
-│  │ (39 .md) │  │ (24 .js) │  │ (4 .md)  │  │ (SKILL.md)│  │
+│  │ (39 .md) │  │ (25 .js) │  │ (4 .md)  │  │ (SKILL.md)│  │
 │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────────┘  │
 │       │              │              │                        │
 │       └──────────────┴──────────────┘                       │
@@ -24,7 +24,7 @@ EZRA is a multi-agent codebase governance framework implemented as a set of Mark
 
 ## Component Architecture
 
-### 1. Commands (22 Markdown files)
+### 1. Commands (39 Markdown files)
 
 Location: `commands/ezra/*.md`
 
@@ -41,20 +41,29 @@ description: Full multi-agent codebase analysis
 
 **Design principle:** Commands describe *what* to do, not *how*. Claude Code's intelligence handles the execution. This makes commands portable, testable, and version-controllable.
 
-**Command categories:**
+**Command categories (39 total):**
 
 | Category | Commands |
 |----------|----------|
-| Setup | init, bootstrap, claude-md |
+| Setup | init, bootstrap, claude-md, install |
 | Analysis | scan, review, guard, health, advisor |
 | Decisions | decide |
 | Documentation | doc, doc-check, doc-sync, doc-approve |
 | Monitoring | status, dash |
-| Automation | process, auto |
+| Automation | process, auto, multi |
 | Versioning | version, reconcile |
-| Integration | sync, multi, help |
+| Integration | sync, handoff, help |
+| Governance | oversight, compliance |
+| Settings | settings |
+| Intelligence | learn, library, research |
+| Project Mgmt | pm, progress, plan |
+| Agents | agents |
+| Cost | cost, portfolio |
+| Workflows | workflow |
+| Memory | memory |
+| Licensing | license |
 
-### 2. Hooks (5 Node.js scripts)
+### 2. Hooks (24 Node.js scripts)
 
 Location: `hooks/*.js`
 
@@ -76,13 +85,37 @@ Event occurs → Claude Code pipes JSON to stdin → Hook processes → JSON to 
 **Hook event mapping:**
 
 ```
-SessionStart ──► ezra-dash-hook.js (display project status)
+SessionStart ──► ezra-dash-hook.js    (display project status + health)
+               ► ezra-tier-gate.js    (license tier enforcement)
+               ► ezra-memory-hook.js  (auto-capture context/decisions)
+               ► ezra-progress-hook.js (session progress tracking)
 
-PreToolUse ────► ezra-guard.js (check protected paths)
+PreToolUse ────► ezra-guard.js        (check protected paths)
 
-PostToolUse ───► ezra-drift-hook.js (track doc staleness)
+PostToolUse ───► ezra-drift-hook.js   (track doc staleness)
                ► ezra-version-hook.js (auto-version .ezra/ changes)
                ► ezra-avios-bridge.js (sync decisions/risks)
+```
+
+**Library hooks (required by commands):**
+
+```
+ezra-settings.js       — 3-layer settings merge (defaults → global → project)
+ezra-settings-writer.js — Persistent settings save
+ezra-oversight.js      — Intervention levels + violation tracking
+ezra-agents.js         — Agent orchestration + role registry (100 roles)
+ezra-library.js        — Best practice library
+ezra-workflows.js      — Workflow template engine
+ezra-planner.js        — Planning + milestone engine
+ezra-pm.js             — Project management + reporting
+ezra-memory.js         — Agent memory system
+ezra-dashboard-data.js — Dashboard data aggregation + export
+ezra-cloud-sync.js     — Backup/restore/manifest
+ezra-http.js           — SSRF-protected HTTP client
+ezra-license.js        — License management (core/pro/enterprise)
+ezra-installer.js      — CLI install/uninstall logic
+ezra-hook-logger.js    — Structured JSON event logger
+ezra-error-codes.js    — Error code catalog + formatting
 ```
 
 **Critical rules:**
