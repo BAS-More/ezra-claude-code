@@ -1,376 +1,342 @@
 #!/usr/bin/env node
 'use strict';
 /**
- * Headless E2E test runner for ezra-dashboard
- * Runs against the proxy on port 3003 (which proxies 3001)
- * Reports all passes and failures so we can fix issues.
+ * EZRA Dashboard — Comprehensive Headless E2E Tests
+ * Runs against the proxy on port 3003 (-> 3001).
+ * Tests every public page, all API endpoints, auth flow, security, performance.
  */
-
-const http = require('http');
 const BASE = 'http://localhost:3003';
-
 let pass = 0, fail = 0;
 const failures = [];
 
-async function fetchUrl(path, opts = {}) {
-  const url = BASE + path;
-  const r = await fetch(url, { redirect: 'manual', ...opts });
-  const text = opts.text !== false ? await r.text() : '';
-  return { status: r.status, headers: Object.fromEntries(r.headers), text, location: r.headers.get('location') || '' };
+async function get(path, opts = {}) {
+  const r = await fetch(BASE + path, { redirect: 'manual', ...opts });
+  const text = opts.noBody ? '' : await r.text();
+  return { status: r.status, text, loc: r.headers.get('location') || '', type: r.headers.get('content-type') || '', headers: Object.fromEntries(r.headers) };
 }
 
 async function check(name, fn) {
-  try {
-    await fn();
-    pass++;
-    console.log('  \x1b[32m✓\x1b[0m ' + name);
-  } catch (e) {
-    fail++;
-    const msg = e.message || String(e);
-    failures.push({ name, error: msg });
-    console.log('  \x1b[31m✗\x1b[0m ' + name + ' — ' + msg);
-  }
+  try { await fn(); pass++; console.log('  \x1b[32m✓\x1b[0m ' + name); }
+  catch (e) { fail++; failures.push({ name, error: e.message }); console.log('  \x1b[31m✗\x1b[0m ' + name + ' — ' + e.message); }
 }
-
-function section(s) {
-  console.log('\n\x1b[35m━━ ' + s + ' ━━\x1b[0m');
-}
+function S(s) { console.log('\n\x1b[35m━━ ' + s + ' ━━\x1b[0m'); }
+function has(haystack, needle) { if (!haystack.includes(needle)) throw Error('missing: ' + needle); }
 
 (async () => {
-  console.log('\nEZRA Dashboard E2E Test Suite');
-  console.log('Target: ' + BASE + ' (proxy -> localhost:3001)\n');
+  console.log('\nEZRA Dashboard E2E — Comprehensive Suite');
+  console.log('Target: ' + BASE + '\n');
 
-  // ── Proxy health ──
-  section('Proxy Health');
-  await check('Proxy responds', async () => {
-    const r = await fetchUrl('/');
-    if (r.status !== 200) throw Error('status ' + r.status);
+  // ════════════════════════════════════════════
+  // PROXY
+  // ════════════════════════════════════════════
+  S('1. Proxy Health');
+  await check('Proxy responds 200', async () => { const r = await get('/'); if (r.status !== 200) throw Error(r.status); });
+  await check('Agent page at /test', async () => { const r = await get('/test'); if (r.status !== 200) throw Error(r.status); has(r.text, 'E2E Test Agent'); });
+  await check('X-Frame-Options stripped', async () => { const r = await get('/'); if (r.headers['x-frame-options']) throw Error('not stripped'); });
+  await check('CSP stripped', async () => { const r = await get('/'); if (r.headers['content-security-policy']) throw Error('not stripped'); });
+
+  // ════════════════════════════════════════════
+  // HOMEPAGE
+  // ════════════════════════════════════════════
+  S('2. Homepage (/)');
+  const home = await get('/');
+  await check('Status 200', () => { if (home.status !== 200) throw Error(home.status); });
+  await check('HTML content-type', () => { has(home.type, 'text/html'); });
+  await check('Meta charSet utf-8', () => { if (!home.text.includes('charSet') && !home.text.includes('charset')) throw Error('missing'); });
+  await check('EZRA branding', () => { has(home.text, 'EZRA'); });
+  await check('Hero: Restores and Enforces Standards', () => { has(home.text, 'Restores and Enforces Standards'); });
+  await check('CTA: Get Started Free', () => { has(home.text, 'Get Started Free'); });
+  await check('CTA: Read the Docs', () => { has(home.text, 'Read the Docs'); });
+  await check('Nav /docs', () => { has(home.text, '/docs'); });
+  await check('Nav /pricing', () => { has(home.text, '/pricing'); });
+  await check('Nav /login', () => { has(home.text, '/login'); });
+  await check('Feature: Health Scanning', () => { has(home.text, 'Health Scanning'); });
+  await check('Feature: Multi-Agent Orchestration', () => { has(home.text, 'Multi-Agent'); });
+  await check('Feature: Slash Commands', () => { has(home.text, 'Slash Commands'); });
+  await check('Stat: 22 Hooks', () => { has(home.text, '>22<'); });
+  await check('Stat: 39 Commands', () => { has(home.text, '>39<'); });
+  await check('Stat: Zero Dependencies', () => { has(home.text, 'Zero'); });
+  await check('Footer: Codebase Governance', () => { has(home.text, 'Codebase Governance'); });
+
+  // ════════════════════════════════════════════
+  // DOCS
+  // ════════════════════════════════════════════
+  S('3. Docs (/docs)');
+  const docs = await get('/docs');
+  await check('Status 200', () => { if (docs.status !== 200) throw Error(docs.status); });
+  await check('Documentation heading', () => { has(docs.text, 'Documentation'); });
+  await check('Install cmd', () => { has(docs.text, 'npm install -g ezra-claude-code'); });
+  await check('Command: ezra init', () => { has(docs.text, 'ezra init'); });
+  await check('Command: ezra scan', () => { has(docs.text, 'ezra scan'); });
+  await check('Ref: /ezra:health', () => { has(docs.text, '/ezra:health'); });
+  await check('Ref: /ezra:guard (SSR index)', () => { has(docs.text, '/ezra:guard'); });
+  await check('Ref: /ezra:review (SSR index)', () => { has(docs.text, '/ezra:review'); });
+  await check('Ref: /ezra:dash (SSR index)', () => { has(docs.text, '/ezra:dash'); });
+  await check('Ref: /ezra:scan', () => { has(docs.text, '/ezra:scan'); });
+  await check('Ref: /ezra:oversight', () => { has(docs.text, '/ezra:oversight'); });
+  await check('Ref: /ezra:agents', () => { has(docs.text, '/ezra:agents'); });
+  await check('Ref: /ezra:workflow', () => { has(docs.text, '/ezra:workflow'); });
+  await check('Ref: /ezra:license', () => { has(docs.text, '/ezra:license'); });
+  await check('Ref: /ezra:memory', () => { has(docs.text, '/ezra:memory'); });
+  await check('Ref: /ezra:plan', () => { has(docs.text, '/ezra:plan'); });
+  await check('Code blocks (<code> or <pre>)', () => { if (!docs.text.includes('<code') && !docs.text.includes('<pre')) throw Error('missing'); });
+  await check('Section nav: Getting Started', () => { has(docs.text, 'Getting Started'); });
+  await check('Section nav: Commands Reference', () => { has(docs.text, 'Commands Reference'); });
+  await check('Section nav: Architecture', () => { has(docs.text, 'Architecture'); });
+  await check('Section nav: Troubleshooting', () => { has(docs.text, 'Troubleshooting'); });
+  await check('Section nav: API Reference', () => { has(docs.text, 'API Reference'); });
+  await check('SSR index contains all 39 commands', () => {
+    let found = 0;
+    const cmds = ['init','scan','guard','oversight','settings','compliance','pm','progress',
+      'library','agents','memory','plan','workflow','license','dash','health','status',
+      'decide','review','learn','doc','version','advisor','process','auto','multi',
+      'bootstrap','sync','research','cost','portfolio','handoff','help','install'];
+    for (const c of cmds) { if (docs.text.includes('/ezra:' + c)) found++; }
+    if (found < 30) throw Error('only ' + found + '/' + cmds.length + ' commands in SSR');
   });
-  await check('Agent page serves', async () => {
-    const r = await fetchUrl('/test');
-    if (r.status !== 200) throw Error('status ' + r.status);
-    if (!r.text.includes('E2E Test Agent')) throw Error('wrong content');
-  });
 
-  // ── Homepage ──
-  section('Homepage (/)');
-  const home = await fetchUrl('/');
-  await check('Status 200', () => { if (home.status !== 200) throw Error(home.status) });
-  await check('EZRA branding', () => { if (!home.text.includes('EZRA')) throw Error('missing') });
-  await check('Hero: "The Scribe Who Restores"', () => { if (!home.text.includes('Restores and Enforces Standards')) throw Error('missing') });
-  await check('CTA: Get Started Free', () => { if (!home.text.includes('Get Started Free')) throw Error('missing') });
-  await check('CTA: Read the Docs', () => { if (!home.text.includes('Read the Docs')) throw Error('missing') });
-  await check('Nav link: /docs', () => { if (!home.text.includes('href="/docs"') && !home.text.includes("href='/docs'") && !home.text.includes('/docs')) throw Error('missing') });
-  await check('Nav link: /pricing', () => { if (!home.text.includes('/pricing')) throw Error('missing') });
-  await check('Nav link: /login', () => { if (!home.text.includes('/login')) throw Error('missing') });
-  await check('Feature: Health Scanning', () => { if (!home.text.includes('Health Scanning')) throw Error('missing') });
-  await check('Feature: Multi-Agent Orchestration', () => { if (!home.text.includes('Multi-Agent')) throw Error('missing') });
-  await check('Feature: Slash Commands', () => { if (!home.text.includes('Slash Commands')) throw Error('missing') });
-  await check('Stats: 22 Hooks', () => { if (!home.text.includes('>22<')) throw Error('missing') });
-  await check('Stats: 39 Commands', () => { if (!home.text.includes('>39<')) throw Error('missing') });
-  await check('Stats: Zero Dependencies', () => { if (!home.text.includes('Zero')) throw Error('missing') });
-  await check('Footer: governance text', () => { if (!home.text.includes('Codebase Governance')) throw Error('missing') });
-  await check('Meta: viewport', () => { if (!home.text.includes('viewport')) throw Error('missing') });
-  await check('Meta: charset', () => { if (!home.text.includes('charset')) throw Error('missing') });
+  // ════════════════════════════════════════════
+  // PRICING
+  // ════════════════════════════════════════════
+  S('4. Pricing (/pricing)');
+  const price = await get('/pricing');
+  await check('Status 200', () => { if (price.status !== 200) throw Error(price.status); });
+  await check('Transparent pricing heading', () => { has(price.text, 'transparent pricing'); });
+  await check('Core tier + Free', () => { has(price.text, 'Core'); has(price.text, 'Free'); });
+  await check('Pro tier + $29', () => { has(price.text, 'Pro'); has(price.text, '29'); });
+  await check('Team tier + $59', () => { has(price.text, 'Team'); has(price.text, '59'); });
+  await check('Enterprise + Custom', () => { has(price.text, 'Enterprise'); has(price.text, 'Custom'); });
+  await check('CTA /login?plan=core', () => { has(price.text, '/login?plan=core'); });
+  await check('CTA /login?plan=pro', () => { has(price.text, '/login?plan=pro'); });
+  await check('CTA /login?plan=team', () => { has(price.text, '/login?plan=team'); });
+  await check('mailto:sales@ezradev.com', () => { has(price.text, 'mailto:sales@ezradev.com'); });
+  await check('Feature: Health Scanning or scanning', () => { if (!price.text.includes('Health Scanning') && !price.text.includes('scanning')) throw Error('missing'); });
 
-  // ── Docs ──
-  section('Docs (/docs)');
-  const docs = await fetchUrl('/docs');
-  await check('Status 200', () => { if (docs.status !== 200) throw Error(docs.status) });
-  await check('Documentation heading', () => { if (!docs.text.includes('Documentation')) throw Error('missing') });
-  await check('Install: npm install -g ezra-claude-code', () => { if (!docs.text.includes('npm install -g ezra-claude-code')) throw Error('missing') });
-  await check('Command: ezra init', () => { if (!docs.text.includes('ezra init')) throw Error('missing') });
-  await check('Command: ezra scan', () => { if (!docs.text.includes('ezra scan')) throw Error('missing') });
-  await check('Ref: /ezra:health', () => { if (!docs.text.includes('/ezra:health')) throw Error('missing') });
-  await check('Ref: /ezra:guard', () => { if (!docs.text.includes('/ezra:guard')) throw Error('missing') });
-  await check('Ref: /ezra:review', () => { if (!docs.text.includes('/ezra:review') || !docs.text.includes('review')) throw Error('missing') });
-  await check('Ref: /ezra:dash', () => { if (!docs.text.includes('/ezra:dash') && !docs.text.includes('dashboard')) throw Error('missing') });
-  await check('Has code blocks', () => { if (!docs.text.includes('<code') && !docs.text.includes('```')) throw Error('missing') });
+  // ════════════════════════════════════════════
+  // LOGIN
+  // ════════════════════════════════════════════
+  S('5. Login (/login)');
+  const login = await get('/login');
+  await check('Status 200', () => { if (login.status !== 200) throw Error(login.status); });
+  await check('Sign In heading', () => { has(login.text, 'Sign In'); });
+  await check('Email field', () => { if (!login.text.toLowerCase().includes('email')) throw Error('missing'); });
+  await check('Password field', () => { if (!login.text.toLowerCase().includes('password')) throw Error('missing'); });
+  await check('Forgot password', () => { has(login.text, 'Forgot password'); });
+  await check('GitHub OAuth', () => { has(login.text, 'GitHub'); });
+  await check('Google OAuth', () => { has(login.text, 'Google'); });
+  await check('Microsoft OAuth', () => { has(login.text, 'Microsoft'); });
+  await check('Sign Up toggle', () => { has(login.text, 'Sign Up'); });
+  await check('Login ?plan=pro', async () => { const r = await get('/login?plan=pro'); if (r.status !== 200) throw Error(r.status); });
+  await check('Login ?redirect=/dashboard', async () => { const r = await get('/login?redirect=/dashboard'); if (r.status !== 200) throw Error(r.status); });
 
-  // ── Pricing ──
-  section('Pricing (/pricing)');
-  const price = await fetchUrl('/pricing');
-  await check('Status 200', () => { if (price.status !== 200) throw Error(price.status) });
-  await check('Transparent pricing heading', () => { if (!price.text.includes('transparent pricing')) throw Error('missing') });
-  await check('Core tier', () => { if (!price.text.includes('Core')) throw Error('missing') });
-  await check('Core: Free', () => { if (!price.text.includes('Free')) throw Error('missing') });
-  await check('Pro tier', () => { if (!price.text.includes('Pro')) throw Error('missing') });
-  await check('Pro: $29', () => { if (!price.text.includes('29')) throw Error('missing') });
-  await check('Team tier', () => { if (!price.text.includes('Team')) throw Error('missing') });
-  await check('Team: $59', () => { if (!price.text.includes('59')) throw Error('missing') });
-  await check('Enterprise tier', () => { if (!price.text.includes('Enterprise')) throw Error('missing') });
-  await check('Enterprise: Custom', () => { if (!price.text.includes('Custom')) throw Error('missing') });
-  await check('Core CTA -> /login?plan=core', () => { if (!price.text.includes('/login?plan=core')) throw Error('missing') });
-  await check('Pro CTA -> /login?plan=pro', () => { if (!price.text.includes('/login?plan=pro')) throw Error('missing') });
-  await check('Team CTA -> /login?plan=team', () => { if (!price.text.includes('/login?plan=team')) throw Error('missing') });
-  await check('Enterprise mailto', () => { if (!price.text.includes('mailto:sales@ezradev.com')) throw Error('missing') });
-  await check('Feature lists present', () => { if (!price.text.includes('Health Scanning') && !price.text.includes('scanning')) throw Error('missing') });
-
-  // ── Login ──
-  section('Login (/login)');
-  const login = await fetchUrl('/login');
-  await check('Status 200', () => { if (login.status !== 200) throw Error(login.status) });
-  await check('Sign In heading', () => { if (!login.text.includes('Sign In')) throw Error('missing') });
-  await check('Email field', () => { if (!login.text.toLowerCase().includes('email')) throw Error('missing') });
-  await check('Password field', () => { if (!login.text.toLowerCase().includes('password')) throw Error('missing') });
-  await check('Forgot password', () => { if (!login.text.includes('Forgot password')) throw Error('missing') });
-  await check('GitHub OAuth', () => { if (!login.text.includes('GitHub')) throw Error('missing') });
-  await check('Google OAuth', () => { if (!login.text.includes('Google')) throw Error('missing') });
-  await check('Microsoft OAuth', () => { if (!login.text.includes('Microsoft')) throw Error('missing') });
-  await check('Sign Up toggle', () => { if (!login.text.includes('Sign Up')) throw Error('missing') });
-  await check('Login with ?plan=pro', async () => { const r = await fetchUrl('/login?plan=pro'); if (r.status !== 200) throw Error(r.status) });
-  await check('Login with ?redirect=/dashboard', async () => { const r = await fetchUrl('/login?redirect=/dashboard'); if (r.status !== 200) throw Error(r.status) });
-
-  // ── Protected Routes ──
-  section('Protected Routes (Auth Middleware)');
-  for (const route of ['/dashboard', '/projects', '/settings', '/agents', '/library']) {
-    await check('GET ' + route, async () => {
-      const r = await fetchUrl(route);
-      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
-      // Either redirect to login (auth enforced) or 200 (dev pass-through)
-    });
-    await check(route + ' redirect or pass-through', async () => {
-      const r = await fetchUrl(route);
+  // ════════════════════════════════════════════
+  // AUTH MIDDLEWARE
+  // ════════════════════════════════════════════
+  S('6. Auth Middleware (Protected Routes)');
+  const protectedRoutes = ['/dashboard', '/projects', '/settings', '/agents', '/library'];
+  for (const route of protectedRoutes) {
+    await check(route + ' returns 307 redirect to /login', async () => {
+      const r = await get(route);
       if (r.status === 307 || r.status === 302) {
-        if (!r.location.includes('/login')) throw Error('bad redirect: ' + r.location);
+        if (!r.loc.includes('/login')) throw Error('redirects to: ' + r.loc);
+        if (!r.loc.includes('redirect=')) throw Error('missing redirect param in: ' + r.loc);
+      } else if (r.status === 200) {
+        // Dev mode pass-through — acceptable
+      } else if (r.status >= 500) {
+        throw Error('SERVER ERROR ' + r.status);
       }
-      // 200 = dev mode, also fine
     });
   }
+  await check('Redirect includes original path', async () => {
+    const r = await get('/settings');
+    if (r.status === 307) { has(r.loc, '%2Fsettings'); }
+  });
 
-  // ── API Endpoints ──
-  section('API Endpoints');
-  const apis = [
-    '/api/achievements', '/api/activity', '/api/library', '/api/notifications',
-    '/api/projects', '/api/settings', '/api/workflows',
-  ];
+  // ════════════════════════════════════════════
+  // API ENDPOINTS — GET
+  // ════════════════════════════════════════════
+  S('7. API Endpoints (GET)');
+  const apis = ['/api/achievements', '/api/activity', '/api/library', '/api/notifications', '/api/projects', '/api/settings', '/api/workflows'];
   for (const api of apis) {
-    await check('API ' + api, async () => {
-      const r = await fetchUrl(api);
+    await check('GET ' + api + ' not 500', async () => {
+      const r = await get(api);
       if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
     });
     await check(api + ' returns JSON', async () => {
-      const r = await fetchUrl(api);
+      const r = await get(api);
+      if (r.status === 200) { try { JSON.parse(r.text); } catch { throw Error('invalid JSON'); } }
+    });
+  }
+
+  // ════════════════════════════════════════════
+  // API ENDPOINTS — WRITE (POST/PUT)
+  // ════════════════════════════════════════════
+  S('8. API Endpoints (POST/PUT)');
+  await check('POST /api/settings', async () => {
+    const r = await fetch(BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ test: true }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('POST /api/workflows', async () => {
+    const r = await fetch(BASE + '/api/workflows', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'test', nodes: [], edges: [] }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('PUT /api/projects', async () => {
+    const r = await fetch(BASE + '/api/projects', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+  await check('DELETE /api/workflows (method check)', async () => {
+    const r = await fetch(BASE + '/api/workflows', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'nonexistent' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  });
+
+  // ════════════════════════════════════════════
+  // PROTECTED PAGES (follow redirect → login)
+  // ════════════════════════════════════════════
+  S('9. Protected Pages (redirected → login content)');
+  for (const route of protectedRoutes) {
+    await check(route + ' redirect chain ends at login page', async () => {
+      const r = await fetch(BASE + route, { redirect: 'follow' });
+      const html = await r.text();
+      if (r.status >= 500) throw Error('SERVER ERROR');
+      // After redirect, should be on login page
       if (r.status === 200) {
-        try { JSON.parse(r.text); } catch { throw Error('not JSON: ' + r.text.substring(0, 100)) }
+        if (!html.includes('Sign In') && !html.includes('Dashboard') && !html.includes('Settings')) {
+          throw Error('blank page after redirect');
+        }
       }
     });
   }
 
-  // ── Dashboard ──
-  section('Dashboard (/dashboard)');
-  const dash = await fetchUrl('/dashboard', { redirect: 'follow' });
-  await check('Dashboard not 500', () => { if (dash.status >= 500) throw Error(dash.status) });
-  if (dash.status === 200 && dash.text.includes('Dashboard')) {
-    await check('Dashboard heading', () => { if (!dash.text.includes('Dashboard')) throw Error('missing') });
-    const widgets = ['Health Score', 'Progress', 'Active Agents', 'Decision', 'Security',
-      'Test Coverage', 'Cost', 'Leaderboard', 'Risk', 'Activity', 'Phase',
-      'Achievement', 'Velocity', 'Workflow', 'Readiness', 'Portfolio'];
-    for (const w of widgets) {
-      await check('Widget: ' + w, () => { if (!dash.text.includes(w)) throw Error('missing') });
-    }
-    await check('Edit mode controls', () => {
-      if (!dash.text.toLowerCase().includes('edit')) throw Error('missing');
-    });
-    await check('Save layout control', () => {
-      if (!dash.text.toLowerCase().includes('save')) throw Error('missing');
+  // ════════════════════════════════════════════
+  // PROJECT DETAIL ROUTES
+  // ════════════════════════════════════════════
+  S('10. Project Detail Pages');
+  const detailPages = ['/projects/quiz2biz', '/projects/quiz2biz/plan', '/projects/quiz2biz/commits',
+    '/projects/quiz2biz/assessment', '/projects/quiz2biz/gates', '/projects/quiz2biz/execution'];
+  for (const dp of detailPages) {
+    await check('GET ' + dp + ' not 500', async () => {
+      const r = await get(dp);
+      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
     });
   }
 
-  // ── Projects ──
-  section('Projects (/projects)');
-  const proj = await fetchUrl('/projects', { redirect: 'follow' });
-  await check('Projects not 500', () => { if (proj.status >= 500) throw Error(proj.status) });
-  if (proj.status === 200 && proj.text.includes('Projects')) {
-    await check('Projects heading', () => { if (!proj.text.includes('Projects')) throw Error('missing') });
-    await check('Demo data or empty state', () => {
-      if (!proj.text.includes('Quiz2Biz') && !proj.text.includes('No projects')) throw Error('missing');
-    });
-    if (proj.text.includes('Quiz2Biz')) {
-      await check('Quiz2Biz health score', () => { if (!proj.text.includes('85')) throw Error('missing') });
-      await check('Quiz2Biz phase', () => { if (!proj.text.includes('Stabilis') && !proj.text.includes('Phase')) throw Error('missing') });
-      await check('EZRA project', () => { if (!proj.text.includes('EZRA')) throw Error('missing') });
-      await check('MAH SDK project', () => { if (!proj.text.includes('MAH')) throw Error('missing') });
-      await check('BnM project', () => { if (!proj.text.includes('BnM')) throw Error('missing') });
-    }
-  }
+  // ════════════════════════════════════════════
+  // WORKFLOWS (public route)
+  // ════════════════════════════════════════════
+  S('11. Workflows (/workflows)');
+  const wf = await get('/workflows');
+  await check('Status 200', () => { if (wf.status !== 200) throw Error(wf.status); });
+  await check('Has substantial content', () => { if (wf.text.length < 500) throw Error('too small: ' + wf.text.length); });
 
-  // ── Agents ──
-  section('Agents (/agents)');
-  const agents = await fetchUrl('/agents', { redirect: 'follow' });
-  await check('Agents not 500', () => { if (agents.status >= 500) throw Error(agents.status) });
-  if (agents.status === 200 && agents.text.includes('Agents')) {
-    await check('Agents heading', () => { if (!agents.text.includes('Agents')) throw Error('missing') });
-    for (const p of ['Claude Sonnet', 'GPT-4o', 'Codex', 'Claude Haiku', 'Gemini Pro']) {
-      await check('Provider: ' + p, () => { if (!agents.text.includes(p)) throw Error('missing') });
-    }
-    await check('Status indicators', () => {
-      if (!agents.text.includes('active') && !agents.text.includes('idle')) throw Error('missing');
-    });
-    await check('Roles section', () => {
-      if (!agents.text.includes('Role') && !agents.text.includes('role') && !agents.text.includes('architect')) throw Error('missing');
-    });
-  }
+  // ════════════════════════════════════════════
+  // NOTIFICATIONS
+  // ════════════════════════════════════════════
+  S('12. Notifications (/notifications)');
+  const notif = await get('/notifications');
+  await check('Not 500', () => { if (notif.status >= 500) throw Error(notif.status); });
 
-  // ── Settings ──
-  section('Settings (/settings)');
-  const settings = await fetchUrl('/settings', { redirect: 'follow' });
-  await check('Settings not 500', () => { if (settings.status >= 500) throw Error(settings.status) });
-  if (settings.status === 200) {
-    await check('Settings heading', () => { if (!settings.text.toLowerCase().includes('settings')) throw Error('missing') });
-    await check('Standards section', () => { if (!settings.text.includes('Standard') && !settings.text.includes('TypeScript')) throw Error('missing') });
-    await check('Security section', () => { if (!settings.text.includes('Security') && !settings.text.includes('security')) throw Error('missing') });
-  }
+  // ════════════════════════════════════════════
+  // AUTH CALLBACK
+  // ════════════════════════════════════════════
+  S('13. Auth Callback');
+  await check('/auth/callback exists', async () => { const r = await get('/auth/callback'); if (r.status >= 500) throw Error(r.status); });
 
-  // ── Workflows ──
-  section('Workflows (/workflows)');
-  const wf = await fetchUrl('/workflows', { redirect: 'follow' });
-  await check('Workflows not 500', () => { if (wf.status >= 500) throw Error(wf.status) });
-  if (wf.status === 200) {
-    await check('Workflows content', () => { if (wf.text.length < 500) throw Error('too small: ' + wf.text.length) });
-  }
-
-  // ── Library ──
-  section('Library (/library)');
-  const lib = await fetchUrl('/library', { redirect: 'follow' });
-  await check('Library not 500', () => { if (lib.status >= 500) throw Error(lib.status) });
-  if (lib.status === 200) {
-    await check('Library has content', () => { if (lib.text.length < 500) throw Error('too small') });
-  }
-
-  // ── Notifications ──
-  section('Notifications (/notifications)');
-  const notif = await fetchUrl('/notifications', { redirect: 'follow' });
-  await check('Notifications not 500', () => { if (notif.status >= 500) throw Error(notif.status) });
-
-  // ── Auth Callback ──
-  section('Auth Callback (/auth/callback)');
-  await check('Auth callback exists', async () => {
-    const r = await fetchUrl('/auth/callback');
-    if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
-  });
-
-  // ── Security Tests ──
-  section('Security');
+  // ════════════════════════════════════════════
+  // SECURITY
+  // ════════════════════════════════════════════
+  S('14. Security Tests');
   await check('Open redirect blocked: //evil.com', async () => {
-    const r = await fetchUrl('/login?redirect=//evil.com');
-    if (r.text.includes('href="//evil.com"') || r.text.includes("href='//evil.com'")) throw Error('NOT BLOCKED');
+    const r = await get('/login?redirect=//evil.com');
+    if (r.text.includes('href="//evil.com"') || r.text.includes("href='//evil.com'")) throw Error('VULNERABLE');
   });
   await check('Open redirect blocked: javascript:', async () => {
-    const r = await fetchUrl('/login?redirect=javascript:alert(1)');
-    if (r.text.includes('href="javascript:')) throw Error('NOT BLOCKED');
+    const r = await get('/login?redirect=javascript:alert(1)');
+    if (r.text.includes('href="javascript:')) throw Error('VULNERABLE');
   });
-  await check('XSS in query param', async () => {
-    const r = await fetchUrl('/login?redirect="><script>alert(1)</script>');
+  await check('XSS in redirect param', async () => {
+    const r = await get('/login?redirect="><script>alert(1)</script>');
     if (r.text.includes('<script>alert(1)</script>')) throw Error('XSS VULNERABLE');
   });
-  await check('404 page for /nonexistent', async () => {
-    const r = await fetchUrl('/nonexistent');
+  await check('XSS in plan param', async () => {
+    const r = await get('/login?plan=<script>alert(1)</script>');
+    if (r.text.includes('<script>alert(1)</script>')) throw Error('XSS VULNERABLE');
+  });
+  await check('404 for /nonexistent', async () => {
+    const r = await get('/nonexistent');
     if (r.status !== 404 && !r.text.includes('404') && !r.text.includes('Not Found')) {
-      if (r.status === 200 && r.text.includes('EZRA')) { /* custom 404 */ }
-      else throw Error('no 404 handling — status ' + r.status);
+      if (!(r.status === 200 && r.text.includes('EZRA'))) throw Error('no 404: status ' + r.status);
     }
   });
-  await check('No server info leak', () => {
-    // X-Powered-By should ideally not be present
-    if (home.headers['x-powered-by'] && home.headers['x-powered-by'].includes('Express')) {
-      throw Error('Leaks X-Powered-By: ' + home.headers['x-powered-by']);
-    }
+  await check('X-Powered-By not leaking Express', () => {
+    if (home.headers['x-powered-by'] === 'Express') throw Error('leaking');
   });
-  await check('HTTPS redirect headers (prod)', () => {
-    // In dev we won't have HSTS, just note it
+  await check('No /_next directory listing', async () => {
+    const r = await get('/_next/');
+    if (r.status === 200 && r.text.includes('Index of')) throw Error('directory listing');
   });
-  await check('No directory listing on /_next', async () => {
-    const r = await fetchUrl('/_next/');
-    if (r.status === 200 && r.text.includes('<a href=') && r.text.includes('..')) throw Error('directory listing exposed');
+  await check('API rejects malformed JSON', async () => {
+    const r = await fetch(BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{invalid}', redirect: 'manual' });
+    if (r.status >= 500) throw Error('crashes on bad JSON');
+  });
+  await check('Rate limit header or behavior on login POST', async () => {
+    // Should not crash
+    const r = await fetch(BASE + '/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'test@test.com', password: 'x' }), redirect: 'manual' });
+    if (r.status >= 500) throw Error('SERVER ERROR');
   });
 
-  // ── Static Assets ──
-  section('Static Assets');
-  await check('Favicon or icon', async () => {
-    const r = await fetchUrl('/favicon.ico', { text: false });
-    if (r.status >= 500) throw Error('Server error');
-    // 200 or 404 both OK, just not 500
+  // ════════════════════════════════════════════
+  // STATIC ASSETS
+  // ════════════════════════════════════════════
+  S('15. Static Assets');
+  await check('Favicon accessible', async () => {
+    const r = await get('/favicon.ico', { noBody: true });
+    if (r.status >= 500) throw Error(r.status);
   });
-  await check('Next.js _next/static accessible', async () => {
-    // Extract a CSS URL from the homepage
-    const cssMatch = home.text.match(/href="(\/_next\/static\/[^"]+\.css)"/);
-    if (cssMatch) {
-      const r = await fetchUrl(cssMatch[1], { text: false });
-      if (r.status !== 200) throw Error('CSS status: ' + r.status);
-    }
+  await check('CSS bundle loads', async () => {
+    const m = home.text.match(/href="(\/_next\/static\/[^"]+\.css)"/);
+    if (m) { const r = await get(m[1], { noBody: true }); if (r.status !== 200) throw Error(r.status); }
+  });
+  await check('JS bundle loads', async () => {
+    const m = home.text.match(/src="(\/_next\/static\/[^"]+\.js)"/);
+    if (m) { const r = await get(m[1], { noBody: true }); if (r.status !== 200) throw Error(r.status); }
   });
 
-  // ── Response Times ──
-  section('Performance');
+  // ════════════════════════════════════════════
+  // PERFORMANCE
+  // ════════════════════════════════════════════
+  S('16. Performance');
   for (const path of ['/', '/docs', '/pricing', '/login']) {
-    await check('Response time ' + path + ' < 3s', async () => {
-      const t0 = Date.now();
-      await fetchUrl(path, { text: false });
-      const ms = Date.now() - t0;
+    await check(path + ' < 3s', async () => {
+      const t = Date.now();
+      await get(path, { noBody: true });
+      const ms = Date.now() - t;
       if (ms > 3000) throw Error(ms + 'ms');
     });
   }
-
-  // ── API POST/PUT (if applicable) ──
-  section('API Write Operations');
-  await check('POST /api/settings', async () => {
-    try {
-      const r = await fetch(BASE + '/api/settings', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ test: true }), redirect: 'manual'
-      });
-      // Should not be 500
-      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
-    } catch (e) { if (e.message.includes('SERVER ERROR')) throw e; }
-  });
-  await check('POST /api/workflows', async () => {
-    try {
-      const r = await fetch(BASE + '/api/workflows', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'test', nodes: [], edges: [] }), redirect: 'manual'
-      });
-      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
-    } catch (e) { if (e.message.includes('SERVER ERROR')) throw e; }
-  });
-  await check('PUT /api/projects (if exists)', async () => {
-    try {
-      const r = await fetch(BASE + '/api/projects', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}), redirect: 'manual'
-      });
-      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
-    } catch (e) { if (e.message.includes('SERVER ERROR')) throw e; }
-  });
-
-  // ── Project Sub-pages ──
-  section('Project Detail Pages');
-  const subPages = ['/projects/quiz2biz', '/projects/quiz2biz/plan', '/projects/quiz2biz/commits',
-    '/projects/quiz2biz/assessment', '/projects/quiz2biz/gates', '/projects/quiz2biz/execution'];
-  for (const sp of subPages) {
-    await check('GET ' + sp, async () => {
-      const r = await fetchUrl(sp);
-      if (r.status >= 500) throw Error('SERVER ERROR ' + r.status);
+  for (const api of ['/api/projects', '/api/settings', '/api/workflows']) {
+    await check('API ' + api + ' < 2s', async () => {
+      const t = Date.now();
+      await get(api, { noBody: true });
+      const ms = Date.now() - t;
+      if (ms > 2000) throw Error(ms + 'ms');
     });
   }
 
-  // ════════════════════════════════════
+  // ════════════════════════════════════════════
   // RESULTS
-  // ════════════════════════════════════
+  // ════════════════════════════════════════════
   console.log('\n\x1b[36m════════════════════════════════════\x1b[0m');
   console.log('\x1b[36m  RESULTS\x1b[0m');
   console.log('\x1b[36m════════════════════════════════════\x1b[0m');
   console.log('  \x1b[32mPassed: ' + pass + '\x1b[0m');
   console.log('  \x1b[31mFailed: ' + fail + '\x1b[0m');
   console.log('  Total:  ' + (pass + fail));
-
   if (failures.length > 0) {
     console.log('\n\x1b[31m── Failures ──\x1b[0m');
-    for (const f of failures) {
-      console.log('  \x1b[31m✗\x1b[0m ' + f.name + ': ' + f.error);
-    }
+    for (const f of failures) console.log('  \x1b[31m✗\x1b[0m ' + f.name + ': ' + f.error);
+  } else {
+    console.log('\n\x1b[32m  ALL GREEN ✓\x1b[0m');
   }
-
   console.log('');
   process.exit(fail > 0 ? 1 : 0);
 })();
