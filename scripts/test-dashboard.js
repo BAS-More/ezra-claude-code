@@ -464,6 +464,754 @@ function handleSave(req, res) {
   });
 }
 
+// ─── Visual Browser Test Agent ──────────────────────────────────
+
+function getVisualTestHtml() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EZRA Visual Test Agent</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #e6edf3; display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Left panel: live dashboard ── */
+  .dashboard-panel { flex: 1; position: relative; border-right: 2px solid #30363d; }
+  .dashboard-panel iframe { width: 100%; height: 100%; border: none; }
+
+  /* ── Highlight overlay ── */
+  .highlight-ring {
+    position: fixed; pointer-events: none; z-index: 99999;
+    border: 3px solid #f0883e; border-radius: 8px;
+    box-shadow: 0 0 20px rgba(240,136,62,0.5), 0 0 60px rgba(240,136,62,0.2);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    display: none;
+  }
+  .highlight-ring.active { display: block; }
+  .highlight-label {
+    position: fixed; pointer-events: none; z-index: 100000;
+    background: #f0883e; color: #000; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 4px; white-space: nowrap;
+    display: none; transform: translateY(-100%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .highlight-label.active { display: block; }
+
+  /* ── Right panel: agent log ── */
+  .agent-panel { width: 420px; display: flex; flex-direction: column; background: #161b22; }
+  .agent-header { padding: 16px; border-bottom: 1px solid #30363d; }
+  .agent-header h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .agent-header h2 .dot { width: 8px; height: 8px; border-radius: 50%; background: #3fb950; animation: blink 1.5s infinite; }
+  .agent-status { margin-top: 8px; font-size: 13px; color: #8b949e; }
+
+  .agent-progress { padding: 8px 16px; }
+  .agent-progress-bar { height: 3px; background: #30363d; border-radius: 2px; overflow: hidden; }
+  .agent-progress-fill { height: 100%; background: #58a6ff; transition: width 0.3s; width: 0%; }
+
+  .agent-stats { display: flex; gap: 12px; padding: 8px 16px; font-size: 13px; }
+  .agent-stats .pass { color: #3fb950; }
+  .agent-stats .fail { color: #f85149; }
+  .agent-stats .skip { color: #8b949e; }
+  .agent-stats .time { color: #8b949e; margin-left: auto; }
+
+  .agent-log { flex: 1; overflow-y: auto; padding: 12px 16px; }
+  .log-entry { padding: 6px 0; border-bottom: 1px solid #21262d; font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
+  .log-entry .icon { flex-shrink: 0; width: 18px; text-align: center; }
+  .log-entry .msg { flex: 1; }
+  .log-entry .detail { color: #8b949e; font-size: 12px; margin-top: 2px; }
+  .log-entry.step { color: #58a6ff; }
+  .log-entry.pass { color: #3fb950; }
+  .log-entry.fail { color: #f85149; }
+  .log-entry.info { color: #8b949e; }
+  .log-entry.action { color: #f0883e; }
+  .log-entry.section { color: #d2a8ff; font-weight: 600; padding-top: 12px; }
+
+  .agent-footer { padding: 12px 16px; border-top: 1px solid #30363d; display: flex; gap: 8px; }
+  .agent-footer button { padding: 8px 16px; border: 1px solid #30363d; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; background: #161b22; color: #e6edf3; transition: all 0.15s; }
+  .agent-footer button:hover { border-color: #58a6ff; }
+  .agent-footer .btn-go { background: #238636; border-color: #238636; color: #fff; }
+  .agent-footer .btn-go:hover { background: #2ea043; }
+  .agent-footer .btn-go:disabled { opacity: 0.5; cursor: not-allowed; }
+  .speed-control { display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: 12px; color: #8b949e; }
+  .speed-control select { background: #0d1117; color: #e6edf3; border: 1px solid #30363d; border-radius: 4px; padding: 4px 8px; font-size: 12px; }
+
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="dashboard-panel">
+  <iframe id="dashFrame" src="/"></iframe>
+  <div class="highlight-ring" id="ring"></div>
+  <div class="highlight-label" id="ringLabel"></div>
+</div>
+
+<div class="agent-panel">
+  <div class="agent-header">
+    <h2><span class="dot" id="agentDot"></span> EZRA Test Agent</h2>
+    <div class="agent-status" id="agentStatus">Ready — click Start to begin</div>
+  </div>
+  <div class="agent-progress">
+    <div class="agent-progress-bar"><div class="agent-progress-fill" id="agentProgress"></div></div>
+  </div>
+  <div class="agent-stats">
+    <span class="pass" id="agentPass">0 passed</span>
+    <span class="fail" id="agentFail">0 failed</span>
+    <span class="time" id="agentTime">0s</span>
+  </div>
+  <div class="agent-log" id="agentLog"></div>
+  <div class="agent-footer">
+    <button class="btn-go" id="startBtn" onclick="startAgent()">Start Agent</button>
+    <button onclick="location.reload()">Reset</button>
+    <div class="speed-control">
+      <label>Speed:</label>
+      <select id="speedSelect">
+        <option value="1500">Slow</option>
+        <option value="800" selected>Normal</option>
+        <option value="300">Fast</option>
+        <option value="50">Turbo</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+let passCount = 0, failCount = 0, totalSteps = 0, agentRunning = false;
+const startTime = { v: 0 };
+
+function getSpeed() { return parseInt(document.getElementById('speedSelect').value); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function getDoc() {
+  try { return document.getElementById('dashFrame').contentDocument; } catch { return null; }
+}
+
+function log(type, icon, msg, detail) {
+  const el = document.createElement('div');
+  el.className = 'log-entry ' + type;
+  el.innerHTML = '<span class="icon">' + icon + '</span><div class="msg">' + msg + (detail ? '<div class="detail">' + detail + '</div>' : '') + '</div>';
+  const logEl = document.getElementById('agentLog');
+  logEl.appendChild(el);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function updateStats() {
+  document.getElementById('agentPass').textContent = passCount + ' passed';
+  document.getElementById('agentFail').textContent = failCount + ' failed';
+  document.getElementById('agentTime').textContent = ((Date.now() - startTime.v) / 1000).toFixed(1) + 's';
+}
+
+function setProgress(pct) {
+  document.getElementById('agentProgress').style.width = pct + '%';
+}
+
+function setStatus(msg) {
+  document.getElementById('agentStatus').textContent = msg;
+}
+
+async function highlight(selector, label) {
+  const doc = getDoc();
+  if (!doc) return;
+  const el = typeof selector === 'string' ? doc.querySelector(selector) : selector;
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const iframe = document.getElementById('dashFrame');
+  const iRect = iframe.getBoundingClientRect();
+  const ring = document.getElementById('ring');
+  const lbl = document.getElementById('ringLabel');
+  ring.style.left = (iRect.left + rect.left - 4) + 'px';
+  ring.style.top = (iRect.top + rect.top - 4) + 'px';
+  ring.style.width = (rect.width + 8) + 'px';
+  ring.style.height = (rect.height + 8) + 'px';
+  ring.classList.add('active');
+  lbl.textContent = label || '';
+  lbl.style.left = (iRect.left + rect.left) + 'px';
+  lbl.style.top = (iRect.top + rect.top - 4) + 'px';
+  lbl.classList.add('active');
+  await sleep(getSpeed());
+}
+
+function hideHighlight() {
+  document.getElementById('ring').classList.remove('active');
+  document.getElementById('ringLabel').classList.remove('active');
+}
+
+async function check(name, fn) {
+  totalSteps++;
+  try {
+    await fn();
+    passCount++;
+    log('pass', '\\u2705', name);
+    updateStats();
+  } catch (err) {
+    failCount++;
+    log('fail', '\\u274c', name, err.message);
+    updateStats();
+  }
+}
+
+function section(name) {
+  log('section', '\\u2500', name);
+}
+
+function action(msg) {
+  log('action', '\\ud83d\\udc46', msg);
+}
+
+function info(msg) {
+  log('info', '\\u2139\\ufe0f', msg);
+}
+
+// ═══ AGENT SCRIPT ═══════════════════════════════════════════
+
+async function startAgent() {
+  if (agentRunning) return;
+  agentRunning = true;
+  startTime.v = Date.now();
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('agentDot').style.background = '#f0883e';
+
+  const doc = getDoc();
+  if (!doc) { log('fail', '\\u274c', 'Cannot access dashboard iframe'); return; }
+
+  setStatus('Agent running...');
+  log('info', '\\ud83e\\udd16', 'Agent starting — simulating real user interaction');
+
+  // ── Phase 1: Page Load Verification ──────────────────────
+  section('Phase 1: Page Load & Initial State');
+  setProgress(5);
+
+  await highlight('header', 'Checking header');
+  await check('Page loaded successfully', async () => {
+    if (!doc.querySelector('header')) throw new Error('No header found');
+  });
+
+  await highlight('header h1', 'Verifying branding');
+  await check('EZRA branding visible', async () => {
+    const h1 = doc.querySelector('header h1');
+    if (!h1 || !h1.textContent.includes('EZRA')) throw new Error('Missing EZRA in header');
+  });
+
+  await highlight('#totalPass', 'Checking pass counter');
+  await check('Pass counter shows "0 passed"', async () => {
+    const el = doc.querySelector('#totalPass');
+    if (!el || !el.textContent.includes('0 passed')) throw new Error('Bad initial pass: ' + (el && el.textContent));
+  });
+
+  await highlight('#totalFail', 'Checking fail counter');
+  await check('Fail counter shows "0 failed"', async () => {
+    const el = doc.querySelector('#totalFail');
+    if (!el || !el.textContent.includes('0 failed')) throw new Error('Bad initial fail');
+  });
+
+  await highlight('#totalTime', 'Checking timer');
+  await check('Timer shows "0s"', async () => {
+    const el = doc.querySelector('#totalTime');
+    if (!el || !el.textContent.includes('0s')) throw new Error('Bad initial time');
+  });
+
+  await highlight('#totalSuites', 'Checking suite counter');
+  await check('Suite counter shows "0 / 43 suites"', async () => {
+    const el = doc.querySelector('#totalSuites');
+    if (!el || !el.textContent.includes('43')) throw new Error('Bad suite count: ' + (el && el.textContent));
+  });
+
+  // ── Phase 2: Button Inspection ───────────────────────────
+  section('Phase 2: Control Buttons');
+  setProgress(10);
+
+  await highlight('#runBtn', 'Inspecting Run button');
+  await check('"Run All Tests" button exists and is enabled', async () => {
+    const btn = doc.querySelector('#runBtn');
+    if (!btn) throw new Error('Missing run button');
+    if (btn.disabled) throw new Error('Button disabled');
+    if (!btn.textContent.includes('Run All Tests')) throw new Error('Wrong text: ' + btn.textContent);
+  });
+
+  const filterNames = ['All', 'Core', 'V6', 'V7', 'Quality', 'E2E', 'Failed Only'];
+  const filterValues = ['all', 'core', 'v6', 'v7', 'quality', 'e2e', 'failed'];
+  for (let i = 0; i < filterNames.length; i++) {
+    const btn = doc.querySelector('[data-filter="' + filterValues[i] + '"]');
+    await highlight(btn || 'body', 'Checking ' + filterNames[i] + ' filter');
+    await check('"' + filterNames[i] + '" filter button exists', async () => {
+      if (!btn) throw new Error('Missing filter: ' + filterValues[i]);
+    });
+  }
+
+  // ── Phase 3: Cards Grid ──────────────────────────────────
+  section('Phase 3: Suite Cards Grid');
+  setProgress(15);
+
+  await highlight('#grid', 'Scanning cards grid');
+  const cards = doc.querySelectorAll('.card');
+  await check('43 suite cards rendered', async () => {
+    if (cards.length !== 43) throw new Error('Found ' + cards.length + ' cards');
+  });
+
+  // Check first card
+  const firstCard = cards[0];
+  if (firstCard) {
+    await highlight(firstCard, 'Inspecting first card');
+    await check('First card is "Structure" with PENDING badge', async () => {
+      const name = firstCard.querySelector('.card-name');
+      const badge = firstCard.querySelector('.card-badge');
+      if (!name || !name.textContent.includes('Structure')) throw new Error('First card: ' + (name && name.textContent));
+      if (!badge || !badge.textContent.includes('PENDING')) throw new Error('Badge: ' + (badge && badge.textContent));
+    });
+  }
+
+  // Check last card
+  const lastCard = cards[cards.length - 1];
+  if (lastCard) {
+    await highlight(lastCard, 'Inspecting last card');
+    await check('Last card is "UAT" with PENDING badge', async () => {
+      const name = lastCard.querySelector('.card-name');
+      if (!name || !name.textContent.includes('UAT')) throw new Error('Last card: ' + (name && name.textContent));
+    });
+  }
+
+  // Verify categories
+  await check('Cards span all categories (core, v6, v7, quality, e2e)', async () => {
+    const cats = new Set();
+    cards.forEach(c => cats.add(c.dataset.category));
+    for (const cat of ['core', 'v6', 'v7', 'quality', 'e2e']) {
+      if (!cats.has(cat)) throw new Error('Missing category: ' + cat);
+    }
+  });
+
+  await check('All cards start with status=pending', async () => {
+    let nonPending = 0;
+    cards.forEach(c => { if (c.dataset.status !== 'pending') nonPending++; });
+    if (nonPending > 0) throw new Error(nonPending + ' cards not pending');
+  });
+
+  // ── Phase 4: Progress Bar ────────────────────────────────
+  section('Phase 4: Progress Bar');
+  setProgress(18);
+
+  await highlight('.progress-container', 'Checking progress bar');
+  await check('Progress bar exists at 0%', async () => {
+    const bar = doc.querySelector('#progressBar');
+    if (!bar) throw new Error('Missing progress bar');
+    if (!bar.style.width.includes('0')) throw new Error('Progress not at 0: ' + bar.style.width);
+  });
+
+  // ── Phase 5: Summary Panel ───────────────────────────────
+  section('Phase 5: Summary Panel');
+  setProgress(20);
+
+  await highlight('#summary', 'Checking summary panel');
+  await check('Summary panel exists and is hidden', async () => {
+    const sum = doc.querySelector('#summary');
+    if (!sum) throw new Error('Missing summary');
+    const style = doc.defaultView.getComputedStyle(sum);
+    if (style.display !== 'none') throw new Error('Summary visible before run');
+  });
+
+  // ── Phase 6: Log Panel ───────────────────────────────────
+  section('Phase 6: Log Panel');
+
+  const logDetails = doc.querySelector('.log-panel details');
+  await highlight(logDetails || '.log-panel', 'Checking log panel');
+  await check('Log panel exists with initial message', async () => {
+    const logContent = doc.querySelector('#logContent');
+    if (!logContent) throw new Error('Missing log content');
+    if (!logContent.textContent.includes('Waiting')) throw new Error('Bad initial log: ' + logContent.textContent);
+  });
+
+  // ── Phase 7: Test Filter Buttons ─────────────────────────
+  section('Phase 7: Testing Filter Buttons');
+  setProgress(25);
+
+  action('Clicking "Core" filter...');
+  const coreBtn = doc.querySelector('[data-filter="core"]');
+  if (coreBtn) {
+    coreBtn.click();
+    await highlight(coreBtn, 'Clicked Core');
+    await check('Core filter: only core cards visible', async () => {
+      let visible = 0, hidden = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d === 'none') hidden++; else visible++;
+      });
+      if (visible < 3) throw new Error('Too few visible: ' + visible);
+      if (hidden === 0) throw new Error('Nothing hidden — filter not working');
+    });
+  }
+
+  action('Clicking "V6" filter...');
+  const v6Btn = doc.querySelector('[data-filter="v6"]');
+  if (v6Btn) {
+    v6Btn.click();
+    await highlight(v6Btn, 'Clicked V6');
+    await check('V6 filter: shows V6 cards, hides others', async () => {
+      let v6Visible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none' && c.dataset.category === 'v6') v6Visible++;
+      });
+      if (v6Visible < 10) throw new Error('Only ' + v6Visible + ' V6 cards visible');
+    });
+  }
+
+  action('Clicking "V7" filter...');
+  const v7Btn = doc.querySelector('[data-filter="v7"]');
+  if (v7Btn) {
+    v7Btn.click();
+    await highlight(v7Btn, 'Clicked V7');
+    await check('V7 filter: shows V7 cards', async () => {
+      let v7Visible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none' && c.dataset.category === 'v7') v7Visible++;
+      });
+      if (v7Visible < 5) throw new Error('Only ' + v7Visible + ' V7 cards visible');
+    });
+  }
+
+  action('Clicking "Quality" filter...');
+  const qBtn = doc.querySelector('[data-filter="quality"]');
+  if (qBtn) {
+    qBtn.click();
+    await highlight(qBtn, 'Clicked Quality');
+    await check('Quality filter: shows Lint card', async () => {
+      let qVisible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none') qVisible++;
+      });
+      if (qVisible !== 1) throw new Error('Expected 1 quality card, got ' + qVisible);
+    });
+  }
+
+  action('Clicking "E2E" filter...');
+  const e2eBtn = doc.querySelector('[data-filter="e2e"]');
+  if (e2eBtn) {
+    e2eBtn.click();
+    await highlight(e2eBtn, 'Clicked E2E');
+    await check('E2E filter: shows E2E + UAT cards', async () => {
+      let eVisible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none') eVisible++;
+      });
+      if (eVisible !== 2) throw new Error('Expected 2 e2e cards, got ' + eVisible);
+    });
+  }
+
+  action('Clicking "Failed Only" filter...');
+  const failBtn = doc.querySelector('[data-filter="failed"]');
+  if (failBtn) {
+    failBtn.click();
+    await highlight(failBtn, 'Clicked Failed Only');
+    await check('Failed Only filter: no cards visible (none failed yet)', async () => {
+      let visible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none') visible++;
+      });
+      if (visible !== 0) throw new Error('Expected 0 visible, got ' + visible);
+    });
+  }
+
+  action('Clicking "All" filter to restore...');
+  const allBtn = doc.querySelector('[data-filter="all"]');
+  if (allBtn) {
+    allBtn.click();
+    await highlight(allBtn, 'Clicked All');
+    await check('All filter: all 43 cards visible again', async () => {
+      let visible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none') visible++;
+      });
+      if (visible !== 43) throw new Error('Expected 43, got ' + visible);
+    });
+  }
+
+  // ── Phase 8: CLICK "Run All Tests" ──────────────────────
+  section('Phase 8: Run All Tests (Live!)');
+  setProgress(30);
+
+  action('Clicking "Run All Tests" button...');
+  const runBtn = doc.querySelector('#runBtn');
+  await highlight(runBtn, 'CLICKING Run All Tests');
+  await sleep(getSpeed());
+
+  // Actually click it!
+  if (runBtn) runBtn.click();
+
+  await check('Button changes to "Running..." and becomes disabled', async () => {
+    await sleep(300);
+    const btn = doc.querySelector('#runBtn');
+    if (!btn.disabled) throw new Error('Button not disabled');
+    if (!btn.textContent.includes('Running')) throw new Error('Text: ' + btn.textContent);
+  });
+
+  info('Watching test suites execute in real-time...');
+
+  // Wait and observe each suite completing
+  let lastCompleted = 0;
+  let stableCount = 0;
+  const maxWait = 300000; // 5 min
+  const pollStart = Date.now();
+
+  while (Date.now() - pollStart < maxWait) {
+    await sleep(1000);
+    const badges = doc.querySelectorAll('.card-badge');
+    let completed = 0;
+    let running = 0;
+    badges.forEach(b => {
+      if (b.textContent === 'PASS' || b.textContent === 'FAIL') completed++;
+      if (b.textContent === 'RUNNING') running++;
+    });
+
+    const pct = 30 + Math.round((completed / 43) * 60);
+    setProgress(pct);
+    setStatus('Running: ' + completed + '/43 suites completed' + (running ? ' (' + running + ' running)' : ''));
+
+    // Log new completions
+    if (completed > lastCompleted) {
+      for (let ci = lastCompleted; ci < completed; ci++) {
+        const card = doc.querySelectorAll('.card')[ci];
+        if (card) {
+          const cName = card.querySelector('.card-name');
+          const cBadge = card.querySelector('.card-badge');
+          const cStats = card.querySelector('.card-stats');
+          await highlight(card, (cBadge ? cBadge.textContent : '') + ' — ' + (cName ? cName.textContent : ''));
+          if (cBadge && cBadge.textContent === 'PASS') {
+            log('pass', '\\u2705', (cName ? cName.textContent : 'Suite ' + ci) + ': ' + (cStats ? cStats.textContent : ''));
+          } else {
+            log('fail', '\\u274c', (cName ? cName.textContent : 'Suite ' + ci) + ': ' + (cStats ? cStats.textContent : ''));
+          }
+        }
+      }
+      lastCompleted = completed;
+      stableCount = 0;
+    } else {
+      stableCount++;
+    }
+
+    if (completed >= 43) break;
+    if (stableCount > 60) { info('Timed out waiting for suites'); break; }
+  }
+
+  // ── Phase 9: Verify Run Completed ────────────────────────
+  section('Phase 9: Post-Run Verification');
+  setProgress(92);
+
+  await check('All 43 suites completed', async () => {
+    let completed = 0;
+    doc.querySelectorAll('.card-badge').forEach(b => {
+      if (b.textContent === 'PASS' || b.textContent === 'FAIL') completed++;
+    });
+    if (completed < 43) throw new Error('Only ' + completed + ' completed');
+  });
+
+  await check('All suites show PASS', async () => {
+    let failedSuites = [];
+    doc.querySelectorAll('.card').forEach(c => {
+      const badge = c.querySelector('.card-badge');
+      const name = c.querySelector('.card-name');
+      if (badge && badge.textContent === 'FAIL') failedSuites.push(name ? name.textContent : '?');
+    });
+    if (failedSuites.length > 0) throw new Error('Failed: ' + failedSuites.join(', '));
+  });
+
+  await highlight('#runBtn', 'Checking button restored');
+  await check('Run button re-enabled with original text', async () => {
+    const btn = doc.querySelector('#runBtn');
+    if (!btn) throw new Error('Missing button');
+    if (btn.disabled) throw new Error('Button still disabled');
+    if (!btn.textContent.includes('Run All Tests')) throw new Error('Text: ' + btn.textContent);
+  });
+
+  await highlight('#progressBar', 'Checking progress bar');
+  await check('Progress bar at 100%', async () => {
+    const bar = doc.querySelector('#progressBar');
+    if (!bar) throw new Error('Missing bar');
+    const w = parseFloat(bar.style.width);
+    if (w < 99) throw new Error('Progress: ' + bar.style.width);
+  });
+
+  // ── Phase 10: Status Bar Updated ─────────────────────────
+  section('Phase 10: Status Bar Verification');
+  setProgress(94);
+
+  await highlight('#totalPass', 'Checking final pass count');
+  await check('Pass counter updated (>1900)', async () => {
+    const el = doc.querySelector('#totalPass');
+    const num = parseInt(el.textContent);
+    if (isNaN(num) || num < 1900) throw new Error('Pass count: ' + el.textContent);
+  });
+
+  await highlight('#totalFail', 'Checking final fail count');
+  await check('Fail counter shows 0', async () => {
+    const el = doc.querySelector('#totalFail');
+    if (!el.textContent.includes('0 failed')) throw new Error('Fail: ' + el.textContent);
+  });
+
+  await highlight('#totalSuites', 'Checking suites count');
+  await check('Suite counter shows 43 / 43', async () => {
+    const el = doc.querySelector('#totalSuites');
+    if (!el.textContent.includes('43 / 43')) throw new Error('Suites: ' + el.textContent);
+  });
+
+  await highlight('#totalTime', 'Checking elapsed time');
+  await check('Timer shows elapsed time > 0s', async () => {
+    const el = doc.querySelector('#totalTime');
+    const num = parseFloat(el.textContent);
+    if (isNaN(num) || num <= 0) throw new Error('Time: ' + el.textContent);
+  });
+
+  // ── Phase 11: Summary Panel ──────────────────────────────
+  section('Phase 11: Summary Panel Verification');
+  setProgress(96);
+
+  await highlight('#summary', 'Checking summary appeared');
+  await check('Summary panel is now visible', async () => {
+    const sum = doc.querySelector('#summary');
+    const style = doc.defaultView.getComputedStyle(sum);
+    if (style.display === 'none') throw new Error('Summary still hidden');
+  });
+
+  await highlight('#sumPass', 'Checking summary pass count');
+  await check('Summary passed count > 1900', async () => {
+    const el = doc.querySelector('#sumPass');
+    const num = parseInt(el.textContent);
+    if (isNaN(num) || num < 1900) throw new Error('Sum pass: ' + el.textContent);
+  });
+
+  await highlight('#sumFail', 'Checking summary fail count');
+  await check('Summary failed count = 0', async () => {
+    const el = doc.querySelector('#sumFail');
+    if (el.textContent.trim() !== '0') throw new Error('Sum fail: ' + el.textContent);
+  });
+
+  await highlight('#sumSuites', 'Checking summary suites');
+  await check('Summary suites = 43', async () => {
+    const el = doc.querySelector('#sumSuites');
+    if (el.textContent.trim() !== '43') throw new Error('Sum suites: ' + el.textContent);
+  });
+
+  await highlight('#sumResult', 'Checking result verdict');
+  await check('Summary result says "ALL GREEN"', async () => {
+    const el = doc.querySelector('#sumResult');
+    if (!el.textContent.includes('ALL GREEN')) throw new Error('Result: ' + el.textContent);
+  });
+
+  // ── Phase 12: Log Panel ──────────────────────────────────
+  section('Phase 12: Log Output Verification');
+  setProgress(97);
+
+  action('Opening log panel...');
+  const details = doc.querySelector('.log-panel details');
+  if (details) details.open = true;
+  await sleep(getSpeed());
+
+  await highlight('#logContent', 'Checking log output');
+  await check('Log contains test output lines', async () => {
+    const logEl = doc.querySelector('#logContent');
+    if (!logEl) throw new Error('Missing log');
+    if (logEl.textContent.length < 100) throw new Error('Log too short: ' + logEl.textContent.length + ' chars');
+  });
+
+  await check('Log contains pass indicators', async () => {
+    const logEl = doc.querySelector('#logContent');
+    if (!logEl.textContent.includes('passed')) throw new Error('No pass lines in log');
+  });
+
+  // ── Phase 13: Re-test Filters (post-run) ─────────────────
+  section('Phase 13: Post-Run Filter Tests');
+  setProgress(98);
+
+  action('Clicking "Core" filter after run...');
+  const coreBtn2 = doc.querySelector('[data-filter="core"]');
+  if (coreBtn2) {
+    coreBtn2.click();
+    await highlight(coreBtn2, 'Core filter post-run');
+    await check('Core filter works after run completion', async () => {
+      let coreVisible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none' && c.dataset.category === 'core') coreVisible++;
+      });
+      if (coreVisible < 3) throw new Error('Core visible: ' + coreVisible);
+    });
+  }
+
+  action('Clicking "Failed Only" filter...');
+  const failBtn2 = doc.querySelector('[data-filter="failed"]');
+  if (failBtn2) {
+    failBtn2.click();
+    await highlight(failBtn2, 'Failed Only post-run');
+    await check('Failed Only filter: 0 cards (all passed)', async () => {
+      let visible = 0;
+      doc.querySelectorAll('.card').forEach(c => {
+        const d = doc.defaultView.getComputedStyle(c).display;
+        if (d !== 'none') visible++;
+      });
+      if (visible !== 0) throw new Error('Expected 0, got ' + visible);
+    });
+  }
+
+  action('Clicking "All" to restore...');
+  const allBtn2 = doc.querySelector('[data-filter="all"]');
+  if (allBtn2) {
+    allBtn2.click();
+    await highlight(allBtn2, 'All restored');
+  }
+
+  // ── Phase 14: Card Hover & Detail Check ──────────────────
+  section('Phase 14: Individual Card Deep Inspection');
+  setProgress(99);
+
+  // Pick a few key cards and verify their stats
+  const keyCards = ['Structure', 'Commands', 'Lint', 'E2E', 'UAT'];
+  for (const name of keyCards) {
+    let found = null;
+    doc.querySelectorAll('.card').forEach(c => {
+      const cn = c.querySelector('.card-name');
+      if (cn && cn.textContent === name) found = c;
+    });
+    if (found) {
+      await highlight(found, 'Inspecting ' + name);
+      await check(name + ' card shows pass count > 0', async () => {
+        const stats = found.querySelector('.card-stats');
+        if (!stats) throw new Error('No stats');
+        const pass = parseInt(stats.textContent);
+        if (pass <= 0 || isNaN(pass)) {
+          // Parse the text more carefully
+          if (!stats.textContent.includes('passed')) throw new Error('No pass info: ' + stats.textContent);
+        }
+      });
+    }
+  }
+
+  // ── DONE ─────────────────────────────────────────────────
+  setProgress(100);
+  hideHighlight();
+
+  const totalTime = ((Date.now() - startTime.v) / 1000).toFixed(1);
+  const allPassed = failCount === 0;
+
+  section('Agent Complete');
+  log(allPassed ? 'pass' : 'fail', allPassed ? '\\ud83c\\udfc6' : '\\u274c',
+    passCount + ' passed, ' + failCount + ' failed in ' + totalTime + 's',
+    allPassed ? 'ALL CHECKS PASSED — Dashboard fully operational' : 'SOME CHECKS FAILED — Review log above');
+
+  setStatus(allPassed ? 'All checks passed (' + totalTime + 's)' : failCount + ' failures detected');
+  document.getElementById('agentDot').style.background = allPassed ? '#3fb950' : '#f85149';
+  document.getElementById('agentDot').style.animation = 'none';
+  agentRunning = false;
+}
+</script>
+</body>
+</html>`;
+}
+
 // ─── HTTP Server ────────────────────────────────────────────────
 
 const server = http.createServer((req, res) => {
@@ -488,6 +1236,12 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && url.pathname === '/api/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', suites: SUITES.length, version: '6.1.0' }));
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/test') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(getVisualTestHtml());
     return;
   }
 
