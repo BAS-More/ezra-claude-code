@@ -24,6 +24,8 @@
     "test:structure": "node tests/test-structure.js",
     "test:templates": "node tests/test-templates.js",
     "test:commands": "node tests/test-commands.js",
+    "test:dashboard": "node scripts/test-dashboard.js",
+    "test:ui": "node tests/test-ui-agent.js",
     "lint": "node tests/lint-all.js"
   },
   "keywords": [

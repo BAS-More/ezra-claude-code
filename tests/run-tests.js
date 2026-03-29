@@ -58,6 +58,9 @@ const SUITES = [
   { name: 'UAT', script: 'test-uat.js' },
 ];
 
+// Note: test-ui-agent.js runs separately (requires dashboard on :3000)
+// Run with: npm run test:ui
+
 const testsDir = __dirname;
 let totalPassed = 0;
 let totalFailed = 0;
