@@ -1,0 +1,586 @@
+#!/usr/bin/env node
+'use strict';
+
+const MAX_STDIN = 1024 * 1024; // 1 MB stdin safety limit
+
+/**
+ * EZRA Unified Settings Parser
+ *
+ * Reads .ezra/settings.yaml and merges with sensible defaults.
+ * Provides section accessors for standards, security, oversight,
+ * best_practices, and workflows.
+ *
+ * Zero external dependencies — uses a built-in simple YAML parser
+ * that handles flat keys, one-level nested sections, inline arrays,
+ * and inline objects.
+ *
+ * Can be required as a module or invoked via stdin (hook protocol).
+ */
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+// EZRA feedback helpers (non-blocking)
+let _log, _fmt;
+try { _log = require('./ezra-hook-logger').logHookEvent; } catch { _log = () => {}; }
+try { _fmt = require('./ezra-error-codes').formatError; } catch { _fmt = (c) => 'EZRA: ' + c; }
+
+// ─── Defaults ────────────────────────────────────────────────────
+
+const DEFAULTS = {
+  standards: {
+    typescript_strict: true,
+    no_any: true,
+    naming: 'camelCase',
+    error_handling: 'explicit',
+    max_complexity: 10,
+    test_coverage_minimum: 80,
+    custom_rules: [],
+  },
+  security: {
+    profile: 'standard',
+    require_auth_on_all_routes: false,
+    secrets_scanning: true,
+    input_validation: true,
+    rate_limiting: false,
+    custom_rules: [],
+  },
+  oversight: {
+    enabled: true,
+    level: 'gate',
+    health_threshold: 75,
+    auto_pause_on_critical: true,
+    review_every_n_files: 5,
+    excluded_paths: ['node_modules', '.git', 'dist', 'coverage'],
+    notify_on: ['critical', 'high', 'medium', 'low'],
+  },
+  best_practices: {
+    enabled: true,
+    suggest_frequency: 'always',
+    domains: ['architecture', 'security', 'quality', 'testing'],
+    auto_suggest: true,
+  },
+  workflows: {
+    active_templates: [],
+    auto_run: false,
+    approval_gates: true,
+  },
+  self_learning: {
+    enabled: true,
+    analysis_frequency: 'weekly',
+    min_data_points: 10,
+    confidence_threshold: 0.75,
+    auto_apply: false,
+    report_on_scan: true,
+    report_on_dash: true,
+    domains: {
+      standards_effectiveness: true,
+      agent_profiles: true,
+      violation_patterns: true,
+      health_trajectories: true,
+      decision_impact: true,
+      workflow_optimisation: true,
+      cost_optimisation: true,
+    },
+    cross_project: {
+      enabled: false,
+      shared_domains: [],
+    },
+    scrape_frequency: 'weekly',
+    auto_add: false,
+    tech_filter: [],
+  },
+  execution: {
+    max_fix_retries: 3,
+    checkpoint_every_n_tasks: 5,
+    pause_on_decision: true,
+    specialist_routing: false,
+    mah_endpoint: 'http://localhost:3001',
+  },
+  notifications: {
+    email: {
+      provider: 'resend',
+      api_key: null,
+      to: null,
+      from: null,
+    },
+    slack: {
+      webhook_url: null,
+    },
+    teams: {
+      webhook_url: null,
+    },
+    dashboard: true,
+    on_events: ['decision_needed', 'phase_complete', 'gate_failed', 'gate_passed', 'deployment_complete'],
+  },
+  project_manager: {
+    enabled: true,
+    mode: 'hybrid',
+    routine_checks: 'rule-based',
+    complex_decisions: 'ai',
+    ai_provider: 'claude',
+    check_interval: 'every_5_tasks',
+    escalation_threshold: 3,
+    stall_detection: 30,
+    daily_report: true,
+    weekly_report: true,
+    milestones: [],
+  },
+  library: {
+    research_enabled: true,
+    update_frequency: 'weekly',
+    budget_monthly: 10.00,
+    sources_whitelist: ['owasp.org', 'developer.mozilla.org', 'react.dev', 'nodejs.org', 'typescriptlang.org', 'nist.gov', 'github.com/advisories'],
+    auto_add_rules: false,
+    alert_on_new_cve: true,
+    categories_monitored: ['all'],
+  },
+  agents: {
+    enabled: true,
+    max_concurrent: 3,
+    daily_budget_usd: 10,
+    monthly_budget_usd: 200,
+    default_provider: 'anthropic',
+    fallback_provider: 'openai',
+    anthropic_api_key: null,
+    anthropic_model: 'claude-sonnet-4-20250514',
+    openai_api_key: null,
+    openai_model: 'gpt-4o',
+    ollama_endpoint: 'http://localhost:11434',
+    ollama_model: 'codellama',
+    budget_ceiling_daily: 10.00,
+    budget_ceiling_monthly: 200.00,
+    budget_ceiling_currency: 'USD',
+    assignment_strategy: 'auto',
+    fallback_order: ['claude', 'codex', 'cursor'],
+    task_routing: 'none',
+  },
+  dashboard: {
+    portfolio_path: '~/.ezra-portfolio.yaml',
+    auto_export: true,
+    export_format: 'json',
+    refresh_interval: 'manual',
+  },
+  memory: {
+    auto_capture: true,
+    max_entries: 500,
+    dedup_threshold: 0.8,
+    capture_sources: 'all',
+    archive_after_days: 90,
+  },
+  planning: {
+    enabled: true,
+    max_tasks_before_gap_check: 5,
+    checkpoint_on_milestone: true,
+    auto_assign: true,
+  },
+  licensing: {
+    tier: 'core',
+    license_key: null,
+    offline_cache_days: 30,
+  },
+  cloud_sync: {
+    enabled: false,
+    provider: 'local',
+    auto_backup: false,
+    backup_retention: 5,
+    sync_on_change: false,
+  },
+  github: {
+    token: null,
+    repo_owner: null,
+    repo_name: null,
+    base_branch: 'main',
+    auto_merge_on_green: false,
+    require_review: true,
+  },
+  deploy: {
+    target: 'custom',
+    hook_url: null,
+    auto_deploy: false,
+    production_approval: true,
+  },
+  quiz2build: {
+    endpoint: 'http://localhost:3000',
+    api_key: null,
+    project_id: null,
+    session_id: null,
+    auto_sync: false,
+    sync_facts: true,
+    import_documents_to_library: true,
+  },
+};
+
+// ─── YAML Parser (simple, no deps) ──────────────────────────────
+
+/**
+ * Parse a single YAML value string into a JS value.
+ * Handles: booleans, null, integers, floats, quoted strings,
+ * inline arrays [a, b], inline objects {k: v}.
+ */
+function parseValue(raw) {
+  if (raw === undefined || raw === null) return null;
+  const trimmed = String(raw).trim();
+  if (trimmed === '' || trimmed === 'null' || trimmed === '~') return null;
+  if (trimmed === 'true') return true;
+  if (trimmed === 'false') return false;
+
+  // Quoted strings
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+
+  // Inline array: [a, b, c]
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    const inner = trimmed.slice(1, -1).trim();
+    if (inner === '') return [];
+    return inner.split(',').map(s => parseValue(s.trim()));
+  }
+
+  // Inline object: {k: v, k2: v2}
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    const inner = trimmed.slice(1, -1).trim();
+    if (inner === '') return {};
+    const obj = {};
+    const pairs = inner.split(',');
+    for (const pair of pairs) {
+      const colonIdx = pair.indexOf(':');
+      if (colonIdx > 0) {
+        const k = pair.slice(0, colonIdx).trim();
+        const v = pair.slice(colonIdx + 1).trim();
+        obj[k] = parseValue(v);
+      }
+    }
+    return obj;
+  }
+
+  // Integer
+  if (/^-?\d+$/.test(trimmed)) return parseInt(trimmed, 10);
+
+  // Float
+  if (/^-?\d+\.\d+$/.test(trimmed)) return parseFloat(trimmed);
+
+  // Plain string
+  return trimmed;
+}
+
+/**
+ * Parse simple YAML text into a JS object.
+ * Supports: top-level keys, one-level nested sections (indented),
+ * list items (- value), comments (#), and blank lines.
+ */
+function parseYamlSimple(text) {
+  const result = {};
+  const lines = text.split(/\r?\n/);
+  let section = null;    // level-0 key (e.g. "self_learning")
+  let subSection = null; // level-1 key (e.g. "domains")
+
+  for (const line of lines) {
+    if (/^\s*$/.test(line) || /^\s*#/.test(line)) continue;
+
+    const indent = (line.match(/^(\s*)/)[1] || '').length;
+    const trimmed = line.trim();
+
+    // Level 0 — top-level key
+    if (indent === 0) {
+      subSection = null;
+      const m = trimmed.match(/^(\w[\w_-]*):\s*(.*)?$/);
+      if (!m) continue;
+      const key = m[1];
+      if (/^(__proto__|constructor|prototype)$/.test(key)) continue;
+      const val = (m[2] || '').trim();
+      if (val === '' || val === undefined) {
+        section = key;
+        result[key] = {};
+      } else {
+        section = null;
+        result[key] = parseValue(val);
+      }
+      continue;
+    }
+
+    if (!section) continue;
+
+    // Level 1 — inside a section (indent 2)
+    if (indent <= 2 || (indent <= 4 && !subSection)) {
+      subSection = null; // reset sub-section when back to level 1
+      if (trimmed.startsWith('- ')) {
+        if (!Array.isArray(result[section])) result[section] = [];
+        result[section].push(parseValue(trimmed.slice(2).trim()));
+        continue;
+      }
+      const m = trimmed.match(/^(\w[\w_-]*):\s*(.*)?$/);
+      if (m) {
+        const key = m[1];
+        if (/^(__proto__|constructor|prototype)$/.test(key)) continue;
+        const val = (m[2] || '').trim();
+        if (typeof result[section] !== 'object' || Array.isArray(result[section])) {
+          result[section] = {};
+        }
+        if (val === '' || val === undefined) {
+          // Sub-section header (e.g. "domains:")
+          subSection = key;
+          result[section][key] = {};
+        } else {
+          result[section][key] = parseValue(val);
+        }
+      }
+      continue;
+    }
+
+    // Level 2 — inside a sub-section (indent 4+)
+    if (subSection && indent >= 4) {
+      if (trimmed.startsWith('- ')) {
+        if (!Array.isArray(result[section][subSection])) result[section][subSection] = [];
+        result[section][subSection].push(parseValue(trimmed.slice(2).trim()));
+        continue;
+      }
+      const m = trimmed.match(/^(\w[\w_-]*):\s*(.*)?$/);
+      if (m) {
+        const key = m[1];
+        if (/^(__proto__|constructor|prototype)$/.test(key)) continue;
+        const val = (m[2] || '').trim();
+        if (typeof result[section][subSection] !== 'object' || Array.isArray(result[section][subSection])) {
+          result[section][subSection] = {};
+        }
+        result[section][subSection][key] = parseValue(val);
+      }
+    }
+  }
+
+  return result;
+}
+
+// ─── Deep Merge ──────────────────────────────────────────────────
+
+/**
+ * Deep merge source into target. Arrays are replaced, not merged.
+ * Returns a new object.
+ */
+function deepMerge(target, source) {
+  const output = {};
+  const BLOCKED = new Set(['__proto__', 'constructor', 'prototype']);
+  // Copy target first
+  for (const key of Object.keys(target)) {
+    if (BLOCKED.has(key)) continue;
+    if (target[key] !== null && typeof target[key] === 'object' && !Array.isArray(target[key])) {
+      output[key] = deepMerge(target[key], {});
+    } else if (Array.isArray(target[key])) {
+      output[key] = target[key].slice();
+    } else {
+      output[key] = target[key];
+    }
+  }
+  // Overlay source
+  for (const key of Object.keys(source)) {
+    if (BLOCKED.has(key)) continue;
+    if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      output[key] = deepMerge(output[key] || {}, source[key]);
+    } else if (Array.isArray(source[key])) {
+      output[key] = source[key].slice();
+    } else {
+      output[key] = source[key];
+    }
+  }
+  return output;
+}
+
+// ─── Settings Loaders ────────────────────────────────────────────
+
+/**
+ * Returns a deep clone of DEFAULTS.
+ */
+function getDefault() {
+  return JSON.parse(JSON.stringify(DEFAULTS));
+}
+
+// ─── Settings Cache ──────────────────────────────────────────────
+
+let _cache = null;
+let _cacheDir = null;
+let _cacheMtime = 0;
+
+function _invalidateCache() {
+  _cache = null;
+  _cacheDir = null;
+  _cacheMtime = 0;
+}
+
+/**
+ * Load global defaults from ~/.claude/hooks/ezra-defaults.yaml.
+ * Falls back to hardcoded DEFAULTS if file doesn't exist.
+ */
+function loadGlobalDefaults() {
+  const globalPath = path.join(os.homedir(), '.claude', 'hooks', 'ezra-defaults.yaml');
+  const defaults = getDefault();
+  if (!fs.existsSync(globalPath)) return defaults;
+  try {
+    const text = fs.readFileSync(globalPath, 'utf8');
+    const parsed = parseYamlSimple(text);
+    return deepMerge(defaults, parsed);
+  } catch {
+    return defaults;
+  }
+}
+
+/**
+ * Load settings with 3-layer merge:
+ *   1. Hardcoded DEFAULTS (safety net)
+ *   2. Global ~/.claude/hooks/ezra-defaults.yaml (user preferences)
+ *   3. Project .ezra/settings.yaml (project-specific overrides)
+ *
+ * Each layer overrides the previous. Missing layers are skipped.
+ * Uses a simple mtime-based cache to avoid re-reading on every call.
+ */
+function loadSettings(projectDir) {
+  const globalMerged = loadGlobalDefaults();
+  const settingsPath = path.join(projectDir, '.ezra', 'settings.yaml');
+  if (!fs.existsSync(settingsPath)) return globalMerged;
+
+  try {
+    const stat = fs.statSync(settingsPath);
+    const mtime = stat.mtimeMs;
+    if (_cache && _cacheDir === projectDir && _cacheMtime === mtime) {
+      return JSON.parse(JSON.stringify(_cache));
+    }
+    const text = fs.readFileSync(settingsPath, 'utf8');
+    const parsed = parseYamlSimple(text);
+    const merged = deepMerge(globalMerged, parsed);
+    _cache = merged;
+    _cacheDir = projectDir;
+    _cacheMtime = mtime;
+    return JSON.parse(JSON.stringify(merged));
+  } catch {
+    return globalMerged;
+  }
+}
+
+/**
+ * Section accessors
+ */
+function getStandards(projectDir) {
+  return loadSettings(projectDir).standards;
+}
+
+function getSecurity(projectDir) {
+  return loadSettings(projectDir).security;
+}
+
+function getOversight(projectDir) {
+  return loadSettings(projectDir).oversight;
+}
+
+function getBestPractices(projectDir) {
+  return loadSettings(projectDir).best_practices;
+}
+
+function getLicensing(projectDir) {
+  return loadSettings(projectDir).licensing;
+}
+
+function getPlanning(projectDir) {
+  return loadSettings(projectDir).planning;
+}
+
+function getMemory(projectDir) {
+  return loadSettings(projectDir).memory;
+}
+
+function getWorkflows(projectDir) {
+  return loadSettings(projectDir).workflows;
+}
+
+function getSelfLearning(projectDir) {
+  return loadSettings(projectDir).self_learning;
+}
+
+function getProjectManager(projectDir) {
+  return loadSettings(projectDir).project_manager;
+}
+
+function getAgents(projectDir) {
+  return loadSettings(projectDir).agents;
+}
+
+function getDashboard(projectDir) {
+  return loadSettings(projectDir).dashboard;
+}
+
+function getCloudSync(projectDir) {
+  return loadSettings(projectDir).cloud_sync;
+}
+
+function getLibrary(projectDir) {
+  return loadSettings(projectDir).library;
+}
+
+function getNotifications(projectDir) {
+  return loadSettings(projectDir).notifications;
+}
+
+function getExecution(projectDir) {
+  return loadSettings(projectDir).execution;
+}
+
+function getQuiz2Build(projectDir) {
+  return loadSettings(projectDir).quiz2build;
+}
+
+// ─── Exports (for require()) ─────────────────────────────────────
+
+module.exports = {
+  loadSettings,
+  getStandards,
+  getSecurity,
+  getOversight,
+  getBestPractices,
+  getLicensing,
+  getPlanning,
+  getMemory,
+  getWorkflows,
+  getSelfLearning,
+  getProjectManager,
+  getAgents,
+  getDashboard,
+  getCloudSync,
+  getLibrary,
+  getNotifications,
+  getExecution,
+  getQuiz2Build,
+  parseYamlSimple,
+  parseValue,
+  deepMerge,
+  DEFAULTS,
+  getDefault,
+  loadGlobalDefaults,
+  _invalidateCache,
+};
+
+// ─── Hook Protocol (stdin → stdout) ──────────────────────────────
+// When invoked as a hook, read settings and output them as JSON.
+
+if (require.main === module) {
+  let input = '';
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', chunk => {
+  input += chunk;
+  if (input.length > MAX_STDIN) { process.exit(0); }
+});
+  process.stdin.on('end', () => {
+    try {
+      const event = JSON.parse(input);
+      const cwd = event.cwd || process.cwd();
+      const settings = loadSettings(cwd);
+      process.stdout.write(JSON.stringify(settings));
+    } catch {
+      // Graceful failure — output empty and exit 0
+      const msg = _fmt('SETTINGS_001', { detail: 'Hook protocol error' });
+      process.stderr.write(msg + "\n");
+      _log(process.cwd(), 'ezra-settings', 'warn', msg);
+      process.stdout.write('{}');
+    }
+    process.exit(0);
+  });
+}
