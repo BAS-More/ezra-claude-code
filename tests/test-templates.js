@@ -25,6 +25,7 @@ const EXPECTED = [
   'onboarding.yaml',
   'plan-review.yaml',
   'phase-gate.yaml',
+  'achievements.yaml',
 ];
 
 const REQUIRED_FIELDS = ['name', 'description', 'version', 'steps'];
