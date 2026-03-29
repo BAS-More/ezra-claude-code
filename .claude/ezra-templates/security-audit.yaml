@@ -1,0 +1,51 @@
+name: security-audit
+description: Full security audit — OWASP scan, dependency audit, secrets check, auth review, report.
+version: 1
+author: EZRA
+
+guard_rails:
+  require_clean_git: true
+  block_on_failure: true
+
+steps:
+  - id: 1
+    name: OWASP Scan
+    type: ezra
+    ezra_command: scan
+    on_failure: stop
+
+  - id: 2
+    name: Dependency Audit
+    type: command
+    command: npm audit --json
+    on_failure: ask
+
+  - id: 3
+    name: Secrets Check
+    type: command
+    command: "grep -rn 'password\\s*=\\s*[\"'\\''']' src/ --include='*.ts' --include='*.js' -l || true"
+    on_failure: skip
+
+  - id: 4
+    name: Security Doc Review
+    type: ezra
+    ezra_command: doc-check
+    on_failure: skip
+
+  - id: 5
+    name: Health Check (Security Pillar)
+    type: ezra
+    ezra_command: health
+    on_failure: skip
+
+  - id: 6
+    name: Advisor (Security Focus)
+    type: ezra
+    ezra_command: advisor security
+    on_failure: skip
+
+  - id: 7
+    name: Security Report
+    type: report
+    report_type: detailed
+    report_sources: [1, 2, 3, 5]

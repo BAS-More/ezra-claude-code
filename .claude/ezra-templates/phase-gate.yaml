@@ -1,0 +1,51 @@
+name: "Phase Gate"
+description: "Mandatory quality gate that must pass 100% before a phase can advance. Runs tests, lint, security scan, coverage check, and standards compliance."
+version: "1.0.0"
+
+guard_rails:
+  block_on_failure: true
+  max_consecutive_failures: 1
+
+steps:
+  - id: 1
+    name: "Run Test Suite"
+    type: check
+    description: "Execute the project's test suite. All tests must pass."
+    on_failure: stop
+
+  - id: 2
+    name: "Lint Check"
+    type: check
+    description: "Run linter. Zero warnings in strict mode."
+    on_failure: stop
+
+  - id: 3
+    name: "Security Scan"
+    type: validate
+    description: "Check for critical/high severity findings via EZRA oversight."
+    on_failure: stop
+
+  - id: 4
+    name: "Coverage Check"
+    type: check
+    description: "Verify line coverage meets the configured minimum (default: not required)."
+    on_failure: stop
+
+  - id: 5
+    name: "Standards Check"
+    type: validate
+    description: "Verify no CRITICAL or HIGH findings in the most recent EZRA scan."
+    on_failure: stop
+
+  - id: 6
+    name: "Gate Report"
+    type: report
+    description: "Generate gate summary with scores, findings, and pass/fail verdict."
+    on_failure: skip
+
+  - id: 7
+    name: "Phase Advance Decision"
+    type: approval
+    auto_approve: true
+    description: "Auto-approve phase advance if all checks pass. Halt and escalate if any check failed."
+    on_failure: stop

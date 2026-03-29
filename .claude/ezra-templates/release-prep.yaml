@@ -1,0 +1,46 @@
+name: release-prep
+description: Pre-release checklist — health gate, security audit, doc completeness, reconciliation, version snapshot.
+version: 1
+author: EZRA
+
+guard_rails:
+  require_clean_git: true
+  require_passing_tests: true
+  block_on_failure: true
+
+steps:
+  - id: 1
+    name: Health Gate
+    type: ezra
+    ezra_command: health
+    on_failure: stop
+
+  - id: 2
+    name: Security Audit
+    type: ezra
+    ezra_command: scan
+    on_failure: stop
+
+  - id: 3
+    name: Doc Completeness
+    type: ezra
+    ezra_command: doc-check
+    on_failure: ask
+
+  - id: 4
+    name: Plan Reconciliation
+    type: ezra
+    ezra_command: reconcile
+    on_failure: ask
+
+  - id: 5
+    name: Version Snapshot
+    type: ezra
+    ezra_command: version snapshot pre-release
+    on_failure: skip
+
+  - id: 6
+    name: Release Report
+    type: report
+    report_type: detailed
+    report_sources: [1, 2, 3, 4]
