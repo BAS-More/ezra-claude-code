@@ -1,6 +1,6 @@
 # EZRA Command Reference
 
-All 39 slash commands available after installation.
+All 41 slash commands available after installation.
 
 ## Setup & Onboarding
 
@@ -501,6 +501,24 @@ Enhanced workflow template system with validation, composition, and execution tr
 - Compose multiple templates into a single workflow; run workflows with execution tracking
 - Execution history and aggregate statistics (run count, success rate, most used templates)
 - Usage: `/ezra:workflow list`, `/ezra:workflow run <name>`, `/ezra:workflow compose <t1> <t2>`, `/ezra:workflow validate <name>`
+
+### `/ezra:assess`
+Quiz2Build assessment integration — import readiness scores, gap heatmaps, and generated documents.
+
+- Import Quiz2Build sessions into EZRA (scores, risks, project facts)
+- Link projects for ongoing sync between EZRA and Quiz2Build
+- Push EZRA state (decisions, scans, health) back as Quiz2Build evidence
+- Re-score readiness using current project state
+- Generate strategic documents (Architecture Dossier, SDLC Playbook, etc.)
+- Usage: `/ezra:assess import <sessionId>`, `/ezra:assess link <projectId>`, `/ezra:assess sync`, `/ezra:assess score`, `/ezra:assess generate <docType>`
+
+### `/ezra:interview`
+Interactive gap interview — build project-definition.yaml from documentation and guided Q&A.
+
+- Scans existing docs for known facts, then asks only about gaps
+- Covers domains: tech stack, deployment, auth, database, testing, security, performance, compliance
+- Outputs structured `.ezra/project-definition.yaml` for planning
+- Usage: `/ezra:interview`, `/ezra:interview resume`
 
 ---
 

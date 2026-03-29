@@ -69,6 +69,7 @@ const SUITES = [
   { name: 'V7-MAHClient',   script: 'test-v7-mah-client.js' },
   { name: 'V7-TaskVerifier', script: 'test-v7-task-verifier.js' },
   { name: 'V7-Q2BClient',   script: 'test-v7-quiz2build-client.js' },
+  { name: 'V7-SessionSync', script: 'test-v7-session-sync.js' },
 
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },

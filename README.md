@@ -51,7 +51,7 @@ npx ezra-claude-code --local
 |-----------|-------------|
 | **41 Slash Commands** | Governance, documents, dashboard, processes, autonomous execution, multi-project, planning, memory, licensing, assessment |
 | **4 Subagent Engines + 100 Roles** | Architect, Reviewer, Guardian, Reconciler — plus 100 specialized roles across 12 domains |
-| **43 Lifecycle Hooks** | Protected path guard, session dashboard, drift detection, version tracking, oversight, memory capture, workflows, licensing, cloud sync, best practice scraper, execution engine |
+| **44 Lifecycle Hooks** | Protected path guard, session dashboard, drift detection, version tracking, oversight, memory capture, workflows, licensing, cloud sync, best practice scraper, execution engine |
 | **81 Document Types** | Full SDLC coverage from business case through decommissioning |
 | **5-Pillar Health** | On-Track, No Gaps, Clean, Secure, Best Practices (scored 0-100) |
 | **Process Engine** | Adjustable step-by-step workflows saved as portable templates |
@@ -133,6 +133,26 @@ npx ezra-claude-code --local
 /ezra:handoff       Generate session handoff brief for continuity across conversations
 /ezra:learn         Capture learnings, patterns, and anti-patterns into project memory
 /ezra:interview     Interactive gap interview — build project-definition.yaml from docs + answers
+/ezra:install       Install EZRA hooks and commands to local or global scope
+```
+
+### Planning & Memory
+
+```
+/ezra:plan          Holistic planning — decompose, assign, execute, verify, checkpoint
+/ezra:memory        Persistent project knowledge base — key facts, red lines, briefings
+/ezra:workflow      Workflow template engine — create, run, list built-in workflows
+/ezra:pm            Project manager — milestones, stall detection, escalation, reports
+/ezra:progress      Track agent progress and check milestones
+/ezra:assess        Project maturity assessment across governance dimensions
+/ezra:portfolio     Multi-project portfolio overview and cross-project insights
+```
+
+### Licensing
+
+```
+/ezra:license       License management — activate, deactivate, check tier (Core/Pro/Team)
+/ezra:help          Show all available commands and usage
 ```
 
 ## Health Pillars

@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 let _http, _settings, _log;
 try { _http = require('./ezra-http.js'); } catch { _http = null; }
@@ -18,13 +18,32 @@ const PROTECTED_BRANCHES = ['main', 'master', 'production', 'release'];
 // Conventional commit types
 const COMMIT_TYPES = ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf', 'ci', 'build'];
 
+// Safe branch/tag name pattern: alphanumeric, hyphens, underscores, dots, slashes
+const SAFE_REF_NAME = /^[a-zA-Z0-9._\-/]+$/;
+
 /**
- * Run a git command safely.
+ * Validate a branch or tag name against safe characters.
+ * Throws if the name contains shell-unsafe characters.
+ */
+function validateRefName(name) {
+  if (!name || typeof name !== 'string') throw new Error('Invalid ref name: empty or non-string');
+  if (!SAFE_REF_NAME.test(name)) throw new Error(`Unsafe ref name rejected: ${name.slice(0, 60)}`);
+  if (name.includes('..') || name.startsWith('-') || name.endsWith('.lock')) {
+    throw new Error(`Invalid ref name rejected: ${name.slice(0, 60)}`);
+  }
+  return name;
+}
+
+/**
+ * Run a git command safely using execFileSync (no shell).
+ * @param {string[]} args — array of arguments passed to git
+ * @param {string} [cwd] — working directory
  * Returns { success, output, error }
  */
 function runGit(args, cwd) {
   try {
-    const output = execSync(`git ${args}`, { cwd, encoding: 'utf8', timeout: 30000, stdio: ['pipe', 'pipe', 'pipe'] });
+    const argsArray = Array.isArray(args) ? args : args.split(/\s+/);
+    const output = execFileSync('git', argsArray, { cwd, encoding: 'utf8', timeout: 30000, stdio: ['pipe', 'pipe', 'pipe'] });
     return { success: true, output: output.trim() };
   } catch (e) {
     return { success: false, output: '', error: (e.stderr || e.message || '').trim() };
@@ -37,10 +56,10 @@ function runGit(args, cwd) {
  */
 function getChangedFiles(projectDir) {
   // Staged
-  const staged = runGit('diff --cached --name-only', projectDir);
+  const staged = runGit(['diff', '--cached', '--name-only'], projectDir);
   // Unstaged tracked
-  const unstaged = runGit('diff --name-only', projectDir);
-  
+  const unstaged = runGit(['diff', '--name-only'], projectDir);
+
   const files = new Set();
   if (staged.success) staged.output.split('\n').filter(Boolean).forEach(f => files.add(f));
   if (unstaged.success) unstaged.output.split('\n').filter(Boolean).forEach(f => files.add(f));
@@ -51,7 +70,7 @@ function getChangedFiles(projectDir) {
  * Get only staged files.
  */
 function getStagedFiles(projectDir) {
-  const result = runGit('diff --cached --name-only', projectDir);
+  const result = runGit(['diff', '--cached', '--name-only'], projectDir);
   return result.success ? result.output.split('\n').filter(Boolean) : [];
 }
 
@@ -118,7 +137,7 @@ function inferScope(files) {
  * Get current branch name.
  */
 function getCurrentBranch(projectDir) {
-  const result = runGit('rev-parse --abbrev-ref HEAD', projectDir);
+  const result = runGit(['rev-parse', '--abbrev-ref', 'HEAD'], projectDir);
   return result.success ? result.output : 'unknown';
 }
 
@@ -136,24 +155,23 @@ function isProtectedBranch(branch) {
  */
 function commitBatch(projectDir, files, message) {
   if (!files || files.length === 0) return { success: false, error: 'No files to commit' };
-  
-  // Stage the files
+
+  // Stage the files — pass each file path as a separate array arg (no shell)
   for (const f of files) {
-    const stageResult = runGit(`add "${f.replace(/"/g, '\\"')}"`, projectDir);
+    const stageResult = runGit(['add', f], projectDir);
     if (!stageResult.success) {
       return { success: false, error: `Failed to stage ${f}: ${stageResult.error}` };
     }
   }
-  
-  // Commit
-  const escapedMsg = message.replace(/"/g, '\\"');
-  const commitResult = runGit(`commit -m "${escapedMsg}"`, projectDir);
+
+  // Commit — message passed as array arg, no shell escaping needed
+  const commitResult = runGit(['commit', '-m', message], projectDir);
   if (!commitResult.success) {
     return { success: false, error: commitResult.error };
   }
-  
+
   // Get SHA
-  const shaResult = runGit('rev-parse HEAD', projectDir);
+  const shaResult = runGit(['rev-parse', 'HEAD'], projectDir);
   return { success: true, sha: shaResult.output, message };
 }
 
@@ -170,8 +188,11 @@ function pushBranch(projectDir, options = {}) {
       protected: true,
     };
   }
-  const pushCmd = options.set_upstream ? `push -u origin ${branch}` : `push origin ${branch}`;
-  const result = runGit(pushCmd, projectDir);
+  validateRefName(branch);
+  const pushArgs = options.set_upstream
+    ? ['push', '-u', 'origin', branch]
+    : ['push', 'origin', branch];
+  const result = runGit(pushArgs, projectDir);
   return { success: result.success, output: result.output, error: result.error, branch };
 }
 
@@ -248,6 +269,8 @@ module.exports = {
   MAX_FILES_PER_BATCH,
   PROTECTED_BRANCHES,
   COMMIT_TYPES,
+  SAFE_REF_NAME,
+  validateRefName,
   getChangedFiles,
   getStagedFiles,
   batchFiles,

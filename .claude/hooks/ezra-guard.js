@@ -196,7 +196,7 @@ function matchGlob(filePath, pattern) {
     .replace(/\./g, '\\.')
     .replace(/\*\*/g, '{{DOUBLESTAR}}')
     .replace(/\*/g, '[^/]*')
-    .replace(/\{\{DOUBLESTAR\}\}/g, '.*');
+    .replace(/\{\{DOUBLESTAR\}\}/g, '.*?');
   
   try {
     return new RegExp(`^${regex}$`).test(normalized) || 

@@ -56,6 +56,31 @@ Run all: `node tests/run-tests.js`
 - `test-v6-progress-hook.js` — Progress tracking hook
 - `test-v6-tier-gate.js` — Tier gate license enforcement
 - `test-v6-version-hook.js` — Version tracking hook
+- `test-v7-interview.js` — Interview engine guided Q&A
+- `test-v7-plan-generator.js` — Plan generation from project definition
+- `test-v7-scraper.js` — Best practice scraper
+- `test-v7-execution.js` — Execution engine task runner
+- `test-v7-phase-gate.js` — Phase gate checks and findings
+- `test-v7-notifier.js` — Notification system
+- `test-v7-commit-engine.js` — Commit engine batching and safety
+- `test-v7-quiz2build.js` — Quiz2Build integration
+- `test-v7-phase7.js` — Phase 7 holistic validation
+- `test-v7-yaml-utils.js` — YAML parse/dump utilities
+- `test-v7-event-bus.js` — Event bus pub/sub
+- `test-v7-project-definition.js` — Project definition loader
+- `test-v7-bp-scheduler.js` — Best practice scheduler
+- `test-v7-doc-ingester.js` — Document ingestion engine
+- `test-v7-phase-suggester.js` — Phase suggestion engine
+- `test-v7-deploy-trigger.js` — Deploy trigger hooks
+- `test-v7-settings.js` — Settings management
+- `test-v7-execution-state.js` — Execution state persistence
+- `test-v7-achievement-engine.js` — Achievements and gamification
+- `test-v7-interview-engine.js` — Interview engine core logic
+- `test-v7-agent-dispatcher.js` — Agent dispatch and routing
+- `test-v7-mah-client.js` — MAH client protocol
+- `test-v7-task-verifier.js` — Task verification engine
+- `test-v7-quiz2build-client.js` — Quiz2Build API client
+- `test-v7-session-sync.js` — Session sync hook protocol
 - `lint-all.js` — Code quality (strict mode, no console.error, proper exit codes)
 - `test-e2e.js` — End-to-end flows in temp directories
 - `test-uat.js` — Alpha/Beta/UAT acceptance tests

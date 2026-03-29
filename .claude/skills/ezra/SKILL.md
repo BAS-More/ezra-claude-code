@@ -61,14 +61,16 @@ EZRA persists state in `.ezra/` at the project root:
 - `/ezra:progress` — Track milestone progress and generate reports
 - `/ezra:library` — Best practice library: browse, search, add, export across 14 categories
 - `/ezra:research` — Research agent control: configure automated best practice discovery
-- `/ezra:portfolio — Portfolio health dashboard
-- /ezra:memory
-- /ezra:plan
-- /ezra:license — license management
-- /ezra:install — installer — planning engine — Agent memory system
-- /ezra:workflow — Enhanced workflow templates
-- /ezra:handoff — Session handoff export
-- /ezra:cost` — Cost tracking and budget management for AI agent usage
+- `/ezra:portfolio` — Cross-project portfolio health dashboard
+- `/ezra:memory` — Persistent project knowledge base — key facts, red lines, briefings
+- `/ezra:plan` — Holistic planning engine — decompose, assign, execute, verify, checkpoint
+- `/ezra:license` — License management — activate, deactivate, check tier (Core/Pro/Team)
+- `/ezra:install` — Install EZRA hooks and commands to local or global scope
+- `/ezra:workflow` — Workflow template engine — create, run, list built-in workflows
+- `/ezra:handoff` — Generate session handoff brief for continuity across conversations
+- `/ezra:cost` — Cost tracking and budget management for AI agent usage
+- `/ezra:assess` — Quiz2Build assessment integration — import readiness scores, gap heatmaps, generated documents
+- `/ezra:interview` — Interactive gap interview — build project-definition.yaml from docs + answers
 
 ## Agent System
 
