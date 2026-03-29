@@ -46,8 +46,12 @@ function isAllowed(url) {
   });
 }
 
-function fetchUrl(url) {
+function fetchUrl(url, hops) {
+  if (hops === undefined) hops = 0;
   return new Promise((resolve, reject) => {
+    if (hops > 5) {
+      return reject(new Error(`Too many redirects (max 5) for ${url}`));
+    }
     if (!isAllowed(url)) {
       return reject(new Error(`Domain not in allowlist: ${url}`));
     }
@@ -56,7 +60,7 @@ function fetchUrl(url) {
     const client = parsed.protocol === 'https:' ? https : http;
     const req = client.get(url, { timeout: 10000 }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return fetchUrl(res.headers.location).then(resolve).catch(reject);
+        return fetchUrl(res.headers.location, hops + 1).then(resolve).catch(reject);
       }
       if (res.statusCode !== 200) {
         return reject(new Error(`HTTP ${res.statusCode} for ${url}`));

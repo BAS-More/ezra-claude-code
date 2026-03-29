@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 /**
  * hooks/ezra-tier-gate.js — PreToolUse hook for license tier gating

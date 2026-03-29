@@ -57,6 +57,10 @@ for (const file of jsFiles) {
   const rel = path.relative(ROOT, file);
   const content = fs.readFileSync(file, 'utf8');
 
+  test(`${rel}: has shebang line`, () => {
+    assert(content.startsWith('#!/usr/bin/env node'), `Missing #!/usr/bin/env node shebang`);
+  });
+
   test(`${rel}: no require of external packages`, () => {
     const requires = content.match(/require\(['"]((?!fs|path|os|child_process|readline|crypto|url|util|http|https|stream|events|buffer|querystring|string_decoder|assert|net|tls|dns|dgram|cluster|worker_threads|perf_hooks|v8|vm|zlib)[\w@/-]+)['"]\)/g);
     if (requires && requires.length > 0) {

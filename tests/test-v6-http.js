@@ -287,6 +287,39 @@ test('httpsPost: handles empty string URL', async () => {
   assert(caught, 'empty URL should throw');
 });
 
+// ═══ Alias exports (GAP-001 fix validation) ═════════════════════
+
+test('exports: post alias exists and is a function', () => {
+  assert(typeof ezraHttp.post === 'function', 'post alias missing');
+  assert(ezraHttp.post === ezraHttp.httpsPost, 'post should alias httpsPost');
+});
+
+test('exports: request function exists', () => {
+  assert(typeof ezraHttp.request === 'function', 'request function missing');
+});
+
+test('request: rejects non-HTTPS URL', async () => {
+  let caught = false;
+  try {
+    await ezraHttp.request('http://example.com/path', { method: 'POST', body: '{}' });
+  } catch (e) {
+    caught = true;
+    assert(e.message.includes('SSRF') || e.message.includes('https'), 'should mention HTTPS requirement');
+  }
+  assert(caught, 'plain HTTP request should throw');
+});
+
+test('request: routes GET method to httpsGet path (SSRF blocked)', async () => {
+  let caught = false;
+  try {
+    await ezraHttp.request('https://192.168.1.1/path', { method: 'GET' });
+  } catch (e) {
+    caught = true;
+    assert(e.message.includes('SSRF') || e.message.includes('private'), 'should block private IP');
+  }
+  assert(caught, 'GET to private IP should throw via httpsGet path');
+});
+
 // ═══ DONE ═══════════════════════════════════════════════════════
 
 console.log(`PASSED: ${passed}  FAILED: ${failed}`);

@@ -82,6 +82,10 @@ function apiRequest(endpoint, urlPath, options) {
   if (!_http) {
     return { error: 'ezra-http not available', skipped: true };
   }
+  // Warn if endpoint is plain HTTP and not localhost (will fail SSRF check in production)
+  if (endpoint && endpoint.startsWith('http://') && !endpoint.includes('localhost') && !endpoint.includes('127.0.0.1')) {
+    process.stderr.write('[Q2B] Warning: endpoint "' + endpoint + '" uses plain HTTP. Production endpoints must use HTTPS.\n');
+  }
   const url = endpoint.replace(/\/$/, '') + urlPath;
   try {
     return _http.request(url, options);

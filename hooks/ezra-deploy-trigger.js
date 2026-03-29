@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 let _http, _settings, _log;

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 /**
  * hooks/ezra-license.js — License Management Engine for EZRA v6

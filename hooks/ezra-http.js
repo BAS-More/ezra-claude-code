@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 /**
  * hooks/ezra-http.js — Shared HTTP utility for EZRA cloud hooks
@@ -173,9 +174,35 @@ function httpsGet(url, headers) {
 
 // ─── Exports ────────────────────────────────────────────────────
 
+// ─── Convenience aliases ─────────────────────────────────────────
+
+/**
+ * Alias for httpsPost — used by hooks that call _http.post()
+ */
+const post = httpsPost;
+
+/**
+ * Generic request dispatcher — used by hooks that call _http.request(url, opts)
+ * opts: { method, headers, body }
+ */
+function request(url, opts) {
+  opts = opts || {};
+  const method = (opts.method || 'GET').toUpperCase();
+  if (method === 'GET') {
+    return httpsGet(url, opts.headers);
+  }
+  let body = opts.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch (_) { body = {}; }
+  }
+  return httpsPost(url, body || {}, opts.headers);
+}
+
 module.exports = {
   httpsPost,
   httpsGet,
+  post,
+  request,
   isBlockedHost,
   resolveAndCheck,
   PRIVATE_IP_PATTERNS,

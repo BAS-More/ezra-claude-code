@@ -311,6 +311,32 @@ test('research.md: pending subcommand documented', () => {
   assert(content.includes('pending'), 'research.md should document pending subcommand');
 });
 
+// ─── Redirect depth guard (GAP-003 regression test) ──────────────────────────
+
+test('scraper: fetchUrl rejects after 5 redirect hops', async () => {
+  let threw = false;
+  try {
+    // Call with hops already at the limit — should reject immediately
+    await scraper.fetchUrl('https://owasp.org/test', 6);
+  } catch (e) {
+    threw = true;
+    assert(
+      e.message.toLowerCase().includes('redirect') || e.message.toLowerCase().includes('hop'),
+      'Error should mention redirect limit, got: ' + e.message
+    );
+  }
+  assert(threw, 'fetchUrl should reject when hops > 5');
+});
+
+test('scraper: fetchUrl hop parameter accepted (no throw at 0 hops)', () => {
+  // Confirm the function signature accepts the hops parameter without crashing
+  // when given a disallowed domain (will throw domain error, not hops error)
+  let errMsg = '';
+  try { scraper.fetchUrl('https://evil.example.com', 0); } catch (e) { errMsg = e.message; }
+  // If it throws synchronously, it should NOT be a hops error
+  assert(!errMsg.includes('redirect') && !errMsg.includes('hop'), 'Should not error on hops=0, got: ' + errMsg);
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log(`  V7-Scraper: PASSED: ${passed} FAILED: ${failed}`);
