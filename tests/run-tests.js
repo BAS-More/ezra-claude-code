@@ -43,6 +43,8 @@ const SUITES = [
   { name: 'V6-Tier-Gate', script: 'test-v6-tier-gate.js' },
   { name: 'V6-Version-Hook', script: 'test-v6-version-hook.js' },
 
+  { name: 'V7-Interview', script: 'test-v7-interview.js' },
+
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },
   { name: 'UAT', script: 'test-uat.js' },

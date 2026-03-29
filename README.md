@@ -132,6 +132,7 @@ npx ezra-claude-code --local
 /ezra:cost          Cost tracking and budget management for AI agent usage
 /ezra:handoff       Generate session handoff brief for continuity across conversations
 /ezra:learn         Capture learnings, patterns, and anti-patterns into project memory
+/ezra:interview     Interactive gap interview — build project-definition.yaml from docs + answers
 ```
 
 ## Health Pillars

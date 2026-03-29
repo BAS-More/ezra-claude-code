@@ -41,6 +41,7 @@ const EXPECTED_COMMANDS = [
     'plan',
     'license',
     'install', 'workflow', 'cost',
+    'interview',
 ];
 
 const EXPECTED_AGENTS = [

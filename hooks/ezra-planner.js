@@ -536,6 +536,70 @@ function describePlan(projectDir) {
   return lines.join('\n');
 }
 
+// ─── createPlanFromDefinition ────────────────────────────────────
+
+/**
+ * Create a plan from a project-definition.yaml file.
+ * Reads .ezra/project-definition.yaml, maps it to a createPlan() spec,
+ * and returns the result of createPlan().
+ */
+function createPlanFromDefinition(projectDir) {
+  const defPath = path.join(projectDir, '.ezra', 'project-definition.yaml');
+  if (!fs.existsSync(defPath)) {
+    return { success: false, error: 'No project-definition.yaml found. Run /ezra:interview first.' };
+  }
+
+  let def;
+  try {
+    def = readYaml(defPath);
+  } catch (e) {
+    return { success: false, error: 'Failed to read project-definition.yaml: ' + e.message };
+  }
+
+  if (!def.project_name && !def.name) {
+    return { success: false, error: 'project-definition.yaml must have project_name field.' };
+  }
+
+  // Build features list from definition
+  const features = [];
+
+  // Add explicit features
+  if (Array.isArray(def.features)) {
+    def.features.forEach(f => { if (f) features.push(String(f)); });
+  }
+
+  // Add tech stack signals as constraints
+  const stack = def.tech_stack || {};
+  const langs = Array.isArray(stack.languages) ? stack.languages : (stack.languages ? [stack.languages] : []);
+  const frameworks = Array.isArray(stack.frameworks) ? stack.frameworks : (stack.frameworks ? [stack.frameworks] : []);
+  if (langs.length > 0) features.push('Tech stack: ' + langs.join(', '));
+  if (frameworks.length > 0) features.push('Frameworks: ' + frameworks.join(', '));
+  if (def.auth_strategy) features.push('Auth: ' + def.auth_strategy);
+  if (def.database_choice) features.push('Database: ' + def.database_choice);
+  if (def.deployment_target) features.push('Deploy to: ' + def.deployment_target);
+  if (def.testing_requirements) features.push('Testing: ' + def.testing_requirements);
+
+  // Build risk list from security level and constraints
+  const risks = [];
+  if (def.security_level && def.security_level !== 'low') {
+    risks.push('Security level: ' + def.security_level + ' — enforce input validation, secrets management, OWASP top 10');
+  }
+  if (def.performance_targets) {
+    risks.push('Performance targets: ' + def.performance_targets);
+  }
+  const constraints = Array.isArray(def.constraints) ? def.constraints : [];
+  constraints.forEach(c => { if (c) risks.push(String(c)); });
+
+  const spec = {
+    name: def.project_name || def.name,
+    description: def.description || '',
+    features,
+    risks,
+  };
+
+  return createPlan(projectDir, spec);
+}
+
 // ─── Exports ────────────────────────────────────────────────────
 
 module.exports = {
@@ -562,4 +626,5 @@ module.exports = {
   getCheckpointsDir,
   getGapReportsDir,
   generateId,
+  createPlanFromDefinition,
 };
