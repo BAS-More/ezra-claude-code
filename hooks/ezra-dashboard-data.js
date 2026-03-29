@@ -448,6 +448,98 @@ function saveDashboardExport(projectDir, data) {
   return filePath;
 }
 
+// ─── Dashboard Sync ─────────────────────────────────────────────
+
+/**
+ * Push current project state to the EZRA Dashboard.
+ * Reads dashboard_url and dashboard_sync_token from .ezra/settings.yaml.
+ * Uses ezra-http.js for SSRF-safe HTTPS POST.
+ */
+async function syncToDashboard(projectDir, action) {
+  const ezraDir = path.join(projectDir, '.ezra');
+  const settingsPath = path.join(ezraDir, 'settings.yaml');
+  if (!fs.existsSync(settingsPath)) return { synced: false, reason: 'no settings.yaml' };
+
+  const settings = readYaml(settingsPath);
+  // Support nested and flat key formats
+  const dashUrl = settings.dashboard_url || (settings.dashboard && settings.dashboard.url) || '';
+  const syncToken = settings.dashboard_sync_token || (settings.dashboard && settings.dashboard.sync_token) || '';
+
+  if (!dashUrl) return { synced: false, reason: 'dashboard_url not configured in .ezra/settings.yaml' };
+  if (!syncToken) return { synced: false, reason: 'dashboard_sync_token not configured in .ezra/settings.yaml' };
+
+  // Collect full state
+  const exported = exportDashboardData(projectDir);
+  const gov = readYaml(path.join(ezraDir, 'governance.yaml'));
+
+  // Count plans
+  const plansDir = path.join(ezraDir, 'plans');
+  let plansCount = 0;
+  if (fs.existsSync(plansDir)) {
+    plansCount = fs.readdirSync(plansDir).filter(f => f.endsWith('.yaml')).length;
+  }
+
+  // Count risks
+  const risksPath = path.join(ezraDir, 'risks.yaml');
+  let riskCount = 0;
+  if (fs.existsSync(risksPath)) {
+    const risksContent = fs.readFileSync(risksPath, 'utf8');
+    riskCount = (risksContent.match(/status:\s*open/gi) || []).length;
+  }
+
+  // Health grade from score
+  const score = exported.health.health_score;
+  let grade = 'N/A';
+  if (score !== null) {
+    if (score >= 90) grade = 'A';
+    else if (score >= 75) grade = 'B';
+    else if (score >= 60) grade = 'C';
+    else if (score >= 40) grade = 'D';
+    else grade = 'F';
+  }
+
+  const payload = {
+    action: action || 'sync',
+    project_name: gov.project || gov.name || path.basename(projectDir),
+    project_path: projectDir,
+    phase: gov.phase || gov.project_phase || null,
+    version: exported.health.version,
+    health_score: score,
+    health_grade: grade,
+    decisions_count: exported.health.decisions_count,
+    plans_count: plansCount,
+    scans_count: 0,
+    drift_level: exported.health.drift_level,
+    risk_count: riskCount,
+    last_scan_date: exported.health.last_scan,
+    open_items: exported.brief.open_items || [],
+    recent_decisions: exported.brief.recent_decisions || [],
+    recent_commits: exported.brief.recent_commits || [],
+    architecture: exported.brief.architecture || '',
+  };
+
+  // Count scans
+  const scansDir = path.join(ezraDir, 'scans');
+  if (fs.existsSync(scansDir)) {
+    payload.scans_count = fs.readdirSync(scansDir).filter(f => f.endsWith('.yaml')).length;
+  }
+
+  // POST to dashboard
+  let _http;
+  try { _http = require('./ezra-http'); } catch { return { synced: false, reason: 'ezra-http.js not found' }; }
+
+  const url = dashUrl.replace(/\/$/, '') + '/api/ezra/sync';
+  try {
+    const result = await _http.post(url, payload, {
+      'x-ezra-sync-token': syncToken,
+      'Content-Type': 'application/json',
+    });
+    return { synced: true, statusCode: result.statusCode, body: result.body };
+  } catch (err) {
+    return { synced: false, reason: err.message };
+  }
+}
+
 // ─── Exports ─────────────────────────────────────────────────────
 
 module.exports = {

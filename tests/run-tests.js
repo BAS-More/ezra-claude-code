@@ -53,6 +53,14 @@ const SUITES = [
   { name: 'V7-Quiz2Build',  script: 'test-v7-quiz2build.js' },
   { name: 'V7-Phase7',      script: 'test-v7-phase7.js' },
 
+  { name: 'V7-YamlUtils',   script: 'test-v7-yaml-utils.js' },
+  { name: 'V7-EventBus',    script: 'test-v7-event-bus.js' },
+  { name: 'V7-ProjectDef',  script: 'test-v7-project-definition.js' },
+  { name: 'V7-BPScheduler', script: 'test-v7-bp-scheduler.js' },
+  { name: 'V7-DocIngester', script: 'test-v7-doc-ingester.js' },
+  { name: 'V7-PhaseSugg',   script: 'test-v7-phase-suggester.js' },
+  { name: 'V7-DeployTrig',  script: 'test-v7-deploy-trigger.js' },
+
   { name: 'Lint', script: 'lint-all.js' },
   { name: 'E2E', script: 'test-e2e.js' },
   { name: 'UAT', script: 'test-uat.js' },

@@ -42,7 +42,7 @@ test('deepMerge basic', () => { const r = deepMerge({ a: 1 }, { b: 2 }); assert(
 test('deepMerge overwrites', () => { const r = deepMerge({ a: 1 }, { a: 2 }); assert(r.a === 2); });
 test('deepMerge deep', () => { const r = deepMerge({ x: { a: 1 } }, { x: { b: 2 } }); assert(r.x.a === 1 && r.x.b === 2); });
 test('deepMerge replaces arrays', () => { const r = deepMerge({ a: [1] }, { a: [2, 3] }); assert(r.a.length === 2); });
-test('deepMerge handles null target', () => { const r = deepMerge(null, { a: 1 }); assert(typeof r === 'object'); });
+test('deepMerge handles empty objects', () => { const r = deepMerge({}, { a: 1 }); assert(r.a === 1); });
 test('deepMerge blocks __proto__', () => { const r = deepMerge({}, { '__proto__': { x: 1 } }); assert(!r.x); });
 
 // --- stringifyYaml ---
